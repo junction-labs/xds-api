@@ -1,0 +1,13 @@
+# Proto dependencies for building the Envoy XDS APIs.
+#
+# These are kept in sync with Envoy bazel configuration.
+#
+# - use the data-plane-api project which is a mirror from envoy itself, so we
+#   also use the dep versions from that repo. repostory_locations.bazel
+[dependencies]
+envoy-data-plane = { repo_url = "https://github.com/envoyproxy/data-plane-api.git", git_ref = "786c93ccaae9891338f098a5aba60e9987d78bd3" }
+cncf-xds = { repo_url = "https://github.com/cncf/xds", git_ref = "555b57ec207be86f811fb0c04752db6f85e3d7e2" }
+protoc-gen-validate = { repo_url = "https://github.com/bufbuild/protoc-gen-validate", git_ref = "v1.0.4" }
+googleapis = { repo_url = "https://github.com/googleapis/googleapis", git_ref = "114a745b2841a044e98cdbb19358ed29fcf4a5f1" }
+opencensus-proto = { repo_url = "https://github.com/census-instrumentation/opencensus-proto", git_ref = "v0.4.1", proto_root = "src" }
+prometheus-client-model = { repo_url = "https://github.com/prometheus/client_model", git_ref = "v0.6.1" }
