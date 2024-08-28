@@ -5,48 +5,37 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use clap::{Parser, Subcommand};
+use anyhow::Context;
 use prost::Message;
 use prost_build::Module;
 use prost_types::FileDescriptorSet;
 use serde::Deserialize;
 use xshell::{cmd, Shell};
 
-fn main() -> anyhow::Result<()> {
-    let args = Args::parse();
+/// Generate sources and check that the generated changes have been committed.
+///
+/// If you are working on this repo, you can set `XDS_API_SKIP_GEN_SRC` to skip
+/// generating sources on every `cargo test` and
+/// `XDS_API_SKIP_GEN_SRC_DIRTY_CHECK` to skip the dirty check.
+///
+/// These flags are opt-out instead of opt-in so the checks run in CI and fail
+/// on pushes that get protos and generated sources out-of-sync.
+#[test]
+fn generate_sources() -> anyhow::Result<()> {
     let sh = Shell::new().unwrap();
-
-    match &args.command {
-        Commands::Generate => generate_xds_api(&sh),
+    if !env::var("XDS_API_SKIP_GEN_SRC").is_ok() {
+        generate_xds_api(&sh)?;
     }
-}
 
-/// Build scripts and build script accessories.
-#[derive(Parser)]
-struct Args {
-    #[command(subcommand)]
-    command: Commands,
-}
+    if !env::var("XDS_API_SKIP_GEN_SRC_DIRTY_CHECK").is_ok() {
+        check_dirty_repo(&sh)?;
+    }
 
-#[derive(Subcommand)]
-enum Commands {
-    /// Generate the xds-api crate based on the Envoy XDS protobuf API.
-    ///
-    /// This task clones the required proto dependencies listed in
-    /// xds-api/proto-defs.toml and does a full rebuild of the api with
-    /// tonic-build.
-    ///
-    /// This command does NOT check in the generated code. For now, that should
-    /// be done manually after reviewing any diffs with the existing definitions.
-    Generate,
+    Ok(())
 }
 
 fn project_root() -> PathBuf {
-    Path::new(&env!("CARGO_MANIFEST_DIR"))
-        .ancestors()
-        .nth(1)
-        .unwrap()
-        .to_path_buf()
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
 /// Generate the xds-api definitions by downloading protobuf dependencies and running
@@ -90,6 +79,16 @@ fn generate_xds_api(sh: &Shell) -> anyhow::Result<()> {
     compile_xds_api(sh, &project_root, &git_dir, &proto_deps)?;
 
     eprintln!("### Okay!");
+    Ok(())
+}
+
+fn check_dirty_repo(sh: &Shell) -> anyhow::Result<()> {
+    let git_status = cmd!(sh, "git status --porcelain").read()?;
+    if !git_status.is_empty() {
+        anyhow::bail!(
+            "Uncomitted git changes found. Make sure you commit protobufs before pushing."
+        )
+    }
     Ok(())
 }
 
@@ -150,13 +149,11 @@ fn compile_xds_api<P: AsRef<Path>, Q: AsRef<Path>>(
         })
         .collect();
 
-    let out_dir = &project_root.as_ref().join("xds-api/src/generated");
+    let out_dir = &project_root.as_ref().join("src/generated");
     cmd!(sh, "rm -r {out_dir}").run()?;
     cmd!(sh, "mkdir -p {out_dir}").run()?;
 
-    let descriptor_path = project_root
-        .as_ref()
-        .join("xds-api/src/xds-descriptors.bin");
+    let descriptor_path = project_root.as_ref().join("src/xds-descriptors.bin");
 
     let mut prost_config = prost_build::Config::new();
     prost_config.enable_type_names();
@@ -184,17 +181,17 @@ fn compile_xds_api<P: AsRef<Path>, Q: AsRef<Path>>(
     let fds = FileDescriptorSet::decode(encoded_descriptor_set.as_slice())
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
 
-    generate_includes(
-        project_root.as_ref().join("xds-api/src/generated/mod.rs"),
-        fds,
-    )?;
+    generate_includes(project_root.as_ref().join("src/generated/mod.rs"), fds)?;
 
     Ok(())
 }
 
 fn envoy_deps<P: AsRef<Path>>(project_root: P) -> anyhow::Result<ProtoDeps> {
     let deps_file = project_root.as_ref().join("protobufs.toml");
-    let deps = toml::from_str(&fs::read_to_string(deps_file)?)?;
+    let deps = toml::from_str(
+        &fs::read_to_string(&deps_file)
+            .with_context(|| format!("failed to load deps file: {}", deps_file.display()))?,
+    )?;
     Ok(deps)
 }
 
