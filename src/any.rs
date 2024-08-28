@@ -126,6 +126,24 @@ well_known_types! {
     ///     _ => todo!(),
     /// }
     /// ```
+    ///
+    /// # `pbjson`
+    ///
+    /// With the `pbjson` feature enabled, [Any][protobuf::Any] messages use
+    /// `WellKnownTypes` for canonical json conversion and any type listed in
+    /// `WellKnownTypes` will be serialized as a struct instead of as an opaque
+    /// blob. For example, an `Any` containing an
+    /// [HttpConnectionManager][xds_http::HttpConnectionManager] would serialize
+    /// to.
+    ///
+    /// ```no_run,json
+    /// {
+    ///     "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+    ///     "route_config": {
+    ///         "name": "test_route"
+    ///     }
+    /// }
+    /// ```
     pub enum WellKnownTypes {
         /// An XDS Listener for LDS.
         Listener => xds_listener::Listener,
