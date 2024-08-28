@@ -28,17 +28,6 @@ pub mod route_discovery_service_client {
     pub struct RouteDiscoveryServiceClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl RouteDiscoveryServiceClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
-    }
     impl<T> RouteDiscoveryServiceClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
@@ -228,17 +217,6 @@ pub mod virtual_host_discovery_service_client {
     #[derive(Debug, Clone)]
     pub struct VirtualHostDiscoveryServiceClient<T> {
         inner: tonic::client::Grpc<T>,
-    }
-    impl VirtualHostDiscoveryServiceClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
     }
     impl<T> VirtualHostDiscoveryServiceClient<T>
     where
@@ -929,17 +907,6 @@ pub mod scoped_routes_discovery_service_client {
     #[derive(Debug, Clone)]
     pub struct ScopedRoutesDiscoveryServiceClient<T> {
         inner: tonic::client::Grpc<T>,
-    }
-    impl ScopedRoutesDiscoveryServiceClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
     }
     impl<T> ScopedRoutesDiscoveryServiceClient<T>
     where

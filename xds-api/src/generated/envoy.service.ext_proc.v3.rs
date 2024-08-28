@@ -562,17 +562,6 @@ pub mod external_processor_client {
     pub struct ExternalProcessorClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl ExternalProcessorClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
-    }
     impl<T> ExternalProcessorClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,

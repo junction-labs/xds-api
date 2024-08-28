@@ -17,7 +17,7 @@ fn main() -> anyhow::Result<()> {
     let sh = Shell::new().unwrap();
 
     match &args.command {
-        Commands::GenerateXdsApi => generate_xds_api(&sh),
+        Commands::Generate => generate_xds_api(&sh),
     }
 }
 
@@ -38,7 +38,7 @@ enum Commands {
     ///
     /// This command does NOT check in the generated code. For now, that should
     /// be done manually after reviewing any diffs with the existing definitions.
-    GenerateXdsApi,
+    Generate,
 }
 
 fn project_root() -> PathBuf {
