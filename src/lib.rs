@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 
 mod any;
+
+#[allow(clippy::all, clippy::pedantic, clippy::nursery)]
 mod generated;
 
 pub mod pb {

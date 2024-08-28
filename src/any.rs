@@ -70,6 +70,7 @@ macro_rules! well_known_types {
         }
 
         #[cfg(feature = "pbjson")]
+        #[allow(clippy::large_enum_variant)]
         #[derive(Debug)]
         enum JsonAny {
             $(
