@@ -1,9 +1,8 @@
 # Proto dependencies for building the Envoy XDS APIs.
 #
-# These are kept in sync with Envoy bazel configuration.
-#
-# - use the data-plane-api project which is a mirror from envoy itself, so we
-#   also use the dep versions from that repo. repostory_locations.bazel
+# The version of the envoy-data-plane repo here determines the version of all of
+# the other dependencies in this file. The git refs here MUST match the versions
+# listed in enovyproxy/data-plane-api.git/bazel/repository_locations.bzl.
 [dependencies]
 envoy-data-plane = { repo_url = "https://github.com/envoyproxy/data-plane-api.git", git_ref = "786c93ccaae9891338f098a5aba60e9987d78bd3" }
 cncf-xds = { repo_url = "https://github.com/cncf/xds", git_ref = "555b57ec207be86f811fb0c04752db6f85e3d7e2" }

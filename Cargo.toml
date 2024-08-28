@@ -8,8 +8,9 @@ repository = "https://github.com/junction-labs/xds-api"
 homepage = "https://github.com/junction-labs/xds-api"
 readme = "README.md"
 description = """
-Protocol buffer types for working with Envoy's XDS APIs.
+Protocol buffer types for working with Envoy's xDS APIs.
 """
+keywords = ["grpc", "xds", "envoy"]
 
 
 [lib]
@@ -27,7 +28,6 @@ pbjson = { version = "0.7", optional = true }
 serde = { version = "1.0", optional = true }
 
 [features]
-transport = ["tonic/transport"]
 pbjson = ["dep:pbjson", "dep:serde"]
 descriptor = []
 
