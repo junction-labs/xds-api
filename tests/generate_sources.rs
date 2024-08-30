@@ -23,11 +23,11 @@ use xshell::{cmd, Shell};
 #[test]
 fn generate_sources() -> anyhow::Result<()> {
     let sh = Shell::new().unwrap();
-    if !env::var("XDS_API_SKIP_GEN_SRC").is_ok() {
+    if env::var("XDS_API_SKIP_GEN_SRC").is_err() {
         generate_xds_api(&sh)?;
     }
 
-    if !env::var("XDS_API_SKIP_GEN_SRC_DIRTY_CHECK").is_ok() {
+    if env::var("XDS_API_SKIP_GEN_SRC_DIRTY_CHECK").is_err() {
         check_dirty_repo(&sh)?;
     }
 
@@ -63,6 +63,15 @@ fn project_root() -> PathBuf {
 fn generate_xds_api(sh: &Shell) -> anyhow::Result<()> {
     let project_root = project_root();
     let proto_deps = envoy_deps(&project_root)?;
+
+    eprintln!("### Checking protoc version...");
+    let protoc_version = check_protoc_version(sh)?;
+    let expected_version = read_protoc_version(&project_root)?;
+    if protoc_version != expected_version {
+        anyhow::bail!(
+            "protoc version ({protoc_version}) doesn't match pinned version ({expected_version})"
+        )
+    }
 
     eprintln!("### Collecting protobuf dependencies...");
 
@@ -322,4 +331,17 @@ fn write_line<W: io::Write>(w: &mut W, depth: usize, line: &str) -> io::Result<(
         line = line,
     );
     w.write_all(line.as_bytes())
+}
+
+fn check_protoc_version(sh: &Shell) -> anyhow::Result<String> {
+    let output = cmd!(sh, "protoc --version").read()?;
+    let Some(version) = output.split_ascii_whitespace().last() else {
+        anyhow::bail!("oops: couldn't parse protoc version");
+    };
+    Ok(version.to_string())
+}
+
+fn read_protoc_version(root_dir: &Path) -> io::Result<String> {
+    let version = std::fs::read_to_string(root_dir.join(".protoc-version"))?;
+    Ok(version.trim().to_string())
 }

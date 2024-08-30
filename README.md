@@ -38,3 +38,8 @@ Reflection Service.
 [pbjson]: https://crates.io/crates/pbjson
 [reflection]: https://docs.rs/tonic-reflection/0.12.2/tonic_reflection/server/struct.Builder.html#method.register_encoded_file_descriptor_set
 [protojson]: https://protobuf.dev/programming-guides/proto3/#json
+
+## Protoc
+
+Because this crate compiles well-known types on its own, it depends on a pinned
+version of `protoc`. The currently pinned version is kept in `.protoc-version`.
