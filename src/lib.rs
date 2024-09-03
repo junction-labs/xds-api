@@ -11,6 +11,8 @@ pub mod pb {
 
 pub use any::WellKnownTypes;
 
+mod value;
+
 /// A serialized file descriptor set containing the entirety of the XDS API.
 ///
 /// See [`prost_types`][fd] and the GRPC documentation for information on how to use
