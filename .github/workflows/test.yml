@@ -2,10 +2,10 @@ name: Regression Build and Test
 
 on: 
   push:
-    branches: [ "main", "fix-protoc" ]
+    branches: [ "main" ]
     
   pull_request:
-    branches: [ "main", "fix-protoc" ]
+    branches: [ "main" ]
   
 env:
   CARGO_TERM_COLOR: always
