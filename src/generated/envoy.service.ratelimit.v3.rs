@@ -6,7 +6,6 @@
 /// are provided, the server will limit on *ALL* of them and return an OVER_LIMIT response if any
 /// of them are over limit. This enables more complex application level rate limiting scenarios
 /// if desired.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RateLimitRequest {
     /// All rate limit requests must specify a domain. This enables the configuration to be per
@@ -37,7 +36,6 @@ impl ::prost::Name for RateLimitRequest {
 }
 /// A response from a ShouldRateLimit call.
 /// \[#next-free-field: 8\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RateLimitResponse {
     /// The overall response code which takes into account all of the descriptors that were passed
@@ -90,7 +88,6 @@ pub struct RateLimitResponse {
 /// Nested message and enum types in `RateLimitResponse`.
 pub mod rate_limit_response {
     /// Defines an actual rate limit in terms of requests per unit of time and the unit itself.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct RateLimit {
         /// A name or description of this limit.
@@ -142,13 +139,13 @@ pub mod rate_limit_response {
             /// (if the ProtoBuf definition does not change) and safe for programmatic use.
             pub fn as_str_name(&self) -> &'static str {
                 match self {
-                    Unit::Unknown => "UNKNOWN",
-                    Unit::Second => "SECOND",
-                    Unit::Minute => "MINUTE",
-                    Unit::Hour => "HOUR",
-                    Unit::Day => "DAY",
-                    Unit::Month => "MONTH",
-                    Unit::Year => "YEAR",
+                    Self::Unknown => "UNKNOWN",
+                    Self::Second => "SECOND",
+                    Self::Minute => "MINUTE",
+                    Self::Hour => "HOUR",
+                    Self::Day => "DAY",
+                    Self::Month => "MONTH",
+                    Self::Year => "YEAR",
                 }
             }
             /// Creates an enum from field names used in the ProtoBuf definition.
@@ -187,7 +184,6 @@ pub mod rate_limit_response {
     /// The implementation may choose to preemptively query the rate limit server for more quota on or
     /// before expiration or before the available quota runs out.
     /// \[#not-implemented-hide:\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Quota {
         /// Number of matching requests granted in quota. Must be 1 or more.
@@ -207,8 +203,7 @@ pub mod rate_limit_response {
     }
     /// Nested message and enum types in `Quota`.
     pub mod quota {
-        #[allow(clippy::derive_partial_eq_without_eq)]
-        #[derive(Clone, PartialEq, ::prost::Oneof)]
+        #[derive(Clone, Copy, PartialEq, ::prost::Oneof)]
         pub enum ExpirationSpecifier {
             /// Point in time at which the quota expires.
             #[prost(message, tag = "2")]
@@ -229,7 +224,6 @@ pub mod rate_limit_response {
         }
     }
     /// \[#next-free-field: 6\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct DescriptorStatus {
         /// The response code for an individual descriptor.
@@ -311,9 +305,9 @@ pub mod rate_limit_response {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                Code::Unknown => "UNKNOWN",
-                Code::Ok => "OK",
-                Code::OverLimit => "OVER_LIMIT",
+                Self::Unknown => "UNKNOWN",
+                Self::Ok => "OK",
+                Self::OverLimit => "OVER_LIMIT",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -339,7 +333,13 @@ impl ::prost::Name for RateLimitResponse {
 }
 /// Generated client implementations.
 pub mod rate_limit_service_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
@@ -350,8 +350,8 @@ pub mod rate_limit_service_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+        T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
@@ -376,7 +376,7 @@ pub mod rate_limit_service_client {
             >,
             <T as tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             RateLimitServiceClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -423,8 +423,7 @@ pub mod rate_limit_service_client {
                 .ready()
                 .await
                 .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
+                    tonic::Status::unknown(
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
@@ -446,11 +445,17 @@ pub mod rate_limit_service_client {
 }
 /// Generated server implementations.
 pub mod rate_limit_service_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     /// Generated trait containing gRPC methods that should be implemented for use with RateLimitServiceServer.
     #[async_trait]
-    pub trait RateLimitService: Send + Sync + 'static {
+    pub trait RateLimitService: std::marker::Send + std::marker::Sync + 'static {
         /// Determine whether rate limiting should take place.
         async fn should_rate_limit(
             &self,
@@ -461,20 +466,18 @@ pub mod rate_limit_service_server {
         >;
     }
     #[derive(Debug)]
-    pub struct RateLimitServiceServer<T: RateLimitService> {
-        inner: _Inner<T>,
+    pub struct RateLimitServiceServer<T> {
+        inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    struct _Inner<T>(Arc<T>);
-    impl<T: RateLimitService> RateLimitServiceServer<T> {
+    impl<T> RateLimitServiceServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
         pub fn from_arc(inner: Arc<T>) -> Self {
-            let inner = _Inner(inner);
             Self {
                 inner,
                 accept_compression_encodings: Default::default(),
@@ -524,8 +527,8 @@ pub mod rate_limit_service_server {
     impl<T, B> tonic::codegen::Service<http::Request<B>> for RateLimitServiceServer<T>
     where
         T: RateLimitService,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
+        B: Body + std::marker::Send + 'static,
+        B::Error: Into<StdError> + std::marker::Send + 'static,
     {
         type Response = http::Response<tonic::body::BoxBody>;
         type Error = std::convert::Infallible;
@@ -537,7 +540,6 @@ pub mod rate_limit_service_server {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
-            let inner = self.inner.clone();
             match req.uri().path() {
                 "/envoy.service.ratelimit.v3.RateLimitService/ShouldRateLimit" => {
                     #[allow(non_camel_case_types)]
@@ -569,7 +571,6 @@ pub mod rate_limit_service_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let inner = inner.0;
                         let method = ShouldRateLimitSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
@@ -588,20 +589,25 @@ pub mod rate_limit_service_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", "12")
-                                .header("content-type", "application/grpc")
-                                .body(empty_body())
-                                .unwrap(),
-                        )
+                        let mut response = http::Response::new(empty_body());
+                        let headers = response.headers_mut();
+                        headers
+                            .insert(
+                                tonic::Status::GRPC_STATUS,
+                                (tonic::Code::Unimplemented as i32).into(),
+                            );
+                        headers
+                            .insert(
+                                http::header::CONTENT_TYPE,
+                                tonic::metadata::GRPC_CONTENT_TYPE,
+                            );
+                        Ok(response)
                     })
                 }
             }
         }
     }
-    impl<T: RateLimitService> Clone for RateLimitServiceServer<T> {
+    impl<T> Clone for RateLimitServiceServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -613,17 +619,9 @@ pub mod rate_limit_service_server {
             }
         }
     }
-    impl<T: RateLimitService> Clone for _Inner<T> {
-        fn clone(&self) -> Self {
-            Self(Arc::clone(&self.0))
-        }
-    }
-    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
-    impl<T: RateLimitService> tonic::server::NamedService for RateLimitServiceServer<T> {
-        const NAME: &'static str = "envoy.service.ratelimit.v3.RateLimitService";
+    /// Generated gRPC service name
+    pub const SERVICE_NAME: &str = "envoy.service.ratelimit.v3.RateLimitService";
+    impl<T> tonic::server::NamedService for RateLimitServiceServer<T> {
+        const NAME: &'static str = SERVICE_NAME;
     }
 }

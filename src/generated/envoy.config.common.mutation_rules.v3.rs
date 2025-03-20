@@ -25,7 +25,6 @@
 /// rejected. In the ext_proc filter, that counter is named
 /// ``rejected_header_mutations``.
 /// \[#next-free-field: 8\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeaderMutationRules {
     /// By default, certain headers that could affect processing of subsequent
@@ -97,7 +96,6 @@ impl ::prost::Name for HeaderMutationRules {
 }
 /// The HeaderMutation structure specifies an action that may be taken on HTTP
 /// headers.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeaderMutation {
     #[prost(oneof = "header_mutation::Action", tags = "1, 2")]
@@ -105,7 +103,6 @@ pub struct HeaderMutation {
 }
 /// Nested message and enum types in `HeaderMutation`.
 pub mod header_mutation {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Action {
         /// Remove the specified header if it exists.

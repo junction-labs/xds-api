@@ -2,7 +2,6 @@
 /// This represents the different types of messages that Envoy can send
 /// to an external processing server.
 /// \[#next-free-field: 11\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProcessingRequest {
     /// Dynamic metadata associated with the request.
@@ -43,7 +42,6 @@ pub mod processing_request {
     /// Each request message will include one of the following sub-messages. Which
     /// ones are set for a particular HTTP request/response depend on the
     /// processing mode.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Request {
         /// Information about the HTTP request headers, as well as peer info and additional
@@ -93,7 +91,6 @@ impl ::prost::Name for ProcessingRequest {
 /// For every ProcessingRequest received by the server with the ``observability_mode`` field
 /// set to false, the server must send back exactly one ProcessingResponse message.
 /// \[#next-free-field: 11\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProcessingResponse {
     /// Optional metadata that will be emitted as dynamic metadata to be consumed by
@@ -139,7 +136,6 @@ pub struct ProcessingResponse {
 }
 /// Nested message and enum types in `ProcessingResponse`.
 pub mod processing_response {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Response {
         /// The server must send back this message in response to a message with the
@@ -189,7 +185,6 @@ impl ::prost::Name for ProcessingResponse {
 }
 /// This message is sent to the external server when the HTTP request and responses
 /// are first received.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HttpHeaders {
     /// The HTTP request headers. All header keys will be
@@ -229,7 +224,6 @@ impl ::prost::Name for HttpHeaders {
     }
 }
 /// This message contains the message body that Envoy sends to the external server.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HttpBody {
     #[prost(bytes = "vec", tag = "1")]
@@ -248,7 +242,6 @@ impl ::prost::Name for HttpBody {
     }
 }
 /// This message contains the trailers.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HttpTrailers {
     /// The ``trailers`` encoding is based on the runtime guard
@@ -273,7 +266,6 @@ impl ::prost::Name for HttpTrailers {
     }
 }
 /// This message must be sent in response to an HttpHeaders message.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeadersResponse {
     #[prost(message, optional, tag = "1")]
@@ -290,7 +282,6 @@ impl ::prost::Name for HeadersResponse {
     }
 }
 /// This message must be sent in response to an HttpTrailers message.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TrailersResponse {
     /// Instructions on how to manipulate the trailers
@@ -308,7 +299,6 @@ impl ::prost::Name for TrailersResponse {
     }
 }
 /// This message must be sent in response to an HttpBody message.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BodyResponse {
     #[prost(message, optional, tag = "1")]
@@ -326,7 +316,6 @@ impl ::prost::Name for BodyResponse {
 }
 /// This message contains common fields between header and body responses.
 /// \[#next-free-field: 6\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommonResponse {
     /// If set, provide additional direction on how the Envoy proxy should
@@ -408,8 +397,8 @@ pub mod common_response {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                ResponseStatus::Continue => "CONTINUE",
-                ResponseStatus::ContinueAndReplace => "CONTINUE_AND_REPLACE",
+                Self::Continue => "CONTINUE",
+                Self::ContinueAndReplace => "CONTINUE_AND_REPLACE",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -439,7 +428,6 @@ impl ::prost::Name for CommonResponse {
 /// has already started, then  this will either ship the reply directly
 /// to the downstream codec, or reset the stream.
 /// \[#next-free-field: 6\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ImmediateResponse {
     /// The response code to return
@@ -472,8 +460,7 @@ impl ::prost::Name for ImmediateResponse {
     }
 }
 /// This message specifies a gRPC status for an ImmediateResponse message.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct GrpcStatus {
     /// The actual gRPC status
     #[prost(uint32, tag = "1")]
@@ -491,7 +478,6 @@ impl ::prost::Name for GrpcStatus {
 }
 /// Change HTTP headers or trailers by appending, replacing, or removing
 /// headers.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeaderMutation {
     /// Add or replace HTTP headers. Attempts to set the value of
@@ -524,7 +510,6 @@ impl ::prost::Name for HeaderMutation {
 }
 /// Replace the entire message body chunk received in the corresponding
 /// HttpBody message with this new body, or clear the body.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BodyMutation {
     #[prost(oneof = "body_mutation::Mutation", tags = "1, 2")]
@@ -532,7 +517,6 @@ pub struct BodyMutation {
 }
 /// Nested message and enum types in `BodyMutation`.
 pub mod body_mutation {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Mutation {
         /// The entire body to replace
@@ -555,7 +539,13 @@ impl ::prost::Name for BodyMutation {
 }
 /// Generated client implementations.
 pub mod external_processor_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
@@ -566,8 +556,8 @@ pub mod external_processor_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+        T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
@@ -592,7 +582,7 @@ pub mod external_processor_client {
             >,
             <T as tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             ExternalProcessorClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -642,8 +632,7 @@ pub mod external_processor_client {
                 .ready()
                 .await
                 .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
+                    tonic::Status::unknown(
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
@@ -665,16 +654,22 @@ pub mod external_processor_client {
 }
 /// Generated server implementations.
 pub mod external_processor_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     /// Generated trait containing gRPC methods that should be implemented for use with ExternalProcessorServer.
     #[async_trait]
-    pub trait ExternalProcessor: Send + Sync + 'static {
+    pub trait ExternalProcessor: std::marker::Send + std::marker::Sync + 'static {
         /// Server streaming response type for the Process method.
         type ProcessStream: tonic::codegen::tokio_stream::Stream<
                 Item = std::result::Result<super::ProcessingResponse, tonic::Status>,
             >
-            + Send
+            + std::marker::Send
             + 'static;
         /// This begins the bidirectional stream that Envoy will use to
         /// give the server control over what the filter does. The actual
@@ -686,20 +681,18 @@ pub mod external_processor_server {
         ) -> std::result::Result<tonic::Response<Self::ProcessStream>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct ExternalProcessorServer<T: ExternalProcessor> {
-        inner: _Inner<T>,
+    pub struct ExternalProcessorServer<T> {
+        inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    struct _Inner<T>(Arc<T>);
-    impl<T: ExternalProcessor> ExternalProcessorServer<T> {
+    impl<T> ExternalProcessorServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
         pub fn from_arc(inner: Arc<T>) -> Self {
-            let inner = _Inner(inner);
             Self {
                 inner,
                 accept_compression_encodings: Default::default(),
@@ -749,8 +742,8 @@ pub mod external_processor_server {
     impl<T, B> tonic::codegen::Service<http::Request<B>> for ExternalProcessorServer<T>
     where
         T: ExternalProcessor,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
+        B: Body + std::marker::Send + 'static,
+        B::Error: Into<StdError> + std::marker::Send + 'static,
     {
         type Response = http::Response<tonic::body::BoxBody>;
         type Error = std::convert::Infallible;
@@ -762,7 +755,6 @@ pub mod external_processor_server {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
-            let inner = self.inner.clone();
             match req.uri().path() {
                 "/envoy.service.ext_proc.v3.ExternalProcessor/Process" => {
                     #[allow(non_camel_case_types)]
@@ -796,7 +788,6 @@ pub mod external_processor_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let inner = inner.0;
                         let method = ProcessSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
@@ -815,20 +806,25 @@ pub mod external_processor_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", "12")
-                                .header("content-type", "application/grpc")
-                                .body(empty_body())
-                                .unwrap(),
-                        )
+                        let mut response = http::Response::new(empty_body());
+                        let headers = response.headers_mut();
+                        headers
+                            .insert(
+                                tonic::Status::GRPC_STATUS,
+                                (tonic::Code::Unimplemented as i32).into(),
+                            );
+                        headers
+                            .insert(
+                                http::header::CONTENT_TYPE,
+                                tonic::metadata::GRPC_CONTENT_TYPE,
+                            );
+                        Ok(response)
                     })
                 }
             }
         }
     }
-    impl<T: ExternalProcessor> Clone for ExternalProcessorServer<T> {
+    impl<T> Clone for ExternalProcessorServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -840,18 +836,9 @@ pub mod external_processor_server {
             }
         }
     }
-    impl<T: ExternalProcessor> Clone for _Inner<T> {
-        fn clone(&self) -> Self {
-            Self(Arc::clone(&self.0))
-        }
-    }
-    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
-    impl<T: ExternalProcessor> tonic::server::NamedService
-    for ExternalProcessorServer<T> {
-        const NAME: &'static str = "envoy.service.ext_proc.v3.ExternalProcessor";
+    /// Generated gRPC service name
+    pub const SERVICE_NAME: &str = "envoy.service.ext_proc.v3.ExternalProcessor";
+    impl<T> tonic::server::NamedService for ExternalProcessorServer<T> {
+        const NAME: &'static str = SERVICE_NAME;
     }
 }

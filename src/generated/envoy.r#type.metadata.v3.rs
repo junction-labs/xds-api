@@ -22,7 +22,6 @@
 ///     - key: prop
 ///     - key: foo
 ///
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MetadataKey {
     /// The key name of Metadata to retrieve the Struct from the metadata.
@@ -42,7 +41,6 @@ pub struct MetadataKey {
 pub mod metadata_key {
     /// Specifies the segment in a path to retrieve value from Metadata.
     /// Currently it is only supported to specify the key, i.e. field name, as one segment of a path.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct PathSegment {
         #[prost(oneof = "path_segment::Segment", tags = "1")]
@@ -50,7 +48,6 @@ pub mod metadata_key {
     }
     /// Nested message and enum types in `PathSegment`.
     pub mod path_segment {
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum Segment {
             /// If specified, use the key to retrieve the value in a Struct.
@@ -80,8 +77,7 @@ impl ::prost::Name for MetadataKey {
     }
 }
 /// Describes what kind of metadata.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct MetadataKind {
     #[prost(oneof = "metadata_kind::Kind", tags = "1, 2, 3, 4")]
     pub kind: ::core::option::Option<metadata_kind::Kind>,
@@ -89,8 +85,7 @@ pub struct MetadataKind {
 /// Nested message and enum types in `MetadataKind`.
 pub mod metadata_kind {
     /// Represents dynamic metadata associated with the request.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct Request {}
     impl ::prost::Name for Request {
         const NAME: &'static str = "Request";
@@ -103,8 +98,7 @@ pub mod metadata_kind {
         }
     }
     /// Represents metadata from :ref:`the route<envoy_v3_api_field_config.route.v3.Route.metadata>`.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct Route {}
     impl ::prost::Name for Route {
         const NAME: &'static str = "Route";
@@ -117,8 +111,7 @@ pub mod metadata_kind {
         }
     }
     /// Represents metadata from :ref:`the upstream cluster<envoy_v3_api_field_config.cluster.v3.Cluster.metadata>`.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct Cluster {}
     impl ::prost::Name for Cluster {
         const NAME: &'static str = "Cluster";
@@ -132,8 +125,7 @@ pub mod metadata_kind {
     }
     /// Represents metadata from :ref:`the upstream
     /// host<envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct Host {}
     impl ::prost::Name for Host {
         const NAME: &'static str = "Host";
@@ -145,8 +137,7 @@ pub mod metadata_kind {
             "type.googleapis.com/envoy.type.metadata.v3.MetadataKind.Host".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Oneof)]
     pub enum Kind {
         /// Request kind of metadata.
         #[prost(message, tag = "1")]

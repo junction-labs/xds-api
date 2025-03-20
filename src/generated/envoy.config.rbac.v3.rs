@@ -48,7 +48,6 @@
 ///        principals:
 ///          - any: true
 ///
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Rbac {
     /// The action to take if a policy matches. Every action either allows or denies a request,
@@ -80,7 +79,6 @@ pub struct Rbac {
 }
 /// Nested message and enum types in `RBAC`.
 pub mod rbac {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct AuditLoggingOptions {
         /// Condition for the audit logging to happen.
@@ -100,7 +98,6 @@ pub mod rbac {
     /// Nested message and enum types in `AuditLoggingOptions`.
     pub mod audit_logging_options {
         /// \[#not-implemented-hide:\]
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct AuditLoggerConfig {
             /// Typed logger configuration.
@@ -155,10 +152,10 @@ pub mod rbac {
             /// (if the ProtoBuf definition does not change) and safe for programmatic use.
             pub fn as_str_name(&self) -> &'static str {
                 match self {
-                    AuditCondition::None => "NONE",
-                    AuditCondition::OnDeny => "ON_DENY",
-                    AuditCondition::OnAllow => "ON_ALLOW",
-                    AuditCondition::OnDenyAndAllow => "ON_DENY_AND_ALLOW",
+                    Self::None => "NONE",
+                    Self::OnDeny => "ON_DENY",
+                    Self::OnAllow => "ON_ALLOW",
+                    Self::OnDenyAndAllow => "ON_DENY_AND_ALLOW",
                 }
             }
             /// Creates an enum from field names used in the ProtoBuf definition.
@@ -214,9 +211,9 @@ pub mod rbac {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                Action::Allow => "ALLOW",
-                Action::Deny => "DENY",
-                Action::Log => "LOG",
+                Self::Allow => "ALLOW",
+                Self::Deny => "DENY",
+                Self::Log => "LOG",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -244,7 +241,6 @@ impl ::prost::Name for Rbac {
 /// A policy matches if and only if at least one of its permissions match the
 /// action taking place AND at least one of its principals match the downstream
 /// AND the condition is true if specified.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Policy {
     /// Required. The set of permissions that define a role. Each permission is
@@ -286,7 +282,6 @@ impl ::prost::Name for Policy {
 }
 /// Permission defines an action (or actions) that a principal can take.
 /// \[#next-free-field: 14\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Permission {
     #[prost(
@@ -299,7 +294,6 @@ pub struct Permission {
 pub mod permission {
     /// Used in the ``and_rules`` and ``or_rules`` fields in the ``rule`` oneof. Depending on the context,
     /// each are applied with the associated behavior.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Set {
         #[prost(message, repeated, tag = "1")]
@@ -315,7 +309,6 @@ pub mod permission {
             "type.googleapis.com/envoy.config.rbac.v3.Permission.Set".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Rule {
         /// A set of rules that all must match in order to define the action.
@@ -400,7 +393,6 @@ impl ::prost::Name for Permission {
 /// Principal defines an identity or a group of identities for a downstream
 /// subject.
 /// \[#next-free-field: 13\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Principal {
     #[prost(
@@ -413,7 +405,6 @@ pub struct Principal {
 pub mod principal {
     /// Used in the ``and_ids`` and ``or_ids`` fields in the ``identifier`` oneof.
     /// Depending on the context, each are applied with the associated behavior.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Set {
         #[prost(message, repeated, tag = "1")]
@@ -430,7 +421,6 @@ pub mod principal {
         }
     }
     /// Authentication attributes for a downstream.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Authenticated {
         /// The name of the principal. If set, The URI SAN or DNS SAN in that order
@@ -451,7 +441,6 @@ pub mod principal {
             "type.googleapis.com/envoy.config.rbac.v3.Principal.Authenticated".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Identifier {
         /// A set of identifiers that all must match in order to define the
@@ -525,7 +514,6 @@ impl ::prost::Name for Principal {
     }
 }
 /// Action defines the result of allowance or denial when a request matches the matcher.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Action {
     /// The name indicates the policy name.

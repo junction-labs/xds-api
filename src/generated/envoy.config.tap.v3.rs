@@ -2,7 +2,6 @@
 /// Tap configuration.
 ///
 /// \[#comment:TODO(mattklein123): Rate limiting\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TapConfig {
     /// The match configuration. If the configuration matches the data source being tapped, a tap will
@@ -52,7 +51,6 @@ impl ::prost::Name for TapConfig {
 /// Tap match configuration. This is a recursive structure which allows complex nested match
 /// configurations to be built using various logical operators.
 /// \[#next-free-field: 11\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MatchPredicate {
     #[prost(oneof = "match_predicate::Rule", tags = "1, 2, 3, 4, 5, 6, 7, 8, 9, 10")]
@@ -61,7 +59,6 @@ pub struct MatchPredicate {
 /// Nested message and enum types in `MatchPredicate`.
 pub mod match_predicate {
     /// A set of match configurations used for logical operations.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct MatchSet {
         /// The list of rules that make up the set.
@@ -78,7 +75,6 @@ pub mod match_predicate {
             "type.googleapis.com/envoy.config.tap.v3.MatchPredicate.MatchSet".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Rule {
         /// A set that describes a logical OR. If any member of the set matches, the match configuration
@@ -126,7 +122,6 @@ impl ::prost::Name for MatchPredicate {
     }
 }
 /// HTTP headers match configuration.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HttpHeadersMatch {
     /// HTTP headers to match.
@@ -153,7 +148,6 @@ impl ::prost::Name for HttpHeadersMatch {
 ///    Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
 ///    If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
 ///    to scan only part of the http body.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HttpGenericBodyMatch {
     /// Limits search to specified number of bytes - default zero (no limit - match entire captured buffer).
@@ -165,7 +159,6 @@ pub struct HttpGenericBodyMatch {
 }
 /// Nested message and enum types in `HttpGenericBodyMatch`.
 pub mod http_generic_body_match {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct GenericTextMatch {
         #[prost(oneof = "generic_text_match::Rule", tags = "1, 2")]
@@ -173,7 +166,6 @@ pub mod http_generic_body_match {
     }
     /// Nested message and enum types in `GenericTextMatch`.
     pub mod generic_text_match {
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum Rule {
             /// Text string to be located in HTTP body.
@@ -207,7 +199,6 @@ impl ::prost::Name for HttpGenericBodyMatch {
     }
 }
 /// Tap output configuration.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OutputConfig {
     /// Output sinks for tap data. Currently a single sink is allowed in the list. Once multiple
@@ -251,7 +242,6 @@ impl ::prost::Name for OutputConfig {
 }
 /// Tap output sink configuration.
 /// \[#next-free-field: 7\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OutputSink {
     /// Sink output format.
@@ -314,11 +304,11 @@ pub mod output_sink {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                Format::JsonBodyAsBytes => "JSON_BODY_AS_BYTES",
-                Format::JsonBodyAsString => "JSON_BODY_AS_STRING",
-                Format::ProtoBinary => "PROTO_BINARY",
-                Format::ProtoBinaryLengthDelimited => "PROTO_BINARY_LENGTH_DELIMITED",
-                Format::ProtoText => "PROTO_TEXT",
+                Self::JsonBodyAsBytes => "JSON_BODY_AS_BYTES",
+                Self::JsonBodyAsString => "JSON_BODY_AS_STRING",
+                Self::ProtoBinary => "PROTO_BINARY",
+                Self::ProtoBinaryLengthDelimited => "PROTO_BINARY_LENGTH_DELIMITED",
+                Self::ProtoText => "PROTO_TEXT",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -333,7 +323,6 @@ pub mod output_sink {
             }
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum OutputSinkType {
         /// Tap output will be streamed out the :http:post:`/tap` admin endpoint.
@@ -380,8 +369,7 @@ impl ::prost::Name for OutputSink {
     }
 }
 /// Streaming admin sink configuration.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct StreamingAdminSink {}
 impl ::prost::Name for StreamingAdminSink {
     const NAME: &'static str = "StreamingAdminSink";
@@ -397,8 +385,7 @@ impl ::prost::Name for StreamingAdminSink {
 /// one of multiple criteria are satisfied.
 /// Similar to StreamingAdminSink, it is only allowed to specify the buffered admin output
 /// sink if the tap is being configured from the ``/tap`` admin endpoint.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct BufferedAdminSink {
     /// Stop collecting traces when the specified number are collected.
     /// If other criteria for ending collection are reached first, this value will not be used.
@@ -425,7 +412,6 @@ impl ::prost::Name for BufferedAdminSink {
     }
 }
 /// The file per tap sink outputs a discrete file for every tapped stream.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilePerTapSink {
     /// Path prefix. The output file will be of the form <path_prefix>_<id>.pb, where <id> is an
@@ -446,7 +432,6 @@ impl ::prost::Name for FilePerTapSink {
 }
 /// \[#not-implemented-hide:\] Streaming gRPC sink configuration sends the taps to an external gRPC
 /// server.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct StreamingGrpcSink {
     /// Opaque identifier, that will be sent back to the streaming grpc server.

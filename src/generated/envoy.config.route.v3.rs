@@ -5,7 +5,6 @@
 /// a virtual host is selected based on the domain, the routes are processed in order to see which
 /// upstream cluster to route to or whether to perform a redirect.
 /// \[#next-free-field: 25\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VirtualHost {
     /// The logical name of the virtual host. This is used when emitting certain
@@ -211,9 +210,9 @@ pub mod virtual_host {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                TlsRequirementType::None => "NONE",
-                TlsRequirementType::ExternalOnly => "EXTERNAL_ONLY",
-                TlsRequirementType::All => "ALL",
+                Self::None => "NONE",
+                Self::ExternalOnly => "EXTERNAL_ONLY",
+                Self::All => "ALL",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -238,7 +237,6 @@ impl ::prost::Name for VirtualHost {
     }
 }
 /// A filter-defined action type.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterAction {
     #[prost(message, optional, tag = "1")]
@@ -258,7 +256,6 @@ impl ::prost::Name for FilterAction {
 }
 /// This can be used in route matcher :ref:`VirtualHost.matcher <envoy_v3_api_field_config.route.v3.VirtualHost.matcher>`.
 /// When the matcher matches, routes will be matched and run.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RouteList {
     /// The list of routes that will be matched and run, in order. The first route that matches will be used.
@@ -283,7 +280,6 @@ impl ::prost::Name for RouteList {
 ///    Envoy supports routing on HTTP method via :ref:`header matching
 ///    <envoy_v3_api_msg_config.route.v3.HeaderMatcher>`.
 /// \[#next-free-field: 20\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Route {
     /// Name for the route.
@@ -378,7 +374,6 @@ pub struct Route {
 }
 /// Nested message and enum types in `Route`.
 pub mod route {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Action {
         /// Route request to some upstream cluster.
@@ -421,7 +416,6 @@ impl ::prost::Name for Route {
 /// multiple upstream clusters along with weights that indicate the percentage of
 /// traffic to be forwarded to each cluster. The router selects an upstream cluster based on the
 /// weights.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WeightedCluster {
     /// Specifies one or more upstream clusters associated with the route.
@@ -454,7 +448,6 @@ pub struct WeightedCluster {
 /// Nested message and enum types in `WeightedCluster`.
 pub mod weighted_cluster {
     /// \[#next-free-field: 13\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct ClusterWeight {
         /// Only one of ``name`` and ``cluster_header`` may be specified.
@@ -552,7 +545,6 @@ pub mod weighted_cluster {
     }
     /// Nested message and enum types in `ClusterWeight`.
     pub mod cluster_weight {
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum HostRewriteSpecifier {
             /// Indicates that during forwarding, the host header will be swapped with
@@ -572,7 +564,6 @@ pub mod weighted_cluster {
                 .into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum RandomValueSpecifier {
         /// Specifies the header name that is used to look up the random value passed in the request header.
@@ -595,7 +586,6 @@ impl ::prost::Name for WeightedCluster {
     }
 }
 /// Configuration for a cluster specifier plugin.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ClusterSpecifierPlugin {
     /// The name of the plugin and its opaque configuration.
@@ -620,7 +610,6 @@ impl ::prost::Name for ClusterSpecifierPlugin {
     }
 }
 /// \[#next-free-field: 16\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RouteMatch {
     /// Indicates that prefix/path matching should be case sensitive. The default
@@ -696,8 +685,7 @@ pub struct RouteMatch {
 }
 /// Nested message and enum types in `RouteMatch`.
 pub mod route_match {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct GrpcRouteMatchOptions {}
     impl ::prost::Name for GrpcRouteMatchOptions {
         const NAME: &'static str = "GrpcRouteMatchOptions";
@@ -710,8 +698,7 @@ pub mod route_match {
                 .into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct TlsContextMatchOptions {
         /// If specified, the route will match against whether or not a certificate is presented.
         /// If not specified, certificate presentation status (true or false) will not be considered when route matching.
@@ -748,8 +735,7 @@ pub mod route_match {
         }
     }
     /// An extensible message for matching CONNECT or CONNECT-UDP requests.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct ConnectMatcher {}
     impl ::prost::Name for ConnectMatcher {
         const NAME: &'static str = "ConnectMatcher";
@@ -761,7 +747,6 @@ pub mod route_match {
             "type.googleapis.com/envoy.config.route.v3.RouteMatch.ConnectMatcher".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PathSpecifier {
         /// If specified, the route is a prefix rule meaning that the prefix must
@@ -831,7 +816,6 @@ impl ::prost::Name for RouteMatch {
 ///    as as alternative.
 ///
 /// \[#next-free-field: 14\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CorsPolicy {
     /// Specifies string patterns that match allowed origins. An origin is allowed if any of the
@@ -889,7 +873,6 @@ pub struct CorsPolicy {
 }
 /// Nested message and enum types in `CorsPolicy`.
 pub mod cors_policy {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum EnabledSpecifier {
         /// Specifies the % of requests for which the CORS filter is enabled.
@@ -914,7 +897,6 @@ impl ::prost::Name for CorsPolicy {
     }
 }
 /// \[#next-free-field: 42\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RouteAction {
     /// The HTTP status code to use when configured cluster is not found.
@@ -1225,7 +1207,6 @@ pub mod route_action {
     ///
     ///    Shadowing doesn't support Http CONNECT and upgrades.
     /// \[#next-free-field: 7\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct RequestMirrorPolicy {
         /// Only one of ``cluster`` and ``cluster_header`` can be specified.
@@ -1285,7 +1266,6 @@ pub mod route_action {
     /// Specifies the route's hashing policy if the upstream cluster uses a hashing :ref:`load balancer
     /// <arch_overview_load_balancing_types>`.
     /// \[#next-free-field: 7\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct HashPolicy {
         /// The flag that short-circuits the hash computing. This field provides a
@@ -1314,7 +1294,6 @@ pub mod route_action {
     }
     /// Nested message and enum types in `HashPolicy`.
     pub mod hash_policy {
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Header {
             /// The name of the request header that will be used to obtain the hash
@@ -1340,7 +1319,6 @@ pub mod route_action {
             }
         }
         /// CookieAttribute defines an API for adding additional attributes for a HTTP cookie.
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct CookieAttribute {
             /// The name of the cookie attribute.
@@ -1375,7 +1353,6 @@ pub mod route_action {
         ///     destination ports and addresses so that multiple independent HTTP2
         ///     streams on the same connection will independently receive the same
         ///     cookie, even if they arrive at the Envoy simultaneously.
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Cookie {
             /// The name of the cookie that will be used to obtain the hash key. If the
@@ -1409,8 +1386,7 @@ pub mod route_action {
                     .into()
             }
         }
-        #[allow(clippy::derive_partial_eq_without_eq)]
-        #[derive(Clone, PartialEq, ::prost::Message)]
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
         pub struct ConnectionProperties {
             /// Hash on source IP address.
             #[prost(bool, tag = "1")]
@@ -1428,7 +1404,6 @@ pub mod route_action {
                     .into()
             }
         }
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct QueryParameter {
             /// The name of the URL query parameter that will be used to obtain the hash
@@ -1449,7 +1424,6 @@ pub mod route_action {
                     .into()
             }
         }
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct FilterState {
             /// The name of the Object in the per-request filterState, which is an
@@ -1469,7 +1443,6 @@ pub mod route_action {
                     .into()
             }
         }
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum PolicySpecifier {
             /// Header hash policy.
@@ -1505,7 +1478,6 @@ pub mod route_action {
     /// :ref:`upgrade_configs
     /// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.upgrade_configs>`
     /// but does not affect any custom filter chain specified there.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct UpgradeConfig {
         /// The case-insensitive name of this upgrade, e.g. "websocket".
@@ -1529,7 +1501,6 @@ pub mod route_action {
     pub mod upgrade_config {
         /// Configuration for sending data upstream as a raw data payload. This is used for
         /// CONNECT or POST requests, when forwarding request payload as raw TCP.
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct ConnectConfig {
             /// If present, the proxy protocol header will be prepended to the CONNECT payload sent upstream.
@@ -1563,8 +1534,7 @@ pub mod route_action {
             "type.googleapis.com/envoy.config.route.v3.RouteAction.UpgradeConfig".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct MaxStreamDuration {
         /// Specifies the maximum duration allowed for streams on the route. If not specified, the value
         /// from the :ref:`max_stream_duration
@@ -1635,11 +1605,9 @@ pub mod route_action {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                ClusterNotFoundResponseCode::ServiceUnavailable => "SERVICE_UNAVAILABLE",
-                ClusterNotFoundResponseCode::NotFound => "NOT_FOUND",
-                ClusterNotFoundResponseCode::InternalServerError => {
-                    "INTERNAL_SERVER_ERROR"
-                }
+                Self::ServiceUnavailable => "SERVICE_UNAVAILABLE",
+                Self::NotFound => "NOT_FOUND",
+                Self::InternalServerError => "INTERNAL_SERVER_ERROR",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1677,12 +1645,8 @@ pub mod route_action {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                InternalRedirectAction::PassThroughInternalRedirect => {
-                    "PASS_THROUGH_INTERNAL_REDIRECT"
-                }
-                InternalRedirectAction::HandleInternalRedirect => {
-                    "HANDLE_INTERNAL_REDIRECT"
-                }
+                Self::PassThroughInternalRedirect => "PASS_THROUGH_INTERNAL_REDIRECT",
+                Self::HandleInternalRedirect => "HANDLE_INTERNAL_REDIRECT",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1696,7 +1660,6 @@ pub mod route_action {
             }
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum ClusterSpecifier {
         /// Indicates the upstream cluster to which the request should be routed
@@ -1736,7 +1699,6 @@ pub mod route_action {
         #[prost(message, tag = "39")]
         InlineClusterSpecifierPlugin(super::ClusterSpecifierPlugin),
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum HostRewriteSpecifier {
         /// Indicates that during forwarding, the host header will be swapped with
@@ -1812,7 +1774,6 @@ impl ::prost::Name for RouteAction {
 }
 /// HTTP retry :ref:`architecture overview <arch_overview_http_routing_retry>`.
 /// \[#next-free-field: 14\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RetryPolicy {
     /// Specifies the conditions under which retry takes place. These are the same
@@ -1920,7 +1881,6 @@ pub struct RetryPolicy {
 }
 /// Nested message and enum types in `RetryPolicy`.
 pub mod retry_policy {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct RetryPriority {
         #[prost(string, tag = "1")]
@@ -1932,7 +1892,6 @@ pub mod retry_policy {
     /// Nested message and enum types in `RetryPriority`.
     pub mod retry_priority {
         /// \[#extension-category: envoy.retry_priorities\]
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum ConfigType {
             #[prost(message, tag = "3")]
@@ -1949,7 +1908,6 @@ pub mod retry_policy {
             "type.googleapis.com/envoy.config.route.v3.RetryPolicy.RetryPriority".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct RetryHostPredicate {
         #[prost(string, tag = "1")]
@@ -1961,7 +1919,6 @@ pub mod retry_policy {
     /// Nested message and enum types in `RetryHostPredicate`.
     pub mod retry_host_predicate {
         /// \[#extension-category: envoy.retry_host_predicates\]
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum ConfigType {
             #[prost(message, tag = "3")]
@@ -1979,8 +1936,7 @@ pub mod retry_policy {
                 .into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct RetryBackOff {
         /// Specifies the base interval between retries. This parameter is required and must be greater
         /// than zero. Values less than 1 ms are rounded up to 1 ms.
@@ -2009,7 +1965,6 @@ pub mod retry_policy {
             "type.googleapis.com/envoy.config.route.v3.RetryPolicy.RetryBackOff".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct ResetHeader {
         /// The name of the reset header.
@@ -2076,7 +2031,6 @@ pub mod retry_policy {
     ///    Configuring ``rate_limited_retry_back_off`` will not by itself cause a request
     ///    to be retried. You will still need to configure the right retry policy to match
     ///    the responses from the upstream server.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct RateLimitedRetryBackOff {
         /// Specifies the reset headers (like ``Retry-After`` or ``X-RateLimit-Reset``)
@@ -2127,8 +2081,8 @@ pub mod retry_policy {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                ResetHeaderFormat::Seconds => "SECONDS",
-                ResetHeaderFormat::UnixTimestamp => "UNIX_TIMESTAMP",
+                Self::Seconds => "SECONDS",
+                Self::UnixTimestamp => "UNIX_TIMESTAMP",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2152,8 +2106,7 @@ impl ::prost::Name for RetryPolicy {
     }
 }
 /// HTTP request hedging :ref:`architecture overview <arch_overview_http_routing_hedging>`.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct HedgePolicy {
     /// Specifies the number of initial requests that should be sent upstream.
     /// Must be at least 1.
@@ -2198,7 +2151,6 @@ impl ::prost::Name for HedgePolicy {
     }
 }
 /// \[#next-free-field: 10\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RedirectAction {
     /// The host portion of the URL will be swapped with this value.
@@ -2262,11 +2214,11 @@ pub mod redirect_action {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                RedirectResponseCode::MovedPermanently => "MOVED_PERMANENTLY",
-                RedirectResponseCode::Found => "FOUND",
-                RedirectResponseCode::SeeOther => "SEE_OTHER",
-                RedirectResponseCode::TemporaryRedirect => "TEMPORARY_REDIRECT",
-                RedirectResponseCode::PermanentRedirect => "PERMANENT_REDIRECT",
+                Self::MovedPermanently => "MOVED_PERMANENTLY",
+                Self::Found => "FOUND",
+                Self::SeeOther => "SEE_OTHER",
+                Self::TemporaryRedirect => "TEMPORARY_REDIRECT",
+                Self::PermanentRedirect => "PERMANENT_REDIRECT",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2286,7 +2238,6 @@ pub mod redirect_action {
     ///      set to ``:80``, the port will be removed after the redirection
     ///   2. If the source URI scheme is ``https`` and the port is explicitly
     ///      set to ``:443``, the port will be removed after the redirection
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum SchemeRewriteSpecifier {
         /// The scheme portion of the URL will be swapped with "https".
@@ -2296,7 +2247,6 @@ pub mod redirect_action {
         #[prost(string, tag = "7")]
         SchemeRedirect(::prost::alloc::string::String),
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PathRewriteSpecifier {
         /// The path portion of the URL will be swapped with this value.
@@ -2366,7 +2316,6 @@ impl ::prost::Name for RedirectAction {
         "type.googleapis.com/envoy.config.route.v3.RedirectAction".into()
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DirectResponseAction {
     /// Specifies the HTTP response status to be returned.
@@ -2394,8 +2343,7 @@ impl ::prost::Name for DirectResponseAction {
     }
 }
 /// \[#not-implemented-hide:\]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct NonForwardingAction {}
 impl ::prost::Name for NonForwardingAction {
     const NAME: &'static str = "NonForwardingAction";
@@ -2407,7 +2355,6 @@ impl ::prost::Name for NonForwardingAction {
         "type.googleapis.com/envoy.config.route.v3.NonForwardingAction".into()
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Decorator {
     /// The operation name associated with the request matched to this route. If tracing is
@@ -2436,7 +2383,6 @@ impl ::prost::Name for Decorator {
         "type.googleapis.com/envoy.config.route.v3.Decorator".into()
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Tracing {
     /// Target percentage of requests managed by this HTTP connection manager that will be force
@@ -2508,7 +2454,6 @@ impl ::prost::Name for Tracing {
 ///     Virtual clusters are a useful tool, but we do not recommend setting up a virtual cluster for
 ///     every application endpoint. This is both not easily maintainable and as well the matching and
 ///     statistics output are not free.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VirtualCluster {
     /// Specifies a list of header matchers to use for matching requests. Each specified header must
@@ -2534,7 +2479,6 @@ impl ::prost::Name for VirtualCluster {
 }
 /// Global rate limiting :ref:`architecture overview <arch_overview_global_rate_limit>`.
 /// Also applies to Local rate limiting :ref:`using descriptors <config_http_filters_local_rate_limit_descriptors>`.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RateLimit {
     /// Refers to the stage set in the filter. The rate limit configuration only
@@ -2569,7 +2513,6 @@ pub struct RateLimit {
 /// Nested message and enum types in `RateLimit`.
 pub mod rate_limit {
     /// \[#next-free-field: 12\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Action {
         #[prost(
@@ -2587,8 +2530,7 @@ pub mod rate_limit {
         ///    ("source_cluster", "<local service cluster>")
         ///
         /// <local service cluster> is derived from the :option:`--service-cluster` option.
-        #[allow(clippy::derive_partial_eq_without_eq)]
-        #[derive(Clone, PartialEq, ::prost::Message)]
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
         pub struct SourceCluster {}
         impl ::prost::Name for SourceCluster {
             const NAME: &'static str = "SourceCluster";
@@ -2617,8 +2559,7 @@ pub mod rate_limit {
         ///    chooses a cluster randomly from a set of clusters with attributed weight.
         /// * :ref:`cluster_header <envoy_v3_api_field_config.route.v3.RouteAction.cluster_header>` indicates which
         ///    header in the request contains the target cluster.
-        #[allow(clippy::derive_partial_eq_without_eq)]
-        #[derive(Clone, PartialEq, ::prost::Message)]
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
         pub struct DestinationCluster {}
         impl ::prost::Name for DestinationCluster {
             const NAME: &'static str = "DestinationCluster";
@@ -2637,7 +2578,6 @@ pub mod rate_limit {
         /// .. code-block:: cpp
         ///
         ///    ("<descriptor_key>", "<header_value_queried_from_header>")
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct RequestHeaders {
             /// The header name to be queried from the request headers. The header’s
@@ -2671,8 +2611,7 @@ pub mod rate_limit {
         /// .. code-block:: cpp
         ///
         ///    ("remote_address", "<trusted address from x-forwarded-for>")
-        #[allow(clippy::derive_partial_eq_without_eq)]
-        #[derive(Clone, PartialEq, ::prost::Message)]
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
         pub struct RemoteAddress {}
         impl ::prost::Name for RemoteAddress {
             const NAME: &'static str = "RemoteAddress";
@@ -2691,8 +2630,7 @@ pub mod rate_limit {
         /// .. code-block:: cpp
         ///
         ///    ("masked_remote_address", "<masked address from x-forwarded-for>")
-        #[allow(clippy::derive_partial_eq_without_eq)]
-        #[derive(Clone, PartialEq, ::prost::Message)]
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
         pub struct MaskedRemoteAddress {
             /// Length of prefix mask len for IPv4 (e.g. 0, 32).
             /// Defaults to 32 when unset.
@@ -2729,7 +2667,6 @@ pub mod rate_limit {
         /// .. code-block:: cpp
         ///
         ///    ("generic_key", "<descriptor_value>")
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct GenericKey {
             /// The value to use in the descriptor entry.
@@ -2756,7 +2693,6 @@ pub mod rate_limit {
         /// .. code-block:: cpp
         ///
         ///    ("header_match", "<descriptor_value>")
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct HeaderValueMatch {
             /// The key to use in the descriptor entry. Defaults to ``header_match``.
@@ -2801,7 +2737,6 @@ pub mod rate_limit {
         ///
         /// .. attention::
         ///    This action has been deprecated in favor of the :ref:`metadata <envoy_v3_api_msg_config.route.v3.RateLimit.Action.MetaData>` action
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct DynamicMetaData {
             /// The key to use in the descriptor entry.
@@ -2835,7 +2770,6 @@ pub mod rate_limit {
         ///
         ///    ("<descriptor_key>", "<value_queried_from_metadata>")
         /// \[#next-free-field: 6\]
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct MetaData {
             /// The key to use in the descriptor entry.
@@ -2888,8 +2822,8 @@ pub mod rate_limit {
                 /// (if the ProtoBuf definition does not change) and safe for programmatic use.
                 pub fn as_str_name(&self) -> &'static str {
                     match self {
-                        Source::Dynamic => "DYNAMIC",
-                        Source::RouteEntry => "ROUTE_ENTRY",
+                        Self::Dynamic => "DYNAMIC",
+                        Self::RouteEntry => "ROUTE_ENTRY",
                     }
                 }
                 /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2918,7 +2852,6 @@ pub mod rate_limit {
         /// .. code-block:: cpp
         ///
         ///    ("query_match", "<descriptor_value>")
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct QueryParameterValueMatch {
             /// The key to use in the descriptor entry. Defaults to ``query_match``.
@@ -2956,7 +2889,6 @@ pub mod rate_limit {
                     .into()
             }
         }
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum ActionSpecifier {
             /// Rate limit on source cluster.
@@ -3014,7 +2946,6 @@ pub mod rate_limit {
             "type.googleapis.com/envoy.config.route.v3.RateLimit.Action".into()
         }
     }
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Override {
         #[prost(oneof = "r#override::OverrideSpecifier", tags = "1")]
@@ -3023,7 +2954,6 @@ pub mod rate_limit {
     /// Nested message and enum types in `Override`.
     pub mod r#override {
         /// Fetches the override from the dynamic metadata.
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct DynamicMetadata {
             /// Metadata struct that defines the key and path to retrieve the struct value.
@@ -3046,7 +2976,6 @@ pub mod rate_limit {
                     .into()
             }
         }
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum OverrideSpecifier {
             /// Limit override from dynamic metadata.
@@ -3102,7 +3031,6 @@ impl ::prost::Name for RateLimit {
 ///
 ///   \[#next-major-version: HeaderMatcher should be refactored to use StringMatcher.\]
 /// \[#next-free-field: 15\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeaderMatcher {
     /// Specifies the name of the header in the request.
@@ -3156,7 +3084,6 @@ pub struct HeaderMatcher {
 /// Nested message and enum types in `HeaderMatcher`.
 pub mod header_matcher {
     /// Specifies how the header match will be performed to route the request.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum HeaderMatchSpecifier {
         /// If specified, header match will be performed based on the value of the header.
@@ -3232,7 +3159,6 @@ impl ::prost::Name for HeaderMatcher {
 /// Query parameter matching treats the query string of a request's :path header
 /// as an ampersand-separated list of keys and/or key=value elements.
 /// \[#next-free-field: 7\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryParameterMatcher {
     /// Specifies the name of a key that must be present in the requested
@@ -3249,7 +3175,6 @@ pub struct QueryParameterMatcher {
 }
 /// Nested message and enum types in `QueryParameterMatcher`.
 pub mod query_parameter_matcher {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum QueryParameterMatchSpecifier {
         /// Specifies whether a query parameter value should match against a string.
@@ -3272,7 +3197,6 @@ impl ::prost::Name for QueryParameterMatcher {
 }
 /// HTTP Internal Redirect :ref:`architecture overview <arch_overview_internal_redirects>`.
 /// \[#next-free-field: 6\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InternalRedirectPolicy {
     /// An internal redirect is not handled, unless the number of previous internal redirects that a
@@ -3328,7 +3252,6 @@ impl ::prost::Name for InternalRedirectPolicy {
 /// :ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`,
 /// or :ref:`WeightedCluster.ClusterWeight.typed_per_filter_config<envoy_v3_api_field_config.route.v3.WeightedCluster.ClusterWeight.typed_per_filter_config>`
 /// to add additional flags to the filter.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterConfig {
     /// The filter config.
@@ -3369,7 +3292,6 @@ impl ::prost::Name for FilterConfig {
     }
 }
 /// \[#next-free-field: 18\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RouteConfiguration {
     /// The name of the route configuration. For example, it might match
@@ -3521,7 +3443,6 @@ impl ::prost::Name for RouteConfiguration {
         "type.googleapis.com/envoy.config.route.v3.RouteConfiguration".into()
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Vhds {
     /// Configuration source specifier for VHDS.
@@ -3601,7 +3522,6 @@ impl ::prost::Name for Vhds {
 /// RouteConfiguration being assigned to the HTTP request/stream.
 ///
 /// \[#next-free-field: 6\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ScopedRouteConfiguration {
     /// Whether the RouteConfiguration should be loaded on demand.
@@ -3629,7 +3549,6 @@ pub mod scoped_route_configuration {
     /// specified in the HttpConnectionManager. The matching is done per HTTP
     /// request and is dependent on the order of the fragments contained in the
     /// Key.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Key {
         /// The ordered set of fragments to match against. The order must match the
@@ -3640,7 +3559,6 @@ pub mod scoped_route_configuration {
     }
     /// Nested message and enum types in `Key`.
     pub mod key {
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Fragment {
             #[prost(oneof = "fragment::Type", tags = "1")]
@@ -3648,7 +3566,6 @@ pub mod scoped_route_configuration {
         }
         /// Nested message and enum types in `Fragment`.
         pub mod fragment {
-            #[allow(clippy::derive_partial_eq_without_eq)]
             #[derive(Clone, PartialEq, ::prost::Oneof)]
             pub enum Type {
                 /// A string to match against.

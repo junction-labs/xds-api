@@ -44,7 +44,6 @@
 /// Optionally the descriptor can contain a limit override under a "limit" key, that specifies
 /// the number of requests per unit to use instead of the number configured in the
 /// rate limiting service.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RateLimitDescriptor {
     /// Descriptor entries.
@@ -56,7 +55,6 @@ pub struct RateLimitDescriptor {
 }
 /// Nested message and enum types in `RateLimitDescriptor`.
 pub mod rate_limit_descriptor {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Entry {
         /// Descriptor key.
@@ -80,8 +78,7 @@ pub mod rate_limit_descriptor {
     /// Override rate limit to apply to this descriptor instead of the limit
     /// configured in the rate limit service. See :ref:`rate limit override
     /// <config_http_filters_rate_limit_rate_limit_override>` for more information.
-    #[allow(clippy::derive_partial_eq_without_eq)]
-    #[derive(Clone, PartialEq, ::prost::Message)]
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
     pub struct RateLimitOverride {
         /// The number of requests per unit of time.
         #[prost(uint32, tag = "1")]
@@ -117,7 +114,6 @@ impl ::prost::Name for RateLimitDescriptor {
             .into()
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LocalRateLimitDescriptor {
     /// Descriptor entries.
@@ -164,8 +160,8 @@ impl XRateLimitHeadersRfcVersion {
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
-            XRateLimitHeadersRfcVersion::Off => "OFF",
-            XRateLimitHeadersRfcVersion::DraftVersion03 => "DRAFT_VERSION_03",
+            Self::Off => "OFF",
+            Self::DraftVersion03 => "DRAFT_VERSION_03",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -194,9 +190,9 @@ impl VhRateLimitsOptions {
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
-            VhRateLimitsOptions::Override => "OVERRIDE",
-            VhRateLimitsOptions::Include => "INCLUDE",
-            VhRateLimitsOptions::Ignore => "IGNORE",
+            Self::Override => "OVERRIDE",
+            Self::Include => "INCLUDE",
+            Self::Ignore => "IGNORE",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.

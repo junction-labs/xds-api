@@ -17,7 +17,6 @@
 /// - which return values from request_context are copied back
 /// - which return values are copied into request_headers]
 /// \[#next-free-field: 14\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AttributeContext {
     /// The source of a network activity, such as starting a TCP connection.
@@ -69,7 +68,6 @@ pub mod attribute_context {
     /// or receives the request. Service peers should fill in the ``service``,
     /// ``principal``, and ``labels`` as appropriate.
     /// \[#next-free-field: 6\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Peer {
         /// The address of the peer, this is typically the IP address.
@@ -121,7 +119,6 @@ pub mod attribute_context {
         }
     }
     /// Represents a network request, such as an HTTP request.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Request {
         /// The timestamp when the proxy receives the first byte of the request.
@@ -146,7 +143,6 @@ pub mod attribute_context {
     /// This message defines attributes for an HTTP request.
     /// HTTP/1.x, HTTP/2, gRPC are all considered as HTTP requests.
     /// \[#next-free-field: 14\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct HttpRequest {
         /// The unique ID for a request, which can be propagated to downstream
@@ -239,7 +235,6 @@ pub mod attribute_context {
         }
     }
     /// This message defines attributes for the underlying TLS session.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct TlsSession {
         /// SNI used for TLS session.
@@ -268,7 +263,6 @@ impl ::prost::Name for AttributeContext {
         "type.googleapis.com/envoy.service.auth.v3.AttributeContext".into()
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CheckRequest {
     /// The request attributes.
@@ -286,7 +280,6 @@ impl ::prost::Name for CheckRequest {
     }
 }
 /// HTTP attributes for a denied response.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeniedHttpResponse {
     /// This field allows the authorization service to send an HTTP response status code to the
@@ -317,7 +310,6 @@ impl ::prost::Name for DeniedHttpResponse {
 }
 /// HTTP attributes for an OK response.
 /// \[#next-free-field: 9\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OkHttpResponse {
     /// HTTP entity headers in addition to the original request headers. This allows the authorization
@@ -389,7 +381,6 @@ impl ::prost::Name for OkHttpResponse {
     }
 }
 /// Intended for gRPC and Network Authorization servers ``only``.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CheckResponse {
     /// Status ``OK`` allows the request. Any other status indicates the request should be denied, and
@@ -418,7 +409,6 @@ pub mod check_response {
     /// An message that contains HTTP response attributes. This message is
     /// used when the authorization service needs to send custom responses to the
     /// downstream client or, to modify/add request headers being dispatched to the upstream.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum HttpResponse {
         /// Supplies http attributes for a denied response.
@@ -441,7 +431,13 @@ impl ::prost::Name for CheckResponse {
 }
 /// Generated client implementations.
 pub mod authorization_client {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     /// A generic interface for performing authorization check on incoming
@@ -454,8 +450,8 @@ pub mod authorization_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
-        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+        T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
+        <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
@@ -480,7 +476,7 @@ pub mod authorization_client {
             >,
             <T as tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             AuthorizationClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -525,8 +521,7 @@ pub mod authorization_client {
                 .ready()
                 .await
                 .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
+                    tonic::Status::unknown(
                         format!("Service was not ready: {}", e.into()),
                     )
                 })?;
@@ -543,11 +538,17 @@ pub mod authorization_client {
 }
 /// Generated server implementations.
 pub mod authorization_server {
-    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    #![allow(
+        unused_variables,
+        dead_code,
+        missing_docs,
+        clippy::wildcard_imports,
+        clippy::let_unit_value,
+    )]
     use tonic::codegen::*;
     /// Generated trait containing gRPC methods that should be implemented for use with AuthorizationServer.
     #[async_trait]
-    pub trait Authorization: Send + Sync + 'static {
+    pub trait Authorization: std::marker::Send + std::marker::Sync + 'static {
         /// Performs authorization check based on the attributes associated with the
         /// incoming request, and returns status `OK` or not `OK`.
         async fn check(
@@ -558,20 +559,18 @@ pub mod authorization_server {
     /// A generic interface for performing authorization check on incoming
     /// requests to a networked service.
     #[derive(Debug)]
-    pub struct AuthorizationServer<T: Authorization> {
-        inner: _Inner<T>,
+    pub struct AuthorizationServer<T> {
+        inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    struct _Inner<T>(Arc<T>);
-    impl<T: Authorization> AuthorizationServer<T> {
+    impl<T> AuthorizationServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
         pub fn from_arc(inner: Arc<T>) -> Self {
-            let inner = _Inner(inner);
             Self {
                 inner,
                 accept_compression_encodings: Default::default(),
@@ -621,8 +620,8 @@ pub mod authorization_server {
     impl<T, B> tonic::codegen::Service<http::Request<B>> for AuthorizationServer<T>
     where
         T: Authorization,
-        B: Body + Send + 'static,
-        B::Error: Into<StdError> + Send + 'static,
+        B: Body + std::marker::Send + 'static,
+        B::Error: Into<StdError> + std::marker::Send + 'static,
     {
         type Response = http::Response<tonic::body::BoxBody>;
         type Error = std::convert::Infallible;
@@ -634,7 +633,6 @@ pub mod authorization_server {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
-            let inner = self.inner.clone();
             match req.uri().path() {
                 "/envoy.service.auth.v3.Authorization/Check" => {
                     #[allow(non_camel_case_types)]
@@ -664,7 +662,6 @@ pub mod authorization_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let inner = inner.0;
                         let method = CheckSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
@@ -683,20 +680,25 @@ pub mod authorization_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        Ok(
-                            http::Response::builder()
-                                .status(200)
-                                .header("grpc-status", "12")
-                                .header("content-type", "application/grpc")
-                                .body(empty_body())
-                                .unwrap(),
-                        )
+                        let mut response = http::Response::new(empty_body());
+                        let headers = response.headers_mut();
+                        headers
+                            .insert(
+                                tonic::Status::GRPC_STATUS,
+                                (tonic::Code::Unimplemented as i32).into(),
+                            );
+                        headers
+                            .insert(
+                                http::header::CONTENT_TYPE,
+                                tonic::metadata::GRPC_CONTENT_TYPE,
+                            );
+                        Ok(response)
                     })
                 }
             }
         }
     }
-    impl<T: Authorization> Clone for AuthorizationServer<T> {
+    impl<T> Clone for AuthorizationServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -708,17 +710,9 @@ pub mod authorization_server {
             }
         }
     }
-    impl<T: Authorization> Clone for _Inner<T> {
-        fn clone(&self) -> Self {
-            Self(Arc::clone(&self.0))
-        }
-    }
-    impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
-    impl<T: Authorization> tonic::server::NamedService for AuthorizationServer<T> {
-        const NAME: &'static str = "envoy.service.auth.v3.Authorization";
+    /// Generated gRPC service name
+    pub const SERVICE_NAME: &str = "envoy.service.auth.v3.Authorization";
+    impl<T> tonic::server::NamedService for AuthorizationServer<T> {
+        const NAME: &'static str = SERVICE_NAME;
     }
 }

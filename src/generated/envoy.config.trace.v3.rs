@@ -8,7 +8,6 @@
 ///
 ///    Use of this message type has been deprecated in favor of direct use of
 ///    :ref:`Tracing.Http <envoy_v3_api_msg_config.trace.v3.Tracing.Http>`.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Tracing {
     /// Provides configuration for the HTTP tracer.
@@ -23,7 +22,6 @@ pub mod tracing {
     /// :ref:`HttpConnectionManager.Tracing <envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing>`
     /// :ref:`provider <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.provider>`
     /// field.
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Http {
         /// The name of the HTTP trace driver to instantiate. The name must match a
@@ -40,7 +38,6 @@ pub mod tracing {
     pub mod http {
         /// Trace driver specific configuration which must be set according to the driver being instantiated.
         /// \[#extension-category: envoy.tracers\]
-        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Oneof)]
         pub enum ConfigType {
             #[prost(message, tag = "3")]
@@ -70,7 +67,6 @@ impl ::prost::Name for Tracing {
 }
 /// Configuration for the Datadog tracer.
 /// \[#extension: envoy.tracers.datadog\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DatadogConfig {
     /// The cluster to use for submitting traces to the Datadog agent.
@@ -98,7 +94,6 @@ impl ::prost::Name for DatadogConfig {
 /// that implements the `OpenTracing dynamic loading API
 /// <<https://github.com/opentracing/opentracing-cpp>`_.>
 /// \[#extension: envoy.tracers.dynamic_ot\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DynamicOtConfig {
     /// Dynamic library implementing the `OpenTracing API
@@ -127,7 +122,6 @@ impl ::prost::Name for DynamicOtConfig {
 /// Configuration for the LightStep tracer.
 /// \[#extension: envoy.tracers.lightstep\]
 /// \[#not-implemented-hide:\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LightstepConfig {
     /// The cluster manager cluster that hosts the LightStep collectors.
@@ -182,10 +176,10 @@ pub mod lightstep_config {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                PropagationMode::Envoy => "ENVOY",
-                PropagationMode::Lightstep => "LIGHTSTEP",
-                PropagationMode::B3 => "B3",
-                PropagationMode::TraceContext => "TRACE_CONTEXT",
+                Self::Envoy => "ENVOY",
+                Self::Lightstep => "LIGHTSTEP",
+                Self::B3 => "B3",
+                Self::TraceContext => "TRACE_CONTEXT",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -213,7 +207,6 @@ impl ::prost::Name for LightstepConfig {
 /// Configuration for the OpenCensus tracer.
 /// \[#next-free-field: 15\]
 /// \[#extension: envoy.tracers.opencensus\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OpenCensusConfig {
     /// Configures tracing, e.g. the sampler, max number of annotations, etc.
@@ -334,11 +327,11 @@ pub mod open_census_config {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                TraceContext::None => "NONE",
-                TraceContext::TraceContext => "TRACE_CONTEXT",
-                TraceContext::GrpcTraceBin => "GRPC_TRACE_BIN",
-                TraceContext::CloudTraceContext => "CLOUD_TRACE_CONTEXT",
-                TraceContext::B3 => "B3",
+                Self::None => "NONE",
+                Self::TraceContext => "TRACE_CONTEXT",
+                Self::GrpcTraceBin => "GRPC_TRACE_BIN",
+                Self::CloudTraceContext => "CLOUD_TRACE_CONTEXT",
+                Self::B3 => "B3",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -367,7 +360,6 @@ impl ::prost::Name for OpenCensusConfig {
 /// Configuration for the OpenTelemetry tracer.
 ///   \[#extension: envoy.tracers.opentelemetry\]
 /// \[#next-free-field: 6\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OpenTelemetryConfig {
     /// The upstream gRPC cluster that will receive OTLP traces.
@@ -419,7 +411,6 @@ impl ::prost::Name for OpenTelemetryConfig {
     }
 }
 /// Configuration structure.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TraceServiceConfig {
     /// The upstream gRPC cluster that hosts the metrics service.
@@ -442,7 +433,6 @@ impl ::prost::Name for TraceServiceConfig {
 /// in the tracing config must be set to true to get the correct topology and tracing data. Moreover, SkyWalking
 /// Tracer does not support SkyWalking extension header (``sw8-x``) temporarily.
 /// \[#extension: envoy.tracers.skywalking\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SkyWalkingConfig {
     /// SkyWalking collector service.
@@ -462,7 +452,6 @@ impl ::prost::Name for SkyWalkingConfig {
     }
 }
 /// Client config for SkyWalking tracer.
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ClientConfig {
     /// Service name for SkyWalking tracer. If this field is empty, then local service cluster name
@@ -501,7 +490,6 @@ pub mod client_config {
     /// that monitoring application data can be trusted. In current version, Token is considered as a
     /// simple string.
     /// \[#comment:TODO(wbpcode): Get backend token through the SDS API.\]
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum BackendTokenSpecifier {
         /// Inline authentication token string.
@@ -522,7 +510,6 @@ impl ::prost::Name for ClientConfig {
 /// Configuration for the Zipkin tracer.
 /// \[#extension: envoy.tracers.zipkin\]
 /// \[#next-free-field: 8\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ZipkinConfig {
     /// The cluster manager cluster that hosts the Zipkin collectors.
@@ -608,12 +595,12 @@ pub mod zipkin_config {
         /// (if the ProtoBuf definition does not change) and safe for programmatic use.
         pub fn as_str_name(&self) -> &'static str {
             match self {
-                CollectorEndpointVersion::DeprecatedAndUnavailableDoNotUse => {
+                Self::DeprecatedAndUnavailableDoNotUse => {
                     "DEPRECATED_AND_UNAVAILABLE_DO_NOT_USE"
                 }
-                CollectorEndpointVersion::HttpJson => "HTTP_JSON",
-                CollectorEndpointVersion::HttpProto => "HTTP_PROTO",
-                CollectorEndpointVersion::Grpc => "GRPC",
+                Self::HttpJson => "HTTP_JSON",
+                Self::HttpProto => "HTTP_PROTO",
+                Self::Grpc => "GRPC",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -641,7 +628,6 @@ impl ::prost::Name for ZipkinConfig {
     }
 }
 /// \[#extension: envoy.tracers.xray\]
-#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct XRayConfig {
     /// The UDP endpoint of the X-Ray Daemon where the spans will be sent.
@@ -667,7 +653,6 @@ pub struct XRayConfig {
 }
 /// Nested message and enum types in `XRayConfig`.
 pub mod x_ray_config {
-    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct SegmentFields {
         /// The type of AWS resource, e.g. "AWS::AppMesh::Proxy".
