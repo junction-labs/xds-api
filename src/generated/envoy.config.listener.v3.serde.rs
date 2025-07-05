@@ -498,9 +498,6 @@ impl serde::Serialize for FilterChain {
         if !self.name.is_empty() {
             len += 1;
         }
-        if self.on_demand_configuration.is_some() {
-            len += 1;
-        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.listener.v3.FilterChain", len)?;
         if let Some(v) = self.filter_chain_match.as_ref() {
             struct_ser.serialize_field("filter_chain_match", v)?;
@@ -523,9 +520,6 @@ impl serde::Serialize for FilterChain {
         if !self.name.is_empty() {
             struct_ser.serialize_field("name", &self.name)?;
         }
-        if let Some(v) = self.on_demand_configuration.as_ref() {
-            struct_ser.serialize_field("on_demand_configuration", v)?;
-        }
         struct_ser.end()
     }
 }
@@ -547,8 +541,6 @@ impl<'de> serde::Deserialize<'de> for FilterChain {
             "transport_socket_connect_timeout",
             "transportSocketConnectTimeout",
             "name",
-            "on_demand_configuration",
-            "onDemandConfiguration",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -560,7 +552,6 @@ impl<'de> serde::Deserialize<'de> for FilterChain {
             TransportSocket,
             TransportSocketConnectTimeout,
             Name,
-            OnDemandConfiguration,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -589,7 +580,6 @@ impl<'de> serde::Deserialize<'de> for FilterChain {
                             "transportSocket" | "transport_socket" => Ok(GeneratedField::TransportSocket),
                             "transportSocketConnectTimeout" | "transport_socket_connect_timeout" => Ok(GeneratedField::TransportSocketConnectTimeout),
                             "name" => Ok(GeneratedField::Name),
-                            "onDemandConfiguration" | "on_demand_configuration" => Ok(GeneratedField::OnDemandConfiguration),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -616,7 +606,6 @@ impl<'de> serde::Deserialize<'de> for FilterChain {
                 let mut transport_socket__ = None;
                 let mut transport_socket_connect_timeout__ = None;
                 let mut name__ = None;
-                let mut on_demand_configuration__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::FilterChainMatch => {
@@ -661,12 +650,6 @@ impl<'de> serde::Deserialize<'de> for FilterChain {
                             }
                             name__ = Some(map_.next_value()?);
                         }
-                        GeneratedField::OnDemandConfiguration => {
-                            if on_demand_configuration__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("onDemandConfiguration"));
-                            }
-                            on_demand_configuration__ = map_.next_value()?;
-                        }
                     }
                 }
                 Ok(FilterChain {
@@ -677,103 +660,10 @@ impl<'de> serde::Deserialize<'de> for FilterChain {
                     transport_socket: transport_socket__,
                     transport_socket_connect_timeout: transport_socket_connect_timeout__,
                     name: name__.unwrap_or_default(),
-                    on_demand_configuration: on_demand_configuration__,
                 })
             }
         }
         deserializer.deserialize_struct("envoy.config.listener.v3.FilterChain", FIELDS, GeneratedVisitor)
-    }
-}
-impl serde::Serialize for filter_chain::OnDemandConfiguration {
-    #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeStruct;
-        let mut len = 0;
-        if self.rebuild_timeout.is_some() {
-            len += 1;
-        }
-        let mut struct_ser = serializer.serialize_struct("envoy.config.listener.v3.FilterChain.OnDemandConfiguration", len)?;
-        if let Some(v) = self.rebuild_timeout.as_ref() {
-            struct_ser.serialize_field("rebuild_timeout", v)?;
-        }
-        struct_ser.end()
-    }
-}
-impl<'de> serde::Deserialize<'de> for filter_chain::OnDemandConfiguration {
-    #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        const FIELDS: &[&str] = &[
-            "rebuild_timeout",
-            "rebuildTimeout",
-        ];
-
-        #[allow(clippy::enum_variant_names)]
-        enum GeneratedField {
-            RebuildTimeout,
-        }
-        impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
-            where
-                D: serde::Deserializer<'de>,
-            {
-                struct GeneratedVisitor;
-
-                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
-                    type Value = GeneratedField;
-
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        write!(formatter, "expected one of: {:?}", &FIELDS)
-                    }
-
-                    #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
-                    where
-                        E: serde::de::Error,
-                    {
-                        match value {
-                            "rebuildTimeout" | "rebuild_timeout" => Ok(GeneratedField::RebuildTimeout),
-                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
-                        }
-                    }
-                }
-                deserializer.deserialize_identifier(GeneratedVisitor)
-            }
-        }
-        struct GeneratedVisitor;
-        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
-            type Value = filter_chain::OnDemandConfiguration;
-
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                formatter.write_str("struct envoy.config.listener.v3.FilterChain.OnDemandConfiguration")
-            }
-
-            fn visit_map<V>(self, mut map_: V) -> std::result::Result<filter_chain::OnDemandConfiguration, V::Error>
-                where
-                    V: serde::de::MapAccess<'de>,
-            {
-                let mut rebuild_timeout__ = None;
-                while let Some(k) = map_.next_key()? {
-                    match k {
-                        GeneratedField::RebuildTimeout => {
-                            if rebuild_timeout__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("rebuildTimeout"));
-                            }
-                            rebuild_timeout__ = map_.next_value()?;
-                        }
-                    }
-                }
-                Ok(filter_chain::OnDemandConfiguration {
-                    rebuild_timeout: rebuild_timeout__,
-                })
-            }
-        }
-        deserializer.deserialize_struct("envoy.config.listener.v3.FilterChain.OnDemandConfiguration", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for FilterChainMatch {
@@ -1150,6 +1040,9 @@ impl serde::Serialize for Listener {
         if !self.filter_chains.is_empty() {
             len += 1;
         }
+        if self.fcds_config.is_some() {
+            len += 1;
+        }
         if self.filter_chain_matcher.is_some() {
             len += 1;
         }
@@ -1249,6 +1142,9 @@ impl serde::Serialize for Listener {
         }
         if !self.filter_chains.is_empty() {
             struct_ser.serialize_field("filter_chains", &self.filter_chains)?;
+        }
+        if let Some(v) = self.fcds_config.as_ref() {
+            struct_ser.serialize_field("fcds_config", v)?;
         }
         if let Some(v) = self.filter_chain_matcher.as_ref() {
             struct_ser.serialize_field("filter_chain_matcher", v)?;
@@ -1360,6 +1256,8 @@ impl<'de> serde::Deserialize<'de> for Listener {
             "statPrefix",
             "filter_chains",
             "filterChains",
+            "fcds_config",
+            "fcdsConfig",
             "filter_chain_matcher",
             "filterChainMatcher",
             "use_original_dst",
@@ -1422,6 +1320,7 @@ impl<'de> serde::Deserialize<'de> for Listener {
             AdditionalAddresses,
             StatPrefix,
             FilterChains,
+            FcdsConfig,
             FilterChainMatcher,
             UseOriginalDst,
             DefaultFilterChain,
@@ -1476,6 +1375,7 @@ impl<'de> serde::Deserialize<'de> for Listener {
                             "additionalAddresses" | "additional_addresses" => Ok(GeneratedField::AdditionalAddresses),
                             "statPrefix" | "stat_prefix" => Ok(GeneratedField::StatPrefix),
                             "filterChains" | "filter_chains" => Ok(GeneratedField::FilterChains),
+                            "fcdsConfig" | "fcds_config" => Ok(GeneratedField::FcdsConfig),
                             "filterChainMatcher" | "filter_chain_matcher" => Ok(GeneratedField::FilterChainMatcher),
                             "useOriginalDst" | "use_original_dst" => Ok(GeneratedField::UseOriginalDst),
                             "defaultFilterChain" | "default_filter_chain" => Ok(GeneratedField::DefaultFilterChain),
@@ -1528,6 +1428,7 @@ impl<'de> serde::Deserialize<'de> for Listener {
                 let mut additional_addresses__ = None;
                 let mut stat_prefix__ = None;
                 let mut filter_chains__ = None;
+                let mut fcds_config__ = None;
                 let mut filter_chain_matcher__ = None;
                 let mut use_original_dst__ = None;
                 let mut default_filter_chain__ = None;
@@ -1587,6 +1488,12 @@ impl<'de> serde::Deserialize<'de> for Listener {
                                 return Err(serde::de::Error::duplicate_field("filterChains"));
                             }
                             filter_chains__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::FcdsConfig => {
+                            if fcds_config__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("fcdsConfig"));
+                            }
+                            fcds_config__ = map_.next_value()?;
                         }
                         GeneratedField::FilterChainMatcher => {
                             if filter_chain_matcher__.is_some() {
@@ -1765,6 +1672,7 @@ impl<'de> serde::Deserialize<'de> for Listener {
                     additional_addresses: additional_addresses__.unwrap_or_default(),
                     stat_prefix: stat_prefix__.unwrap_or_default(),
                     filter_chains: filter_chains__.unwrap_or_default(),
+                    fcds_config: fcds_config__,
                     filter_chain_matcher: filter_chain_matcher__,
                     use_original_dst: use_original_dst__,
                     default_filter_chain: default_filter_chain__,
@@ -2142,6 +2050,115 @@ impl<'de> serde::Deserialize<'de> for listener::DrainType {
             }
         }
         deserializer.deserialize_any(GeneratedVisitor)
+    }
+}
+impl serde::Serialize for listener::FcdsConfig {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.name.is_empty() {
+            len += 1;
+        }
+        if self.config_source.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.listener.v3.Listener.FcdsConfig", len)?;
+        if !self.name.is_empty() {
+            struct_ser.serialize_field("name", &self.name)?;
+        }
+        if let Some(v) = self.config_source.as_ref() {
+            struct_ser.serialize_field("config_source", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for listener::FcdsConfig {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "name",
+            "config_source",
+            "configSource",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Name,
+            ConfigSource,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "name" => Ok(GeneratedField::Name),
+                            "configSource" | "config_source" => Ok(GeneratedField::ConfigSource),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = listener::FcdsConfig;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.listener.v3.Listener.FcdsConfig")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<listener::FcdsConfig, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut name__ = None;
+                let mut config_source__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Name => {
+                            if name__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("name"));
+                            }
+                            name__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::ConfigSource => {
+                            if config_source__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("configSource"));
+                            }
+                            config_source__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(listener::FcdsConfig {
+                    name: name__.unwrap_or_default(),
+                    config_source: config_source__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.listener.v3.Listener.FcdsConfig", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for listener::InternalListenerConfig {
@@ -2807,6 +2824,12 @@ impl serde::Serialize for QuicProtocolOptions {
         if self.connection_debug_visitor_config.is_some() {
             len += 1;
         }
+        if !self.save_cmsg_config.is_empty() {
+            len += 1;
+        }
+        if self.reject_new_connections {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.listener.v3.QuicProtocolOptions", len)?;
         if let Some(v) = self.quic_protocol_options.as_ref() {
             struct_ser.serialize_field("quic_protocol_options", v)?;
@@ -2841,6 +2864,12 @@ impl serde::Serialize for QuicProtocolOptions {
         if let Some(v) = self.connection_debug_visitor_config.as_ref() {
             struct_ser.serialize_field("connection_debug_visitor_config", v)?;
         }
+        if !self.save_cmsg_config.is_empty() {
+            struct_ser.serialize_field("save_cmsg_config", &self.save_cmsg_config)?;
+        }
+        if self.reject_new_connections {
+            struct_ser.serialize_field("reject_new_connections", &self.reject_new_connections)?;
+        }
         struct_ser.end()
     }
 }
@@ -2872,6 +2901,10 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
             "sendDisableActiveMigration",
             "connection_debug_visitor_config",
             "connectionDebugVisitorConfig",
+            "save_cmsg_config",
+            "saveCmsgConfig",
+            "reject_new_connections",
+            "rejectNewConnections",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -2887,6 +2920,8 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
             ServerPreferredAddressConfig,
             SendDisableActiveMigration,
             ConnectionDebugVisitorConfig,
+            SaveCmsgConfig,
+            RejectNewConnections,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -2919,6 +2954,8 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                             "serverPreferredAddressConfig" | "server_preferred_address_config" => Ok(GeneratedField::ServerPreferredAddressConfig),
                             "sendDisableActiveMigration" | "send_disable_active_migration" => Ok(GeneratedField::SendDisableActiveMigration),
                             "connectionDebugVisitorConfig" | "connection_debug_visitor_config" => Ok(GeneratedField::ConnectionDebugVisitorConfig),
+                            "saveCmsgConfig" | "save_cmsg_config" => Ok(GeneratedField::SaveCmsgConfig),
+                            "rejectNewConnections" | "reject_new_connections" => Ok(GeneratedField::RejectNewConnections),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -2949,6 +2986,8 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                 let mut server_preferred_address_config__ = None;
                 let mut send_disable_active_migration__ = None;
                 let mut connection_debug_visitor_config__ = None;
+                let mut save_cmsg_config__ = None;
+                let mut reject_new_connections__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::QuicProtocolOptions => {
@@ -3017,6 +3056,18 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                             }
                             connection_debug_visitor_config__ = map_.next_value()?;
                         }
+                        GeneratedField::SaveCmsgConfig => {
+                            if save_cmsg_config__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("saveCmsgConfig"));
+                            }
+                            save_cmsg_config__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::RejectNewConnections => {
+                            if reject_new_connections__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("rejectNewConnections"));
+                            }
+                            reject_new_connections__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(QuicProtocolOptions {
@@ -3031,6 +3082,8 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                     server_preferred_address_config: server_preferred_address_config__,
                     send_disable_active_migration: send_disable_active_migration__,
                     connection_debug_visitor_config: connection_debug_visitor_config__,
+                    save_cmsg_config: save_cmsg_config__.unwrap_or_default(),
+                    reject_new_connections: reject_new_connections__.unwrap_or_default(),
                 })
             }
         }

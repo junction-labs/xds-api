@@ -4,9 +4,9 @@
 # the other dependencies in this file. The git refs here MUST match the versions
 # listed in enovyproxy/data-plane-api.git/bazel/repository_locations.bzl.
 [dependencies]
-envoy-data-plane = { repo_url = "https://github.com/envoyproxy/data-plane-api.git", git_ref = "786c93ccaae9891338f098a5aba60e9987d78bd3" }
-cncf-xds = { repo_url = "https://github.com/cncf/xds", git_ref = "555b57ec207be86f811fb0c04752db6f85e3d7e2" }
+envoy-data-plane = { repo_url = "https://github.com/envoyproxy/data-plane-api.git", git_ref = "09409f495015a2a144d421300458d3ad49e20031" }
+cncf-xds = { repo_url = "https://github.com/cncf/xds", git_ref = "2ac532fd44436293585084f8d94c6bdb17835af0" }
 protoc-gen-validate = { repo_url = "https://github.com/bufbuild/protoc-gen-validate", git_ref = "v1.0.4" }
-googleapis = { repo_url = "https://github.com/googleapis/googleapis", git_ref = "114a745b2841a044e98cdbb19358ed29fcf4a5f1" }
-opencensus-proto = { repo_url = "https://github.com/census-instrumentation/opencensus-proto", git_ref = "v0.4.1", proto_root = "src" }
-prometheus-client-model = { repo_url = "https://github.com/prometheus/client_model", git_ref = "v0.6.1" }
+googleapis = { repo_url = "https://github.com/googleapis/googleapis", git_ref = "fd52b5754b2b268bc3a22a10f29844f206abb327" }
+opentelemetry-proto = { repo_url = "https://github.com/open-telemetry/opentelemetry-proto", git_ref = "v1.7.0", proto_root = "src" }
+prometheus-client-model = { repo_url = "https://github.com/prometheus/client_model", git_ref = "v0.6.2" }

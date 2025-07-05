@@ -25,6 +25,30 @@ pub mod extension_config_discovery_service_client {
     )]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
+    /// A service that supports dynamic configuration updates for a specific filter.
+    /// Currently, ECDS is supported for network filters, HTTP filters, UDP session filters, and listener filters.
+    /// Please check :ref:`Extension Config Discovery Service (ECDS) API <config_overview_extension_discovery>`.
+    ///
+    /// The overall extension config discovery service works as follows:
+    ///
+    /// #. A filter (:ref:`Downstream Network <envoy_v3_api_field_config.listener.v3.Filter.config_discovery>`,
+    ///    :ref:`Upstream Network <envoy_v3_api_field_config.cluster.v3.Filter.config_discovery>`,
+    ///    :ref:`Listener <envoy_v3_api_field_config.listener.v3.ListenerFilter.config_discovery>`,
+    ///    :ref:`UDP Session <envoy_v3_api_field_extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter.config_discovery>`,
+    ///    or :ref:`HTTP <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.config_discovery>`)
+    ///    contains a (:ref:`ExtensionConfigSource config discovery <envoy_v3_api_msg_config.core.v3.ExtensionConfigSource>`) configuration. This configuration
+    ///    includes a :ref:`config_source <envoy_v3_api_field_config.core.v3.ExtensionConfigSource.config_source>`,
+    ///    from which the filter configuration will be fetched.
+    /// #. The client then registers for a resource using the filter name as the ``resource_name``.
+    /// #. The xDS server sends back the filter's configuration.
+    /// #. The client stores the configuration that will be used in the next instantiation of the filter chain,
+    ///    i.e., for the next requests. Whenever an updated filter configuration arrives, it will be taken into
+    ///    account in the following instantiation of the filter chain.
+    ///
+    /// .. note::
+    ///   Filters that are configured using ECDS are warmed. For more details see
+    ///   :ref:`ExtensionConfigSource <envoy_v3_api_msg_config.core.v3.ExtensionConfigSource>`.
+    ///
     /// Return extension configurations.
     #[derive(Debug, Clone)]
     pub struct ExtensionConfigDiscoveryServiceClient<T> {
@@ -32,7 +56,7 @@ pub mod extension_config_discovery_service_client {
     }
     impl<T> ExtensionConfigDiscoveryServiceClient<T>
     where
-        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T: tonic::client::GrpcService<tonic::body::Body>,
         T::Error: Into<StdError>,
         T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
@@ -53,13 +77,13 @@ pub mod extension_config_discovery_service_client {
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
             T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
+                http::Request<tonic::body::Body>,
                 Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                    <T as tonic::client::GrpcService<tonic::body::Body>>::ResponseBody,
                 >,
             >,
             <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
+                http::Request<tonic::body::Body>,
             >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             ExtensionConfigDiscoveryServiceClient::new(
@@ -259,6 +283,30 @@ pub mod extension_config_discovery_service_server {
             tonic::Status,
         >;
     }
+    /// A service that supports dynamic configuration updates for a specific filter.
+    /// Currently, ECDS is supported for network filters, HTTP filters, UDP session filters, and listener filters.
+    /// Please check :ref:`Extension Config Discovery Service (ECDS) API <config_overview_extension_discovery>`.
+    ///
+    /// The overall extension config discovery service works as follows:
+    ///
+    /// #. A filter (:ref:`Downstream Network <envoy_v3_api_field_config.listener.v3.Filter.config_discovery>`,
+    ///    :ref:`Upstream Network <envoy_v3_api_field_config.cluster.v3.Filter.config_discovery>`,
+    ///    :ref:`Listener <envoy_v3_api_field_config.listener.v3.ListenerFilter.config_discovery>`,
+    ///    :ref:`UDP Session <envoy_v3_api_field_extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter.config_discovery>`,
+    ///    or :ref:`HTTP <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.config_discovery>`)
+    ///    contains a (:ref:`ExtensionConfigSource config discovery <envoy_v3_api_msg_config.core.v3.ExtensionConfigSource>`) configuration. This configuration
+    ///    includes a :ref:`config_source <envoy_v3_api_field_config.core.v3.ExtensionConfigSource.config_source>`,
+    ///    from which the filter configuration will be fetched.
+    /// #. The client then registers for a resource using the filter name as the ``resource_name``.
+    /// #. The xDS server sends back the filter's configuration.
+    /// #. The client stores the configuration that will be used in the next instantiation of the filter chain,
+    ///    i.e., for the next requests. Whenever an updated filter configuration arrives, it will be taken into
+    ///    account in the following instantiation of the filter chain.
+    ///
+    /// .. note::
+    ///   Filters that are configured using ECDS are warmed. For more details see
+    ///   :ref:`ExtensionConfigSource <envoy_v3_api_msg_config.core.v3.ExtensionConfigSource>`.
+    ///
     /// Return extension configurations.
     #[derive(Debug)]
     pub struct ExtensionConfigDiscoveryServiceServer<T> {
@@ -326,7 +374,7 @@ pub mod extension_config_discovery_service_server {
         B: Body + std::marker::Send + 'static,
         B::Error: Into<StdError> + std::marker::Send + 'static,
     {
-        type Response = http::Response<tonic::body::BoxBody>;
+        type Response = http::Response<tonic::body::Body>;
         type Error = std::convert::Infallible;
         type Future = BoxFuture<Self::Response, Self::Error>;
         fn poll_ready(
@@ -507,7 +555,9 @@ pub mod extension_config_discovery_service_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        let mut response = http::Response::new(empty_body());
+                        let mut response = http::Response::new(
+                            tonic::body::Body::default(),
+                        );
                         let headers = response.headers_mut();
                         headers
                             .insert(

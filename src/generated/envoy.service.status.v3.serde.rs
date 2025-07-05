@@ -393,6 +393,7 @@ impl serde::Serialize for ClientConfigStatus {
             Self::ClientRequested => "CLIENT_REQUESTED",
             Self::ClientAcked => "CLIENT_ACKED",
             Self::ClientNacked => "CLIENT_NACKED",
+            Self::ClientReceivedError => "CLIENT_RECEIVED_ERROR",
         };
         serializer.serialize_str(variant)
     }
@@ -408,6 +409,7 @@ impl<'de> serde::Deserialize<'de> for ClientConfigStatus {
             "CLIENT_REQUESTED",
             "CLIENT_ACKED",
             "CLIENT_NACKED",
+            "CLIENT_RECEIVED_ERROR",
         ];
 
         struct GeneratedVisitor;
@@ -452,6 +454,7 @@ impl<'de> serde::Deserialize<'de> for ClientConfigStatus {
                     "CLIENT_REQUESTED" => Ok(ClientConfigStatus::ClientRequested),
                     "CLIENT_ACKED" => Ok(ClientConfigStatus::ClientAcked),
                     "CLIENT_NACKED" => Ok(ClientConfigStatus::ClientNacked),
+                    "CLIENT_RECEIVED_ERROR" => Ok(ClientConfigStatus::ClientReceivedError),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }
             }

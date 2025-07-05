@@ -203,6 +203,7 @@ impl serde::Serialize for processing_mode::BodySendMode {
             Self::Streamed => "STREAMED",
             Self::Buffered => "BUFFERED",
             Self::BufferedPartial => "BUFFERED_PARTIAL",
+            Self::FullDuplexStreamed => "FULL_DUPLEX_STREAMED",
         };
         serializer.serialize_str(variant)
     }
@@ -218,6 +219,7 @@ impl<'de> serde::Deserialize<'de> for processing_mode::BodySendMode {
             "STREAMED",
             "BUFFERED",
             "BUFFERED_PARTIAL",
+            "FULL_DUPLEX_STREAMED",
         ];
 
         struct GeneratedVisitor;
@@ -262,6 +264,7 @@ impl<'de> serde::Deserialize<'de> for processing_mode::BodySendMode {
                     "STREAMED" => Ok(processing_mode::BodySendMode::Streamed),
                     "BUFFERED" => Ok(processing_mode::BodySendMode::Buffered),
                     "BUFFERED_PARTIAL" => Ok(processing_mode::BodySendMode::BufferedPartial),
+                    "FULL_DUPLEX_STREAMED" => Ok(processing_mode::BodySendMode::FullDuplexStreamed),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }
             }

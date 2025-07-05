@@ -70,10 +70,10 @@ pub struct Router {
     /// for more details.
     #[prost(bool, tag = "7")]
     pub suppress_grpc_request_failure_code_stats: bool,
+    /// Optional HTTP filters for the upstream HTTP filter chain.
+    ///
     /// .. note::
     ///    Upstream HTTP filters are currently in alpha.
-    ///
-    /// Optional HTTP filters for the upstream HTTP filter chain.
     ///
     /// These filters will be applied for all requests that pass through the router.
     /// They will also be applied to shadowed requests.

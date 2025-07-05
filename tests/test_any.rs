@@ -1,4 +1,4 @@
-#[cfg(test)]
+#[cfg(all(test, not(feature = "generate_only")))]
 mod any {
     use xds_api::pb::{
         envoy::{

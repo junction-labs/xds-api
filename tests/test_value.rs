@@ -1,4 +1,4 @@
-#[cfg(test)]
+#[cfg(all(test, not(feature = "generate_only")))]
 mod value {
     use std::u64;
 

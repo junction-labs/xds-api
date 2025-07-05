@@ -1556,6 +1556,12 @@ impl serde::Serialize for RateLimit {
         if self.limit.is_some() {
             len += 1;
         }
+        if self.hits_addend.is_some() {
+            len += 1;
+        }
+        if self.apply_on_stream_done {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.route.v3.RateLimit", len)?;
         if let Some(v) = self.stage.as_ref() {
             struct_ser.serialize_field("stage", v)?;
@@ -1568,6 +1574,12 @@ impl serde::Serialize for RateLimit {
         }
         if let Some(v) = self.limit.as_ref() {
             struct_ser.serialize_field("limit", v)?;
+        }
+        if let Some(v) = self.hits_addend.as_ref() {
+            struct_ser.serialize_field("hits_addend", v)?;
+        }
+        if self.apply_on_stream_done {
+            struct_ser.serialize_field("apply_on_stream_done", &self.apply_on_stream_done)?;
         }
         struct_ser.end()
     }
@@ -1584,6 +1596,10 @@ impl<'de> serde::Deserialize<'de> for RateLimit {
             "disableKey",
             "actions",
             "limit",
+            "hits_addend",
+            "hitsAddend",
+            "apply_on_stream_done",
+            "applyOnStreamDone",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -1592,6 +1608,8 @@ impl<'de> serde::Deserialize<'de> for RateLimit {
             DisableKey,
             Actions,
             Limit,
+            HitsAddend,
+            ApplyOnStreamDone,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -1617,6 +1635,8 @@ impl<'de> serde::Deserialize<'de> for RateLimit {
                             "disableKey" | "disable_key" => Ok(GeneratedField::DisableKey),
                             "actions" => Ok(GeneratedField::Actions),
                             "limit" => Ok(GeneratedField::Limit),
+                            "hitsAddend" | "hits_addend" => Ok(GeneratedField::HitsAddend),
+                            "applyOnStreamDone" | "apply_on_stream_done" => Ok(GeneratedField::ApplyOnStreamDone),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -1640,6 +1660,8 @@ impl<'de> serde::Deserialize<'de> for RateLimit {
                 let mut disable_key__ = None;
                 let mut actions__ = None;
                 let mut limit__ = None;
+                let mut hits_addend__ = None;
+                let mut apply_on_stream_done__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Stage => {
@@ -1666,6 +1688,18 @@ impl<'de> serde::Deserialize<'de> for RateLimit {
                             }
                             limit__ = map_.next_value()?;
                         }
+                        GeneratedField::HitsAddend => {
+                            if hits_addend__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("hitsAddend"));
+                            }
+                            hits_addend__ = map_.next_value()?;
+                        }
+                        GeneratedField::ApplyOnStreamDone => {
+                            if apply_on_stream_done__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("applyOnStreamDone"));
+                            }
+                            apply_on_stream_done__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(RateLimit {
@@ -1673,6 +1707,8 @@ impl<'de> serde::Deserialize<'de> for RateLimit {
                     disable_key: disable_key__.unwrap_or_default(),
                     actions: actions__.unwrap_or_default(),
                     limit: limit__,
+                    hits_addend: hits_addend__,
+                    apply_on_stream_done: apply_on_stream_done__.unwrap_or_default(),
                 })
             }
         }
@@ -1701,6 +1737,9 @@ impl serde::Serialize for rate_limit::Action {
                 }
                 rate_limit::action::ActionSpecifier::RequestHeaders(v) => {
                     struct_ser.serialize_field("request_headers", v)?;
+                }
+                rate_limit::action::ActionSpecifier::QueryParameters(v) => {
+                    struct_ser.serialize_field("query_parameters", v)?;
                 }
                 rate_limit::action::ActionSpecifier::RemoteAddress(v) => {
                     struct_ser.serialize_field("remote_address", v)?;
@@ -1744,6 +1783,8 @@ impl<'de> serde::Deserialize<'de> for rate_limit::Action {
             "destinationCluster",
             "request_headers",
             "requestHeaders",
+            "query_parameters",
+            "queryParameters",
             "remote_address",
             "remoteAddress",
             "generic_key",
@@ -1765,6 +1806,7 @@ impl<'de> serde::Deserialize<'de> for rate_limit::Action {
             SourceCluster,
             DestinationCluster,
             RequestHeaders,
+            QueryParameters,
             RemoteAddress,
             GenericKey,
             HeaderValueMatch,
@@ -1797,6 +1839,7 @@ impl<'de> serde::Deserialize<'de> for rate_limit::Action {
                             "sourceCluster" | "source_cluster" => Ok(GeneratedField::SourceCluster),
                             "destinationCluster" | "destination_cluster" => Ok(GeneratedField::DestinationCluster),
                             "requestHeaders" | "request_headers" => Ok(GeneratedField::RequestHeaders),
+                            "queryParameters" | "query_parameters" => Ok(GeneratedField::QueryParameters),
                             "remoteAddress" | "remote_address" => Ok(GeneratedField::RemoteAddress),
                             "genericKey" | "generic_key" => Ok(GeneratedField::GenericKey),
                             "headerValueMatch" | "header_value_match" => Ok(GeneratedField::HeaderValueMatch),
@@ -1846,6 +1889,13 @@ impl<'de> serde::Deserialize<'de> for rate_limit::Action {
                                 return Err(serde::de::Error::duplicate_field("requestHeaders"));
                             }
                             action_specifier__ = map_.next_value::<::std::option::Option<_>>()?.map(rate_limit::action::ActionSpecifier::RequestHeaders)
+;
+                        }
+                        GeneratedField::QueryParameters => {
+                            if action_specifier__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("queryParameters"));
+                            }
+                            action_specifier__ = map_.next_value::<::std::option::Option<_>>()?.map(rate_limit::action::ActionSpecifier::QueryParameters)
 ;
                         }
                         GeneratedField::RemoteAddress => {
@@ -2860,6 +2910,134 @@ impl<'de> serde::Deserialize<'de> for rate_limit::action::QueryParameterValueMat
         deserializer.deserialize_struct("envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch", FIELDS, GeneratedVisitor)
     }
 }
+impl serde::Serialize for rate_limit::action::QueryParameters {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.query_parameter_name.is_empty() {
+            len += 1;
+        }
+        if !self.descriptor_key.is_empty() {
+            len += 1;
+        }
+        if self.skip_if_absent {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.route.v3.RateLimit.Action.QueryParameters", len)?;
+        if !self.query_parameter_name.is_empty() {
+            struct_ser.serialize_field("query_parameter_name", &self.query_parameter_name)?;
+        }
+        if !self.descriptor_key.is_empty() {
+            struct_ser.serialize_field("descriptor_key", &self.descriptor_key)?;
+        }
+        if self.skip_if_absent {
+            struct_ser.serialize_field("skip_if_absent", &self.skip_if_absent)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for rate_limit::action::QueryParameters {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "query_parameter_name",
+            "queryParameterName",
+            "descriptor_key",
+            "descriptorKey",
+            "skip_if_absent",
+            "skipIfAbsent",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            QueryParameterName,
+            DescriptorKey,
+            SkipIfAbsent,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "queryParameterName" | "query_parameter_name" => Ok(GeneratedField::QueryParameterName),
+                            "descriptorKey" | "descriptor_key" => Ok(GeneratedField::DescriptorKey),
+                            "skipIfAbsent" | "skip_if_absent" => Ok(GeneratedField::SkipIfAbsent),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = rate_limit::action::QueryParameters;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.route.v3.RateLimit.Action.QueryParameters")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<rate_limit::action::QueryParameters, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut query_parameter_name__ = None;
+                let mut descriptor_key__ = None;
+                let mut skip_if_absent__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::QueryParameterName => {
+                            if query_parameter_name__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("queryParameterName"));
+                            }
+                            query_parameter_name__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::DescriptorKey => {
+                            if descriptor_key__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("descriptorKey"));
+                            }
+                            descriptor_key__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::SkipIfAbsent => {
+                            if skip_if_absent__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("skipIfAbsent"));
+                            }
+                            skip_if_absent__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(rate_limit::action::QueryParameters {
+                    query_parameter_name: query_parameter_name__.unwrap_or_default(),
+                    descriptor_key: descriptor_key__.unwrap_or_default(),
+                    skip_if_absent: skip_if_absent__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.route.v3.RateLimit.Action.QueryParameters", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for rate_limit::action::RemoteAddress {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -3128,6 +3306,114 @@ impl<'de> serde::Deserialize<'de> for rate_limit::action::SourceCluster {
             }
         }
         deserializer.deserialize_struct("envoy.config.route.v3.RateLimit.Action.SourceCluster", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for rate_limit::HitsAddend {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.number.is_some() {
+            len += 1;
+        }
+        if !self.format.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.route.v3.RateLimit.HitsAddend", len)?;
+        if let Some(v) = self.number.as_ref() {
+            struct_ser.serialize_field("number", v)?;
+        }
+        if !self.format.is_empty() {
+            struct_ser.serialize_field("format", &self.format)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for rate_limit::HitsAddend {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "number",
+            "format",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Number,
+            Format,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "number" => Ok(GeneratedField::Number),
+                            "format" => Ok(GeneratedField::Format),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = rate_limit::HitsAddend;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.route.v3.RateLimit.HitsAddend")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<rate_limit::HitsAddend, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut number__ = None;
+                let mut format__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Number => {
+                            if number__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("number"));
+                            }
+                            number__ = map_.next_value()?;
+                        }
+                        GeneratedField::Format => {
+                            if format__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("format"));
+                            }
+                            format__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(rate_limit::HitsAddend {
+                    number: number__,
+                    format: format__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.route.v3.RateLimit.HitsAddend", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for rate_limit::Override {
@@ -7580,6 +7866,9 @@ impl serde::Serialize for RouteMatch {
         if !self.dynamic_metadata.is_empty() {
             len += 1;
         }
+        if !self.filter_state.is_empty() {
+            len += 1;
+        }
         if self.path_specifier.is_some() {
             len += 1;
         }
@@ -7604,6 +7893,9 @@ impl serde::Serialize for RouteMatch {
         }
         if !self.dynamic_metadata.is_empty() {
             struct_ser.serialize_field("dynamic_metadata", &self.dynamic_metadata)?;
+        }
+        if !self.filter_state.is_empty() {
+            struct_ser.serialize_field("filter_state", &self.filter_state)?;
         }
         if let Some(v) = self.path_specifier.as_ref() {
             match v {
@@ -7649,6 +7941,8 @@ impl<'de> serde::Deserialize<'de> for RouteMatch {
             "tlsContext",
             "dynamic_metadata",
             "dynamicMetadata",
+            "filter_state",
+            "filterState",
             "prefix",
             "path",
             "safe_regex",
@@ -7670,6 +7964,7 @@ impl<'de> serde::Deserialize<'de> for RouteMatch {
             Grpc,
             TlsContext,
             DynamicMetadata,
+            FilterState,
             Prefix,
             Path,
             SafeRegex,
@@ -7704,6 +7999,7 @@ impl<'de> serde::Deserialize<'de> for RouteMatch {
                             "grpc" => Ok(GeneratedField::Grpc),
                             "tlsContext" | "tls_context" => Ok(GeneratedField::TlsContext),
                             "dynamicMetadata" | "dynamic_metadata" => Ok(GeneratedField::DynamicMetadata),
+                            "filterState" | "filter_state" => Ok(GeneratedField::FilterState),
                             "prefix" => Ok(GeneratedField::Prefix),
                             "path" => Ok(GeneratedField::Path),
                             "safeRegex" | "safe_regex" => Ok(GeneratedField::SafeRegex),
@@ -7736,6 +8032,7 @@ impl<'de> serde::Deserialize<'de> for RouteMatch {
                 let mut grpc__ = None;
                 let mut tls_context__ = None;
                 let mut dynamic_metadata__ = None;
+                let mut filter_state__ = None;
                 let mut path_specifier__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
@@ -7780,6 +8077,12 @@ impl<'de> serde::Deserialize<'de> for RouteMatch {
                                 return Err(serde::de::Error::duplicate_field("dynamicMetadata"));
                             }
                             dynamic_metadata__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::FilterState => {
+                            if filter_state__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("filterState"));
+                            }
+                            filter_state__ = Some(map_.next_value()?);
                         }
                         GeneratedField::Prefix => {
                             if path_specifier__.is_some() {
@@ -7830,6 +8133,7 @@ impl<'de> serde::Deserialize<'de> for RouteMatch {
                     grpc: grpc__,
                     tls_context: tls_context__,
                     dynamic_metadata: dynamic_metadata__.unwrap_or_default(),
+                    filter_state: filter_state__.unwrap_or_default(),
                     path_specifier: path_specifier__,
                 })
             }

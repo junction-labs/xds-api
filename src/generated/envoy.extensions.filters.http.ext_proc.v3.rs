@@ -3,6 +3,9 @@
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct ProcessingMode {
     /// How to handle the request header. Default is "SEND".
+    /// Note this field is ignored in :ref:`mode_override
+    /// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>`, since mode
+    /// overrides can only affect messages exchanged after the request header is processed.
     #[prost(enumeration = "processing_mode::HeaderSendMode", tag = "1")]
     pub request_header_mode: i32,
     /// How to handle the response header. Default is "SEND".
@@ -37,9 +40,18 @@ pub mod processing_mode {
     )]
     #[repr(i32)]
     pub enum HeaderSendMode {
-        /// The default HeaderSendMode depends on which part of the message is being
-        /// processed. By default, request and response headers are sent,
-        /// while trailers are skipped.
+        /// When used to configure the ext_proc filter :ref:`processing_mode
+        /// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`,
+        /// the default HeaderSendMode depends on which part of the message is being processed. By
+        /// default, request and response headers are sent, while trailers are skipped.
+        ///
+        /// When used in :ref:`mode_override
+        /// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>` or
+        /// :ref:`allowed_override_modes
+        /// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.allowed_override_modes>`,
+        /// a value of DEFAULT indicates that there is no change from the behavior that is configured for
+        /// the filter in :ref:`processing_mode
+        /// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`.
         Default = 0,
         /// Send the header or trailer.
         Send = 1,
@@ -70,11 +82,12 @@ pub mod processing_mode {
     }
     /// Control how the request and response bodies are handled
     /// When body mutation by external processor is enabled, ext_proc filter will always remove
-    /// the content length header in three cases below because content length can not be guaranteed
+    /// the content length header in four cases below because content length can not be guaranteed
     /// to be set correctly:
     /// 1) STREAMED BodySendMode: header processing completes before body mutation comes back.
     /// 2) BUFFERED_PARTIAL BodySendMode: body is buffered and could be injected in different phases.
     /// 3) BUFFERED BodySendMode + SKIP HeaderSendMode: header processing (e.g., update content-length) is skipped.
+    /// 4) FULL_DUPLEX_STREAMED BodySendMode: header processing completes before body mutation comes back.
     ///
     /// In Envoy's http1 codec implementation, removing content length will enable chunked transfer
     /// encoding whenever feasible. The recipient (either client or server) must be able
@@ -111,6 +124,7 @@ pub mod processing_mode {
         /// chunk. If the body exceeds the configured buffer limit, then the body contents
         /// up to the buffer limit will be sent.
         BufferedPartial = 3,
+        FullDuplexStreamed = 4,
     }
     impl BodySendMode {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -123,6 +137,7 @@ pub mod processing_mode {
                 Self::Streamed => "STREAMED",
                 Self::Buffered => "BUFFERED",
                 Self::BufferedPartial => "BUFFERED_PARTIAL",
+                Self::FullDuplexStreamed => "FULL_DUPLEX_STREAMED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -132,6 +147,7 @@ pub mod processing_mode {
                 "STREAMED" => Some(Self::Streamed),
                 "BUFFERED" => Some(Self::Buffered),
                 "BUFFERED_PARTIAL" => Some(Self::BufferedPartial),
+                "FULL_DUPLEX_STREAMED" => Some(Self::FullDuplexStreamed),
                 _ => None,
             }
         }

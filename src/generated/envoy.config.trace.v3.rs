@@ -65,6 +65,26 @@ impl ::prost::Name for Tracing {
         "type.googleapis.com/envoy.config.trace.v3.Tracing".into()
     }
 }
+/// Configuration for the Remote Configuration feature.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct DatadogRemoteConfig {
+    /// Frequency at which new configuration updates are queried.
+    /// If no value is provided, the default value is delegated to the Datadog tracing library.
+    #[prost(message, optional, tag = "1")]
+    pub polling_interval: ::core::option::Option<
+        super::super::super::super::google::protobuf::Duration,
+    >,
+}
+impl ::prost::Name for DatadogRemoteConfig {
+    const NAME: &'static str = "DatadogRemoteConfig";
+    const PACKAGE: &'static str = "envoy.config.trace.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.trace.v3.DatadogRemoteConfig".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.trace.v3.DatadogRemoteConfig".into()
+    }
+}
 /// Configuration for the Datadog tracer.
 /// \[#extension: envoy.tracers.datadog\]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -79,6 +99,13 @@ pub struct DatadogConfig {
     /// that require a specific hostname. Defaults to :ref:`collector_cluster <envoy_v3_api_field_config.trace.v3.DatadogConfig.collector_cluster>` above.
     #[prost(string, tag = "3")]
     pub collector_hostname: ::prost::alloc::string::String,
+    /// Enables and configures remote configuration.
+    /// Remote Configuration allows to configure the tracer from Datadog's user interface.
+    /// This feature can drastically increase the number of connections to the Datadog Agent.
+    /// Each tracer regularly polls for configuration updates, and the number of tracers is the product
+    /// of the number of listeners and worker threads.
+    #[prost(message, optional, tag = "4")]
+    pub remote_config: ::core::option::Option<DatadogRemoteConfig>,
 }
 impl ::prost::Name for DatadogConfig {
     const NAME: &'static str = "DatadogConfig";
@@ -90,10 +117,10 @@ impl ::prost::Name for DatadogConfig {
         "type.googleapis.com/envoy.config.trace.v3.DatadogConfig".into()
     }
 }
-/// DynamicOtConfig is used to dynamically load a tracer from a shared library
+/// DynamicOtConfig was used to dynamically load a tracer from a shared library
 /// that implements the `OpenTracing dynamic loading API
 /// <<https://github.com/opentracing/opentracing-cpp>`_.>
-/// \[#extension: envoy.tracers.dynamic_ot\]
+/// \[#not-implemented-hide:\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DynamicOtConfig {
     /// Dynamic library implementing the `OpenTracing API
@@ -204,162 +231,9 @@ impl ::prost::Name for LightstepConfig {
         "type.googleapis.com/envoy.config.trace.v3.LightstepConfig".into()
     }
 }
-/// Configuration for the OpenCensus tracer.
-/// \[#next-free-field: 15\]
-/// \[#extension: envoy.tracers.opencensus\]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OpenCensusConfig {
-    /// Configures tracing, e.g. the sampler, max number of annotations, etc.
-    #[deprecated]
-    #[prost(message, optional, tag = "1")]
-    pub trace_config: ::core::option::Option<
-        super::super::super::super::opencensus::proto::trace::v1::TraceConfig,
-    >,
-    /// Enables the stdout exporter if set to true. This is intended for debugging
-    /// purposes.
-    #[deprecated]
-    #[prost(bool, tag = "2")]
-    pub stdout_exporter_enabled: bool,
-    /// Enables the Stackdriver exporter if set to true. The project_id must also
-    /// be set.
-    #[deprecated]
-    #[prost(bool, tag = "3")]
-    pub stackdriver_exporter_enabled: bool,
-    /// The Cloud project_id to use for Stackdriver tracing.
-    #[deprecated]
-    #[prost(string, tag = "4")]
-    pub stackdriver_project_id: ::prost::alloc::string::String,
-    /// (optional) By default, the Stackdriver exporter will connect to production
-    /// Stackdriver. If stackdriver_address is non-empty, it will instead connect
-    /// to this address, which is in the gRPC format:
-    /// <https://github.com/grpc/grpc/blob/master/doc/naming.md>
-    #[deprecated]
-    #[prost(string, tag = "10")]
-    pub stackdriver_address: ::prost::alloc::string::String,
-    /// (optional) The gRPC server that hosts Stackdriver tracing service. Only
-    /// Google gRPC is supported. If :ref:`target_uri <envoy_v3_api_field_config.core.v3.GrpcService.GoogleGrpc.target_uri>`
-    /// is not provided, the default production Stackdriver address will be used.
-    #[deprecated]
-    #[prost(message, optional, tag = "13")]
-    pub stackdriver_grpc_service: ::core::option::Option<
-        super::super::core::v3::GrpcService,
-    >,
-    /// Enables the Zipkin exporter if set to true. The url and service name must
-    /// also be set. This is deprecated, prefer to use Envoy's :ref:`native Zipkin
-    /// tracer <envoy_v3_api_msg_config.trace.v3.ZipkinConfig>`.
-    #[deprecated]
-    #[prost(bool, tag = "5")]
-    pub zipkin_exporter_enabled: bool,
-    /// The URL to Zipkin, e.g. "<http://127.0.0.1:9411/api/v2/spans".> This is
-    /// deprecated, prefer to use Envoy's :ref:`native Zipkin tracer
-    /// <envoy_v3_api_msg_config.trace.v3.ZipkinConfig>`.
-    #[deprecated]
-    #[prost(string, tag = "6")]
-    pub zipkin_url: ::prost::alloc::string::String,
-    /// Enables the OpenCensus Agent exporter if set to true. The ocagent_address or
-    /// ocagent_grpc_service must also be set.
-    #[deprecated]
-    #[prost(bool, tag = "11")]
-    pub ocagent_exporter_enabled: bool,
-    /// The address of the OpenCensus Agent, if its exporter is enabled, in gRPC
-    /// format: <https://github.com/grpc/grpc/blob/master/doc/naming.md>
-    /// \[#comment:TODO: deprecate this field\]
-    #[deprecated]
-    #[prost(string, tag = "12")]
-    pub ocagent_address: ::prost::alloc::string::String,
-    /// (optional) The gRPC server hosted by the OpenCensus Agent. Only Google gRPC is supported.
-    /// This is only used if the ocagent_address is left empty.
-    #[deprecated]
-    #[prost(message, optional, tag = "14")]
-    pub ocagent_grpc_service: ::core::option::Option<
-        super::super::core::v3::GrpcService,
-    >,
-    /// List of incoming trace context headers we will accept. First one found
-    /// wins.
-    #[deprecated]
-    #[prost(
-        enumeration = "open_census_config::TraceContext",
-        repeated,
-        packed = "false",
-        tag = "8"
-    )]
-    pub incoming_trace_context: ::prost::alloc::vec::Vec<i32>,
-    /// List of outgoing trace context headers we will produce.
-    #[deprecated]
-    #[prost(
-        enumeration = "open_census_config::TraceContext",
-        repeated,
-        packed = "false",
-        tag = "9"
-    )]
-    pub outgoing_trace_context: ::prost::alloc::vec::Vec<i32>,
-}
-/// Nested message and enum types in `OpenCensusConfig`.
-pub mod open_census_config {
-    #[derive(
-        Clone,
-        Copy,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash,
-        PartialOrd,
-        Ord,
-        ::prost::Enumeration
-    )]
-    #[repr(i32)]
-    pub enum TraceContext {
-        /// No-op default, no trace context is utilized.
-        None = 0,
-        /// W3C Trace-Context format "traceparent:" header.
-        TraceContext = 1,
-        /// Binary "grpc-trace-bin:" header.
-        GrpcTraceBin = 2,
-        /// "X-Cloud-Trace-Context:" header.
-        CloudTraceContext = 3,
-        /// X-B3-* headers.
-        B3 = 4,
-    }
-    impl TraceContext {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Self::None => "NONE",
-                Self::TraceContext => "TRACE_CONTEXT",
-                Self::GrpcTraceBin => "GRPC_TRACE_BIN",
-                Self::CloudTraceContext => "CLOUD_TRACE_CONTEXT",
-                Self::B3 => "B3",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "NONE" => Some(Self::None),
-                "TRACE_CONTEXT" => Some(Self::TraceContext),
-                "GRPC_TRACE_BIN" => Some(Self::GrpcTraceBin),
-                "CLOUD_TRACE_CONTEXT" => Some(Self::CloudTraceContext),
-                "B3" => Some(Self::B3),
-                _ => None,
-            }
-        }
-    }
-}
-impl ::prost::Name for OpenCensusConfig {
-    const NAME: &'static str = "OpenCensusConfig";
-    const PACKAGE: &'static str = "envoy.config.trace.v3";
-    fn full_name() -> ::prost::alloc::string::String {
-        "envoy.config.trace.v3.OpenCensusConfig".into()
-    }
-    fn type_url() -> ::prost::alloc::string::String {
-        "type.googleapis.com/envoy.config.trace.v3.OpenCensusConfig".into()
-    }
-}
 /// Configuration for the OpenTelemetry tracer.
 ///   \[#extension: envoy.tracers.opentelemetry\]
-/// \[#next-free-field: 6\]
+/// \[#next-free-field: 7\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OpenTelemetryConfig {
     /// The upstream gRPC cluster that will receive OTLP traces.
@@ -399,6 +273,13 @@ pub struct OpenTelemetryConfig {
     /// \[#extension-category: envoy.tracers.opentelemetry.samplers\]
     #[prost(message, optional, tag = "5")]
     pub sampler: ::core::option::Option<super::super::core::v3::TypedExtensionConfig>,
+    /// Envoy caches the span in memory when the OpenTelemetry backend service is temporarily unavailable.
+    /// This field specifies the maximum number of spans that can be cached. If not specified, the
+    /// default is 1024.
+    #[prost(message, optional, tag = "6")]
+    pub max_cache_size: ::core::option::Option<
+        super::super::super::super::google::protobuf::UInt32Value,
+    >,
 }
 impl ::prost::Name for OpenTelemetryConfig {
     const NAME: &'static str = "OpenTelemetryConfig";

@@ -15,6 +15,9 @@ impl serde::Serialize for Cookie {
         if !self.path.is_empty() {
             len += 1;
         }
+        if !self.attributes.is_empty() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.r#type.http.v3.Cookie", len)?;
         if !self.name.is_empty() {
             struct_ser.serialize_field("name", &self.name)?;
@@ -24,6 +27,9 @@ impl serde::Serialize for Cookie {
         }
         if !self.path.is_empty() {
             struct_ser.serialize_field("path", &self.path)?;
+        }
+        if !self.attributes.is_empty() {
+            struct_ser.serialize_field("attributes", &self.attributes)?;
         }
         struct_ser.end()
     }
@@ -38,6 +44,7 @@ impl<'de> serde::Deserialize<'de> for Cookie {
             "name",
             "ttl",
             "path",
+            "attributes",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -45,6 +52,7 @@ impl<'de> serde::Deserialize<'de> for Cookie {
             Name,
             Ttl,
             Path,
+            Attributes,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -69,6 +77,7 @@ impl<'de> serde::Deserialize<'de> for Cookie {
                             "name" => Ok(GeneratedField::Name),
                             "ttl" => Ok(GeneratedField::Ttl),
                             "path" => Ok(GeneratedField::Path),
+                            "attributes" => Ok(GeneratedField::Attributes),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -91,6 +100,7 @@ impl<'de> serde::Deserialize<'de> for Cookie {
                 let mut name__ = None;
                 let mut ttl__ = None;
                 let mut path__ = None;
+                let mut attributes__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Name => {
@@ -111,16 +121,131 @@ impl<'de> serde::Deserialize<'de> for Cookie {
                             }
                             path__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::Attributes => {
+                            if attributes__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("attributes"));
+                            }
+                            attributes__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(Cookie {
                     name: name__.unwrap_or_default(),
                     ttl: ttl__,
                     path: path__.unwrap_or_default(),
+                    attributes: attributes__.unwrap_or_default(),
                 })
             }
         }
         deserializer.deserialize_struct("envoy.r#type.http.v3.Cookie", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for CookieAttribute {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.name.is_empty() {
+            len += 1;
+        }
+        if !self.value.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.r#type.http.v3.CookieAttribute", len)?;
+        if !self.name.is_empty() {
+            struct_ser.serialize_field("name", &self.name)?;
+        }
+        if !self.value.is_empty() {
+            struct_ser.serialize_field("value", &self.value)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for CookieAttribute {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "name",
+            "value",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Name,
+            Value,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "name" => Ok(GeneratedField::Name),
+                            "value" => Ok(GeneratedField::Value),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = CookieAttribute;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.r#type.http.v3.CookieAttribute")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<CookieAttribute, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut name__ = None;
+                let mut value__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Name => {
+                            if name__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("name"));
+                            }
+                            name__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::Value => {
+                            if value__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("value"));
+                            }
+                            value__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(CookieAttribute {
+                    name: name__.unwrap_or_default(),
+                    value: value__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.r#type.http.v3.CookieAttribute", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for PathTransformation {

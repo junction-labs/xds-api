@@ -1,3 +1,94 @@
+impl serde::Serialize for AddressMatcher {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.ranges.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.r#type.matcher.v3.AddressMatcher", len)?;
+        if !self.ranges.is_empty() {
+            struct_ser.serialize_field("ranges", &self.ranges)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for AddressMatcher {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "ranges",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Ranges,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "ranges" => Ok(GeneratedField::Ranges),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = AddressMatcher;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.r#type.matcher.v3.AddressMatcher")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<AddressMatcher, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut ranges__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Ranges => {
+                            if ranges__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("ranges"));
+                            }
+                            ranges__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(AddressMatcher {
+                    ranges: ranges__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.r#type.matcher.v3.AddressMatcher", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for DoubleMatcher {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -129,6 +220,9 @@ impl serde::Serialize for FilterStateMatcher {
                 filter_state_matcher::Matcher::StringMatch(v) => {
                     struct_ser.serialize_field("string_match", v)?;
                 }
+                filter_state_matcher::Matcher::AddressMatch(v) => {
+                    struct_ser.serialize_field("address_match", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -144,12 +238,15 @@ impl<'de> serde::Deserialize<'de> for FilterStateMatcher {
             "key",
             "string_match",
             "stringMatch",
+            "address_match",
+            "addressMatch",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Key,
             StringMatch,
+            AddressMatch,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -173,6 +270,7 @@ impl<'de> serde::Deserialize<'de> for FilterStateMatcher {
                         match value {
                             "key" => Ok(GeneratedField::Key),
                             "stringMatch" | "string_match" => Ok(GeneratedField::StringMatch),
+                            "addressMatch" | "address_match" => Ok(GeneratedField::AddressMatch),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -207,6 +305,13 @@ impl<'de> serde::Deserialize<'de> for FilterStateMatcher {
                                 return Err(serde::de::Error::duplicate_field("stringMatch"));
                             }
                             matcher__ = map_.next_value::<::std::option::Option<_>>()?.map(filter_state_matcher::Matcher::StringMatch)
+;
+                        }
+                        GeneratedField::AddressMatch => {
+                            if matcher__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("addressMatch"));
+                            }
+                            matcher__ = map_.next_value::<::std::option::Option<_>>()?.map(filter_state_matcher::Matcher::AddressMatch)
 ;
                         }
                     }

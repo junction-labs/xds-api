@@ -162,15 +162,38 @@ impl ::prost::Name for LbEndpoint {
         "type.googleapis.com/envoy.config.endpoint.v3.LbEndpoint".into()
     }
 }
+/// LbEndpoint list collection. Entries are `LbEndpoint` resources or references.
 /// \[#not-implemented-hide:\]
-/// A configuration for a LEDS collection.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LbEndpointCollection {
+    #[prost(message, optional, tag = "1")]
+    pub entries: ::core::option::Option<
+        super::super::super::super::xds::core::v3::CollectionEntry,
+    >,
+}
+impl ::prost::Name for LbEndpointCollection {
+    const NAME: &'static str = "LbEndpointCollection";
+    const PACKAGE: &'static str = "envoy.config.endpoint.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.endpoint.v3.LbEndpointCollection".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.endpoint.v3.LbEndpointCollection".into()
+    }
+}
+/// A configuration for an LEDS collection.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LedsClusterLocalityConfig {
     /// Configuration for the source of LEDS updates for a Locality.
     #[prost(message, optional, tag = "1")]
     pub leds_config: ::core::option::Option<super::super::core::v3::ConfigSource>,
-    /// The xDS transport protocol glob collection resource name.
-    /// The service is only supported in delta xDS (incremental) mode.
+    /// The name of the LbEndpoint collection resource.
+    ///
+    /// If the name ends in ``/*``, it indicates an LbEndpoint glob collection,
+    /// which is supported only in the xDS incremental protocol variants.
+    /// Otherwise, it indicates an LbEndpointCollection list collection.
+    ///
+    /// Envoy currently supports only glob collections.
     #[prost(string, tag = "2")]
     pub leds_collection_name: ::prost::alloc::string::String,
 }
@@ -187,15 +210,18 @@ impl ::prost::Name for LedsClusterLocalityConfig {
 /// A group of endpoints belonging to a Locality.
 /// One can have multiple LocalityLbEndpoints for a locality, but only if
 /// they have different priorities.
-/// \[#next-free-field: 9\]
+/// \[#next-free-field: 10\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LocalityLbEndpoints {
     /// Identifies location of where the upstream hosts run.
     #[prost(message, optional, tag = "1")]
     pub locality: ::core::option::Option<super::super::core::v3::Locality>,
+    /// Metadata to provide additional information about the locality endpoints in aggregate.
+    #[prost(message, optional, tag = "9")]
+    pub metadata: ::core::option::Option<super::super::core::v3::Metadata>,
     /// The group of endpoints belonging to the locality specified.
-    /// [#comment:TODO(adisuissa): Once LEDS is implemented this field needs to be
-    /// deprecated and replaced by ``load_balancer_endpoints``.]
+    /// This is ignored if :ref:`leds_cluster_locality_config
+    /// <envoy_v3_api_field_config.endpoint.v3.LocalityLbEndpoints.leds_cluster_locality_config>` is set.
     #[prost(message, repeated, tag = "2")]
     pub lb_endpoints: ::prost::alloc::vec::Vec<LbEndpoint>,
     /// Optional: Per priority/region/zone/sub_zone weight; at least 1. The load
@@ -234,7 +260,6 @@ pub struct LocalityLbEndpoints {
     pub proximity: ::core::option::Option<
         super::super::super::super::google::protobuf::UInt32Value,
     >,
-    /// \[#not-implemented-hide:\]
     #[prost(oneof = "locality_lb_endpoints::LbConfig", tags = "7, 8")]
     pub lb_config: ::core::option::Option<locality_lb_endpoints::LbConfig>,
 }
@@ -258,15 +283,16 @@ pub mod locality_lb_endpoints {
                 .into()
         }
     }
-    /// \[#not-implemented-hide:\]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum LbConfig {
-        /// The group of endpoints belonging to the locality.
-        /// [#comment:TODO(adisuissa): Once LEDS is implemented the ``lb_endpoints`` field
-        /// needs to be deprecated.]
+        /// \[#not-implemented-hide:\]
+        /// Not implemented and deprecated.
         #[prost(message, tag = "7")]
         LoadBalancerEndpoints(LbEndpointList),
         /// LEDS Configuration for the current locality.
+        /// If this is set, the :ref:`lb_endpoints
+        /// <envoy_v3_api_field_config.endpoint.v3.LocalityLbEndpoints.lb_endpoints>`
+        /// field is ignored.
         #[prost(message, tag = "8")]
         LedsClusterLocalityConfig(super::LedsClusterLocalityConfig),
     }
@@ -381,8 +407,9 @@ pub mod cluster_load_assignment {
         /// to determine the health of the priority level, or in other words assume each host has a weight of 1 for
         /// this calculation.
         ///
-        /// Note: this is not currently implemented for
-        /// :ref:`locality weighted load balancing <arch_overview_load_balancing_locality_weighted_lb>`.
+        /// .. note::
+        ///    This is not currently implemented for
+        ///    :ref:`locality weighted load balancing <arch_overview_load_balancing_locality_weighted_lb>`.
         #[prost(bool, tag = "6")]
         pub weighted_priority_health: bool,
     }
@@ -437,7 +464,7 @@ impl ::prost::Name for ClusterLoadAssignment {
 /// These are stats Envoy reports to the management server at a frequency defined by
 /// :ref:`LoadStatsResponse.load_reporting_interval<envoy_v3_api_field_service.load_stats.v3.LoadStatsResponse.load_reporting_interval>`.
 /// Stats per upstream region/zone and optionally per subzone.
-/// \[#next-free-field: 9\]
+/// \[#next-free-field: 15\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpstreamLocalityStats {
     /// Name of zone, region and optionally endpoint group these metrics were
@@ -460,7 +487,45 @@ pub struct UpstreamLocalityStats {
     /// upstream endpoints in the locality.
     #[prost(uint64, tag = "8")]
     pub total_issued_requests: u64,
-    /// Stats for multi-dimensional load balancing.
+    /// The total number of connections in an established state at the time of the
+    /// report. This field is aggregated over all the upstream endpoints in the
+    /// locality.
+    /// In Envoy, this information may be based on ``upstream_cx_active metric``.
+    /// \[#not-implemented-hide:\]
+    #[prost(uint64, tag = "9")]
+    pub total_active_connections: u64,
+    /// The total number of connections opened since the last report.
+    /// This field is aggregated over all the upstream endpoints in the locality.
+    /// In Envoy, this information may be based on ``upstream_cx_total`` metric
+    /// compared to itself between start and end of an interval, i.e.
+    /// ``upstream_cx_total``(now) - ``upstream_cx_total``(now -
+    /// load_report_interval).
+    /// \[#not-implemented-hide:\]
+    #[prost(uint64, tag = "10")]
+    pub total_new_connections: u64,
+    /// The total number of connection failures since the last report.
+    /// This field is aggregated over all the upstream endpoints in the locality.
+    /// In Envoy, this information may be based on ``upstream_cx_connect_fail``
+    /// metric compared to itself between start and end of an interval, i.e.
+    /// ``upstream_cx_connect_fail``(now) - ``upstream_cx_connect_fail``(now -
+    /// load_report_interval).
+    /// \[#not-implemented-hide:\]
+    #[prost(uint64, tag = "11")]
+    pub total_fail_connections: u64,
+    /// CPU utilization stats for multi-dimensional load balancing.
+    /// This typically comes from endpoint metrics reported via ORCA.
+    #[prost(message, optional, tag = "12")]
+    pub cpu_utilization: ::core::option::Option<UnnamedEndpointLoadMetricStats>,
+    /// Memory utilization for multi-dimensional load balancing.
+    /// This typically comes from endpoint metrics reported via ORCA.
+    #[prost(message, optional, tag = "13")]
+    pub mem_utilization: ::core::option::Option<UnnamedEndpointLoadMetricStats>,
+    /// Blended application-defined utilization for multi-dimensional load balancing.
+    /// This typically comes from endpoint metrics reported via ORCA.
+    #[prost(message, optional, tag = "14")]
+    pub application_utilization: ::core::option::Option<UnnamedEndpointLoadMetricStats>,
+    /// Named stats for multi-dimensional load balancing.
+    /// These typically come from endpoint metrics reported via ORCA.
     #[prost(message, repeated, tag = "5")]
     pub load_metric_stats: ::prost::alloc::vec::Vec<EndpointLoadMetricStats>,
     /// Endpoint granularity stats information for this locality. This information
@@ -556,6 +621,28 @@ impl ::prost::Name for EndpointLoadMetricStats {
     }
     fn type_url() -> ::prost::alloc::string::String {
         "type.googleapis.com/envoy.config.endpoint.v3.EndpointLoadMetricStats".into()
+    }
+}
+/// Same as EndpointLoadMetricStats, except without the metric_name field.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct UnnamedEndpointLoadMetricStats {
+    /// Number of calls that finished and included this metric.
+    #[prost(uint64, tag = "1")]
+    pub num_requests_finished_with_metric: u64,
+    /// Sum of metric values across all calls that finished with this metric for
+    /// load_reporting_interval.
+    #[prost(double, tag = "2")]
+    pub total_metric_value: f64,
+}
+impl ::prost::Name for UnnamedEndpointLoadMetricStats {
+    const NAME: &'static str = "UnnamedEndpointLoadMetricStats";
+    const PACKAGE: &'static str = "envoy.config.endpoint.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.endpoint.v3.UnnamedEndpointLoadMetricStats".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.endpoint.v3.UnnamedEndpointLoadMetricStats"
+            .into()
     }
 }
 /// Per cluster load stats. Envoy reports these stats a management server in a

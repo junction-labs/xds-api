@@ -36,7 +36,6 @@ pub struct VirtualHost {
     /// Only one of this and ``matcher`` can be specified.
     #[prost(message, repeated, tag = "3")]
     pub routes: ::prost::alloc::vec::Vec<Route>,
-    /// \[#next-major-version: This should be included in a oneof with routes wrapped in a message.\]
     /// The match tree to use when resolving route actions for incoming requests. Only one of this and ``routes``
     /// can be specified.
     #[prost(message, optional, tag = "21")]
@@ -589,6 +588,8 @@ impl ::prost::Name for WeightedCluster {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ClusterSpecifierPlugin {
     /// The name of the plugin and its opaque configuration.
+    ///
+    /// \[#extension-category: envoy.router.cluster_specifier_plugin\]
     #[prost(message, optional, tag = "1")]
     pub extension: ::core::option::Option<super::super::core::v3::TypedExtensionConfig>,
     /// If is_optional is not set or is set to false and the plugin defined by this message is not a
@@ -609,7 +610,7 @@ impl ::prost::Name for ClusterSpecifierPlugin {
         "type.googleapis.com/envoy.config.route.v3.ClusterSpecifierPlugin".into()
     }
 }
-/// \[#next-free-field: 16\]
+/// \[#next-free-field: 17\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RouteMatch {
     /// Indicates that prefix/path matching should be case sensitive. The default
@@ -679,6 +680,14 @@ pub struct RouteMatch {
     #[prost(message, repeated, tag = "13")]
     pub dynamic_metadata: ::prost::alloc::vec::Vec<
         super::super::super::r#type::matcher::v3::MetadataMatcher,
+    >,
+    /// Specifies a set of filter state matchers on which the route should match.
+    /// The router will check the filter state against all the specified filter state matchers.
+    /// If the number of specified filter state matchers is nonzero, they all must match the
+    /// filter state for a match to occur.
+    #[prost(message, repeated, tag = "16")]
+    pub filter_state: ::prost::alloc::vec::Vec<
+        super::super::super::r#type::matcher::v3::FilterStateMatcher,
     >,
     #[prost(oneof = "route_match::PathSpecifier", tags = "1, 2, 10, 12, 14, 15")]
     pub path_specifier: ::core::option::Option<route_match::PathSpecifier>,
@@ -1183,6 +1192,18 @@ pub struct RouteAction {
     pub max_stream_duration: ::core::option::Option<route_action::MaxStreamDuration>,
     #[prost(oneof = "route_action::ClusterSpecifier", tags = "1, 2, 3, 37, 39")]
     pub cluster_specifier: ::core::option::Option<route_action::ClusterSpecifier>,
+    /// If one of the host rewrite specifiers is set and the
+    /// :ref:`suppress_envoy_headers
+    /// <envoy_v3_api_field_extensions.filters.http.router.v3.Router.suppress_envoy_headers>` flag is not
+    /// set to true, the router filter will place the original host header value before
+    /// rewriting into the :ref:`x-envoy-original-host
+    /// <config_http_filters_router_x-envoy-original-host>` header.
+    ///
+    /// And if the
+    /// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
+    /// is set to true, the original host value will also be appended to the
+    /// :ref:`config_http_conn_man_headers_x-forwarded-host` header.
+    ///
     #[prost(oneof = "route_action::HostRewriteSpecifier", tags = "6, 7, 29, 35")]
     pub host_rewrite_specifier: ::core::option::Option<
         route_action::HostRewriteSpecifier,
@@ -1243,7 +1264,10 @@ pub mod route_action {
         pub runtime_fraction: ::core::option::Option<
             super::super::super::core::v3::RuntimeFractionalPercent,
         >,
-        /// Determines if the trace span should be sampled. Defaults to true.
+        /// Specifies whether the trace span for the shadow request should be sampled. If this field is not explicitly set,
+        /// the shadow request will inherit the sampling decision of its parent span. This ensures consistency with the trace
+        /// sampling policy of the original request and prevents oversampling, especially in scenarios where runtime sampling
+        /// is disabled.
         #[prost(message, optional, tag = "4")]
         pub trace_sampled: ::core::option::Option<
             super::super::super::super::super::google::protobuf::BoolValue,
@@ -1699,13 +1723,22 @@ pub mod route_action {
         #[prost(message, tag = "39")]
         InlineClusterSpecifierPlugin(super::ClusterSpecifierPlugin),
     }
+    /// If one of the host rewrite specifiers is set and the
+    /// :ref:`suppress_envoy_headers
+    /// <envoy_v3_api_field_extensions.filters.http.router.v3.Router.suppress_envoy_headers>` flag is not
+    /// set to true, the router filter will place the original host header value before
+    /// rewriting into the :ref:`x-envoy-original-host
+    /// <config_http_filters_router_x-envoy-original-host>` header.
+    ///
+    /// And if the
+    /// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
+    /// is set to true, the original host value will also be appended to the
+    /// :ref:`config_http_conn_man_headers_x-forwarded-host` header.
+    ///
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum HostRewriteSpecifier {
         /// Indicates that during forwarding, the host header will be swapped with
-        /// this value. Using this option will append the
-        /// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-        /// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-        /// is set.
+        /// this value.
         #[prost(string, tag = "6")]
         HostRewriteLiteral(::prost::alloc::string::String),
         /// Indicates that during forwarding, the host header will be swapped with
@@ -1714,18 +1747,12 @@ pub mod route_action {
         /// type ``strict_dns`` or ``logical_dns``,
         /// or when :ref:`hostname <envoy_v3_api_field_config.endpoint.v3.Endpoint.hostname>`
         /// field is not empty. Setting this to true with other cluster types
-        /// has no effect. Using this option will append the
-        /// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-        /// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-        /// is set.
+        /// has no effect.
         #[prost(message, tag = "7")]
         AutoHostRewrite(super::super::super::super::super::google::protobuf::BoolValue),
         /// Indicates that during forwarding, the host header will be swapped with the content of given
         /// downstream or :ref:`custom <config_http_conn_man_headers_custom_request_headers>` header.
-        /// If header value is empty, host header is left intact. Using this option will append the
-        /// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-        /// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-        /// is set.
+        /// If header value is empty, host header is left intact.
         ///
         /// .. attention::
         ///
@@ -1740,10 +1767,6 @@ pub mod route_action {
         /// Indicates that during forwarding, the host header will be swapped with
         /// the result of the regex substitution executed on path value with query and fragment removed.
         /// This is useful for transitioning variable content between path segment and subdomain.
-        /// Using this option will append the
-        /// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-        /// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-        /// is set.
         ///
         /// For example with the following config:
         ///
@@ -2479,6 +2502,7 @@ impl ::prost::Name for VirtualCluster {
 }
 /// Global rate limiting :ref:`architecture overview <arch_overview_global_rate_limit>`.
 /// Also applies to Local rate limiting :ref:`using descriptors <config_http_filters_local_rate_limit_descriptors>`.
+/// \[#next-free-field: 7\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RateLimit {
     /// Refers to the stage set in the filter. The rate limit configuration only
@@ -2488,11 +2512,21 @@ pub struct RateLimit {
     /// .. note::
     ///
     ///    The filter supports a range of 0 - 10 inclusively for stage numbers.
+    ///
+    /// .. note::
+    ///    This is not supported if the rate limit action is configured in the ``typed_per_filter_config`` like
+    ///    :ref:`VirtualHost.typed_per_filter_config<envoy_v3_api_field_config.route.v3.VirtualHost.typed_per_filter_config>` or
+    ///    :ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`, etc.
     #[prost(message, optional, tag = "1")]
     pub stage: ::core::option::Option<
         super::super::super::super::google::protobuf::UInt32Value,
     >,
     /// The key to be set in runtime to disable this rate limit configuration.
+    ///
+    /// .. note::
+    ///    This is not supported if the rate limit action is configured in the ``typed_per_filter_config`` like
+    ///    :ref:`VirtualHost.typed_per_filter_config<envoy_v3_api_field_config.route.v3.VirtualHost.typed_per_filter_config>` or
+    ///    :ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`, etc.
     #[prost(string, tag = "2")]
     pub disable_key: ::prost::alloc::string::String,
     /// A list of actions that are to be applied for this rate limit configuration.
@@ -2507,17 +2541,48 @@ pub struct RateLimit {
     /// rate limit configuration. If the override value is invalid or cannot be resolved
     /// from metadata, no override is provided. See :ref:`rate limit override
     /// <config_http_filters_rate_limit_rate_limit_override>` for more information.
+    ///
+    /// .. note::
+    ///    This is not supported if the rate limit action is configured in the ``typed_per_filter_config`` like
+    ///    :ref:`VirtualHost.typed_per_filter_config<envoy_v3_api_field_config.route.v3.VirtualHost.typed_per_filter_config>` or
+    ///    :ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`, etc.
     #[prost(message, optional, tag = "4")]
     pub limit: ::core::option::Option<rate_limit::Override>,
+    /// An optional hits addend to be appended to the descriptor produced by this rate limit
+    /// configuration.
+    ///
+    /// .. note::
+    ///    This is only supported if the rate limit action is configured in the ``typed_per_filter_config`` like
+    ///    :ref:`VirtualHost.typed_per_filter_config<envoy_v3_api_field_config.route.v3.VirtualHost.typed_per_filter_config>` or
+    ///    :ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`, etc.
+    #[prost(message, optional, tag = "5")]
+    pub hits_addend: ::core::option::Option<rate_limit::HitsAddend>,
+    /// If true, the rate limit request will be applied when the stream completes. The default value is false.
+    /// This is useful when the rate limit budget needs to reflect the response context that is not available
+    /// on the request path.
+    ///
+    /// For example, let's say the upstream service calculates the usage statistics and returns them in the response body
+    /// and we want to utilize these numbers to apply the rate limit action for the subsequent requests.
+    /// Combined with another filter that can set the desired addend based on the response (e.g. Lua filter),
+    /// this can be used to subtract the usage statistics from the rate limit budget.
+    ///
+    /// A rate limit applied on the stream completion is "fire-and-forget" by nature, and rate limit is not enforced by this config.
+    /// In other words, the current request won't be blocked when this is true, but the budget will be updated for the subsequent
+    /// requests based on the action with this field set to true. Users should ensure that the rate limit is enforced by the actions
+    /// applied on the request path, i.e. the ones with this field set to false.
+    ///
+    /// Currently, this is only supported by the HTTP global rate filter.
+    #[prost(bool, tag = "6")]
+    pub apply_on_stream_done: bool,
 }
 /// Nested message and enum types in `RateLimit`.
 pub mod rate_limit {
-    /// \[#next-free-field: 12\]
+    /// \[#next-free-field: 13\]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Action {
         #[prost(
             oneof = "action::ActionSpecifier",
-            tags = "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11"
+            tags = "1, 2, 3, 12, 4, 5, 6, 7, 8, 9, 10, 11"
         )]
         pub action_specifier: ::core::option::Option<action::ActionSpecifier>,
     }
@@ -2588,9 +2653,18 @@ pub mod rate_limit {
             /// The key to use in the descriptor entry.
             #[prost(string, tag = "2")]
             pub descriptor_key: ::prost::alloc::string::String,
-            /// If set to true, Envoy skips the descriptor while calling rate limiting service
-            /// when header is not present in the request. By default it skips calling the
-            /// rate limiting service if this header is not present in the request.
+            /// Controls the behavior when the specified header is not present in the request.
+            ///
+            /// If set to ``false`` (default):
+            ///
+            /// * Envoy does **NOT** call the rate limiting service for this descriptor.
+            /// * Useful if the header is optional and you prefer to skip rate limiting when it's absent.
+            ///
+            /// If set to ``true``:
+            ///
+            /// * Envoy calls the rate limiting service but omits this descriptor if the header is missing.
+            /// * Useful if you want Envoy to enforce rate limiting even when the header is not present.
+            ///
             #[prost(bool, tag = "3")]
             pub skip_if_absent: bool,
         }
@@ -2602,6 +2676,48 @@ pub mod rate_limit {
             }
             fn type_url() -> ::prost::alloc::string::String {
                 "type.googleapis.com/envoy.config.route.v3.RateLimit.Action.RequestHeaders"
+                    .into()
+            }
+        }
+        /// The following descriptor entry is appended when a query parameter contains a key that matches the
+        /// ``query_parameter_name``:
+        ///
+        /// .. code-block:: cpp
+        ///
+        ///    ("<descriptor_key>", "<query_parameter_value_queried_from_query_parameter>")
+        #[derive(Clone, PartialEq, ::prost::Message)]
+        pub struct QueryParameters {
+            /// The name of the query parameter to use for rate limiting. Value of this query parameter is used to populate
+            /// the value of the descriptor entry for the descriptor_key.
+            #[prost(string, tag = "1")]
+            pub query_parameter_name: ::prost::alloc::string::String,
+            /// The key to use when creating the rate limit descriptor entry. his descriptor key will be used to identify the
+            /// rate limit rule in the rate limiting service.
+            #[prost(string, tag = "2")]
+            pub descriptor_key: ::prost::alloc::string::String,
+            /// Controls the behavior when the specified query parameter is not present in the request.
+            ///
+            /// If set to ``false`` (default):
+            ///
+            /// * Envoy does **NOT** call the rate limiting service for this descriptor.
+            /// * Useful if the query parameter is optional and you prefer to skip rate limiting when it's absent.
+            ///
+            /// If set to ``true``:
+            ///
+            /// * Envoy calls the rate limiting service but omits this descriptor if the query parameter is missing.
+            /// * Useful if you want Envoy to enforce rate limiting even when the query parameter is not present.
+            ///
+            #[prost(bool, tag = "3")]
+            pub skip_if_absent: bool,
+        }
+        impl ::prost::Name for QueryParameters {
+            const NAME: &'static str = "QueryParameters";
+            const PACKAGE: &'static str = "envoy.config.route.v3";
+            fn full_name() -> ::prost::alloc::string::String {
+                "envoy.config.route.v3.RateLimit.Action.QueryParameters".into()
+            }
+            fn type_url() -> ::prost::alloc::string::String {
+                "type.googleapis.com/envoy.config.route.v3.RateLimit.Action.QueryParameters"
                     .into()
             }
         }
@@ -2789,9 +2905,19 @@ pub mod rate_limit {
             /// Source of metadata
             #[prost(enumeration = "meta_data::Source", tag = "4")]
             pub source: i32,
-            /// If set to true, Envoy skips the descriptor while calling rate limiting service
-            /// when ``metadata_key`` is empty and ``default_value`` is not set. By default it skips calling the
-            /// rate limiting service in that case.
+            /// Controls the behavior when the specified ``metadata_key`` is empty and ``default_value`` is not set.
+            ///
+            /// If set to ``false`` (default):
+            ///
+            /// * Envoy does **NOT** call the rate limiting service for this descriptor.
+            /// * Useful if the metadata is optional and you prefer to skip rate limiting when it's absent.
+            ///
+            /// If set to ``true``:
+            ///
+            /// * Envoy calls the rate limiting service but omits this descriptor if the ``metadata_key`` is empty and
+            ///    ``default_value`` is missing.
+            /// * Useful if you want Envoy to enforce rate limiting even when the metadata is not present.
+            ///
             #[prost(bool, tag = "5")]
             pub skip_if_absent: bool,
         }
@@ -2900,6 +3026,9 @@ pub mod rate_limit {
             /// Rate limit on request headers.
             #[prost(message, tag = "3")]
             RequestHeaders(RequestHeaders),
+            /// Rate limit on query parameters.
+            #[prost(message, tag = "12")]
+            QueryParameters(QueryParameters),
             /// Rate limit on remote address.
             #[prost(message, tag = "4")]
             RemoteAddress(RemoteAddress),
@@ -2991,6 +3120,46 @@ pub mod rate_limit {
         }
         fn type_url() -> ::prost::alloc::string::String {
             "type.googleapis.com/envoy.config.route.v3.RateLimit.Override".into()
+        }
+    }
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct HitsAddend {
+        /// Fixed number of hits to add to the rate limit descriptor.
+        ///
+        /// One of the ``number`` or ``format`` fields should be set but not both.
+        #[prost(message, optional, tag = "1")]
+        pub number: ::core::option::Option<
+            super::super::super::super::super::google::protobuf::UInt64Value,
+        >,
+        /// Substitution format string to extract the number of hits to add to the rate limit descriptor.
+        /// The same :ref:`format specifier <config_access_log_format>` as used for
+        /// :ref:`HTTP access logging <config_access_log>` applies here.
+        ///
+        /// .. note::
+        ///
+        ///    The format string must contains only single valid substitution field. If the format string
+        ///    not meets the requirement, the configuration will be rejected.
+        ///
+        ///    The substitution field should generates a non-negative number or string representation of
+        ///    a non-negative number. The value of the non-negative number should be less than or equal
+        ///    to 1000000000 like the ``number`` field. If the output of the substitution field not meet
+        ///    the requirement, this will be treated as an error and the current descriptor will be ignored.
+        ///
+        /// For example, the ``%BYTES_RECEIVED%`` format string will be replaced with the number of bytes
+        /// received in the request.
+        ///
+        /// One of the ``number`` or ``format`` fields should be set but not both.
+        #[prost(string, tag = "2")]
+        pub format: ::prost::alloc::string::String,
+    }
+    impl ::prost::Name for HitsAddend {
+        const NAME: &'static str = "HitsAddend";
+        const PACKAGE: &'static str = "envoy.config.route.v3";
+        fn full_name() -> ::prost::alloc::string::String {
+            "envoy.config.route.v3.RateLimit.HitsAddend".into()
+        }
+        fn type_url() -> ::prost::alloc::string::String {
+            "type.googleapis.com/envoy.config.route.v3.RateLimit.HitsAddend".into()
         }
     }
 }

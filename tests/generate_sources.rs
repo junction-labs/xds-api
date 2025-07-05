@@ -334,7 +334,8 @@ fn write_line<W: io::Write>(w: &mut W, depth: usize, line: &str) -> io::Result<(
 }
 
 fn check_protoc_version(sh: &Shell) -> anyhow::Result<String> {
-    let output = cmd!(sh, "protoc --version").read()?;
+    let protoc_path = env::var("PROTOC").unwrap_or_else(|_| "protoc".to_string());
+    let output = cmd!(sh, "{protoc_path} --version").read()?;
     let Some(version) = output.split_ascii_whitespace().last() else {
         anyhow::bail!("oops: couldn't parse protoc version");
     };

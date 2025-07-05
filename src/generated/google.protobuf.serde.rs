@@ -222,6 +222,9 @@ impl serde::Serialize for DescriptorProto {
         if !self.reserved_name.is_empty() {
             len += 1;
         }
+        if self.visibility.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("google.protobuf.DescriptorProto", len)?;
         if let Some(v) = self.name.as_ref() {
             struct_ser.serialize_field("name", v)?;
@@ -253,6 +256,11 @@ impl serde::Serialize for DescriptorProto {
         if !self.reserved_name.is_empty() {
             struct_ser.serialize_field("reserved_name", &self.reserved_name)?;
         }
+        if let Some(v) = self.visibility.as_ref() {
+            let v = SymbolVisibility::try_from(*v)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", *v)))?;
+            struct_ser.serialize_field("visibility", &v)?;
+        }
         struct_ser.end()
     }
 }
@@ -279,6 +287,7 @@ impl<'de> serde::Deserialize<'de> for DescriptorProto {
             "reservedRange",
             "reserved_name",
             "reservedName",
+            "visibility",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -293,6 +302,7 @@ impl<'de> serde::Deserialize<'de> for DescriptorProto {
             Options,
             ReservedRange,
             ReservedName,
+            Visibility,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -324,6 +334,7 @@ impl<'de> serde::Deserialize<'de> for DescriptorProto {
                             "options" => Ok(GeneratedField::Options),
                             "reservedRange" | "reserved_range" => Ok(GeneratedField::ReservedRange),
                             "reservedName" | "reserved_name" => Ok(GeneratedField::ReservedName),
+                            "visibility" => Ok(GeneratedField::Visibility),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -353,6 +364,7 @@ impl<'de> serde::Deserialize<'de> for DescriptorProto {
                 let mut options__ = None;
                 let mut reserved_range__ = None;
                 let mut reserved_name__ = None;
+                let mut visibility__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Name => {
@@ -415,6 +427,12 @@ impl<'de> serde::Deserialize<'de> for DescriptorProto {
                             }
                             reserved_name__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::Visibility => {
+                            if visibility__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("visibility"));
+                            }
+                            visibility__ = map_.next_value::<::std::option::Option<SymbolVisibility>>()?.map(|x| x as i32);
+                        }
                     }
                 }
                 Ok(DescriptorProto {
@@ -428,6 +446,7 @@ impl<'de> serde::Deserialize<'de> for DescriptorProto {
                     options: options__,
                     reserved_range: reserved_range__.unwrap_or_default(),
                     reserved_name: reserved_name__.unwrap_or_default(),
+                    visibility: visibility__,
                 })
             }
         }
@@ -1077,6 +1096,9 @@ impl serde::Serialize for EnumDescriptorProto {
         if !self.reserved_name.is_empty() {
             len += 1;
         }
+        if self.visibility.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("google.protobuf.EnumDescriptorProto", len)?;
         if let Some(v) = self.name.as_ref() {
             struct_ser.serialize_field("name", v)?;
@@ -1092,6 +1114,11 @@ impl serde::Serialize for EnumDescriptorProto {
         }
         if !self.reserved_name.is_empty() {
             struct_ser.serialize_field("reserved_name", &self.reserved_name)?;
+        }
+        if let Some(v) = self.visibility.as_ref() {
+            let v = SymbolVisibility::try_from(*v)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", *v)))?;
+            struct_ser.serialize_field("visibility", &v)?;
         }
         struct_ser.end()
     }
@@ -1110,6 +1137,7 @@ impl<'de> serde::Deserialize<'de> for EnumDescriptorProto {
             "reservedRange",
             "reserved_name",
             "reservedName",
+            "visibility",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -1119,6 +1147,7 @@ impl<'de> serde::Deserialize<'de> for EnumDescriptorProto {
             Options,
             ReservedRange,
             ReservedName,
+            Visibility,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -1145,6 +1174,7 @@ impl<'de> serde::Deserialize<'de> for EnumDescriptorProto {
                             "options" => Ok(GeneratedField::Options),
                             "reservedRange" | "reserved_range" => Ok(GeneratedField::ReservedRange),
                             "reservedName" | "reserved_name" => Ok(GeneratedField::ReservedName),
+                            "visibility" => Ok(GeneratedField::Visibility),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -1169,6 +1199,7 @@ impl<'de> serde::Deserialize<'de> for EnumDescriptorProto {
                 let mut options__ = None;
                 let mut reserved_range__ = None;
                 let mut reserved_name__ = None;
+                let mut visibility__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Name => {
@@ -1201,6 +1232,12 @@ impl<'de> serde::Deserialize<'de> for EnumDescriptorProto {
                             }
                             reserved_name__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::Visibility => {
+                            if visibility__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("visibility"));
+                            }
+                            visibility__ = map_.next_value::<::std::option::Option<SymbolVisibility>>()?.map(|x| x as i32);
+                        }
                     }
                 }
                 Ok(EnumDescriptorProto {
@@ -1209,6 +1246,7 @@ impl<'de> serde::Deserialize<'de> for EnumDescriptorProto {
                     options: options__,
                     reserved_range: reserved_range__.unwrap_or_default(),
                     reserved_name: reserved_name__.unwrap_or_default(),
+                    visibility: visibility__,
                 })
             }
         }
@@ -2182,6 +2220,12 @@ impl serde::Serialize for FeatureSet {
         if self.json_format.is_some() {
             len += 1;
         }
+        if self.enforce_naming_style.is_some() {
+            len += 1;
+        }
+        if self.default_symbol_visibility.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("google.protobuf.FeatureSet", len)?;
         if let Some(v) = self.field_presence.as_ref() {
             let v = feature_set::FieldPresence::try_from(*v)
@@ -2213,6 +2257,16 @@ impl serde::Serialize for FeatureSet {
                 .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", *v)))?;
             struct_ser.serialize_field("json_format", &v)?;
         }
+        if let Some(v) = self.enforce_naming_style.as_ref() {
+            let v = feature_set::EnforceNamingStyle::try_from(*v)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", *v)))?;
+            struct_ser.serialize_field("enforce_naming_style", &v)?;
+        }
+        if let Some(v) = self.default_symbol_visibility.as_ref() {
+            let v = feature_set::visibility_feature::DefaultSymbolVisibility::try_from(*v)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", *v)))?;
+            struct_ser.serialize_field("default_symbol_visibility", &v)?;
+        }
         struct_ser.end()
     }
 }
@@ -2235,6 +2289,10 @@ impl<'de> serde::Deserialize<'de> for FeatureSet {
             "messageEncoding",
             "json_format",
             "jsonFormat",
+            "enforce_naming_style",
+            "enforceNamingStyle",
+            "default_symbol_visibility",
+            "defaultSymbolVisibility",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -2245,6 +2303,8 @@ impl<'de> serde::Deserialize<'de> for FeatureSet {
             Utf8Validation,
             MessageEncoding,
             JsonFormat,
+            EnforceNamingStyle,
+            DefaultSymbolVisibility,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -2272,6 +2332,8 @@ impl<'de> serde::Deserialize<'de> for FeatureSet {
                             "utf8Validation" | "utf8_validation" => Ok(GeneratedField::Utf8Validation),
                             "messageEncoding" | "message_encoding" => Ok(GeneratedField::MessageEncoding),
                             "jsonFormat" | "json_format" => Ok(GeneratedField::JsonFormat),
+                            "enforceNamingStyle" | "enforce_naming_style" => Ok(GeneratedField::EnforceNamingStyle),
+                            "defaultSymbolVisibility" | "default_symbol_visibility" => Ok(GeneratedField::DefaultSymbolVisibility),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -2297,6 +2359,8 @@ impl<'de> serde::Deserialize<'de> for FeatureSet {
                 let mut utf8_validation__ = None;
                 let mut message_encoding__ = None;
                 let mut json_format__ = None;
+                let mut enforce_naming_style__ = None;
+                let mut default_symbol_visibility__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::FieldPresence => {
@@ -2335,6 +2399,18 @@ impl<'de> serde::Deserialize<'de> for FeatureSet {
                             }
                             json_format__ = map_.next_value::<::std::option::Option<feature_set::JsonFormat>>()?.map(|x| x as i32);
                         }
+                        GeneratedField::EnforceNamingStyle => {
+                            if enforce_naming_style__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("enforceNamingStyle"));
+                            }
+                            enforce_naming_style__ = map_.next_value::<::std::option::Option<feature_set::EnforceNamingStyle>>()?.map(|x| x as i32);
+                        }
+                        GeneratedField::DefaultSymbolVisibility => {
+                            if default_symbol_visibility__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("defaultSymbolVisibility"));
+                            }
+                            default_symbol_visibility__ = map_.next_value::<::std::option::Option<feature_set::visibility_feature::DefaultSymbolVisibility>>()?.map(|x| x as i32);
+                        }
                     }
                 }
                 Ok(FeatureSet {
@@ -2344,10 +2420,86 @@ impl<'de> serde::Deserialize<'de> for FeatureSet {
                     utf8_validation: utf8_validation__,
                     message_encoding: message_encoding__,
                     json_format: json_format__,
+                    enforce_naming_style: enforce_naming_style__,
+                    default_symbol_visibility: default_symbol_visibility__,
                 })
             }
         }
         deserializer.deserialize_struct("google.protobuf.FeatureSet", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for feature_set::EnforceNamingStyle {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let variant = match self {
+            Self::Unknown => "ENFORCE_NAMING_STYLE_UNKNOWN",
+            Self::Style2024 => "STYLE2024",
+            Self::StyleLegacy => "STYLE_LEGACY",
+        };
+        serializer.serialize_str(variant)
+    }
+}
+impl<'de> serde::Deserialize<'de> for feature_set::EnforceNamingStyle {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "ENFORCE_NAMING_STYLE_UNKNOWN",
+            "STYLE2024",
+            "STYLE_LEGACY",
+        ];
+
+        struct GeneratedVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = feature_set::EnforceNamingStyle;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(formatter, "expected one of: {:?}", &FIELDS)
+            }
+
+            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
+                    })
+            }
+
+            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
+                    })
+            }
+
+            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                match value {
+                    "ENFORCE_NAMING_STYLE_UNKNOWN" => Ok(feature_set::EnforceNamingStyle::Unknown),
+                    "STYLE2024" => Ok(feature_set::EnforceNamingStyle::Style2024),
+                    "STYLE_LEGACY" => Ok(feature_set::EnforceNamingStyle::StyleLegacy),
+                    _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
+                }
+            }
+        }
+        deserializer.deserialize_any(GeneratedVisitor)
     }
 }
 impl serde::Serialize for feature_set::EnumType {
@@ -2790,6 +2942,157 @@ impl<'de> serde::Deserialize<'de> for feature_set::Utf8Validation {
                     "UTF8_VALIDATION_UNKNOWN" => Ok(feature_set::Utf8Validation::Unknown),
                     "VERIFY" => Ok(feature_set::Utf8Validation::Verify),
                     "NONE" => Ok(feature_set::Utf8Validation::None),
+                    _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
+                }
+            }
+        }
+        deserializer.deserialize_any(GeneratedVisitor)
+    }
+}
+impl serde::Serialize for feature_set::VisibilityFeature {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let len = 0;
+        let struct_ser = serializer.serialize_struct("google.protobuf.FeatureSet.VisibilityFeature", len)?;
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for feature_set::VisibilityFeature {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                            Err(serde::de::Error::unknown_field(value, FIELDS))
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = feature_set::VisibilityFeature;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct google.protobuf.FeatureSet.VisibilityFeature")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<feature_set::VisibilityFeature, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                while map_.next_key::<GeneratedField>()?.is_some() {
+                    let _ = map_.next_value::<serde::de::IgnoredAny>()?;
+                }
+                Ok(feature_set::VisibilityFeature {
+                })
+            }
+        }
+        deserializer.deserialize_struct("google.protobuf.FeatureSet.VisibilityFeature", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for feature_set::visibility_feature::DefaultSymbolVisibility {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let variant = match self {
+            Self::Unknown => "DEFAULT_SYMBOL_VISIBILITY_UNKNOWN",
+            Self::ExportAll => "EXPORT_ALL",
+            Self::ExportTopLevel => "EXPORT_TOP_LEVEL",
+            Self::LocalAll => "LOCAL_ALL",
+            Self::Strict => "STRICT",
+        };
+        serializer.serialize_str(variant)
+    }
+}
+impl<'de> serde::Deserialize<'de> for feature_set::visibility_feature::DefaultSymbolVisibility {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "DEFAULT_SYMBOL_VISIBILITY_UNKNOWN",
+            "EXPORT_ALL",
+            "EXPORT_TOP_LEVEL",
+            "LOCAL_ALL",
+            "STRICT",
+        ];
+
+        struct GeneratedVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = feature_set::visibility_feature::DefaultSymbolVisibility;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(formatter, "expected one of: {:?}", &FIELDS)
+            }
+
+            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
+                    })
+            }
+
+            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
+                    })
+            }
+
+            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                match value {
+                    "DEFAULT_SYMBOL_VISIBILITY_UNKNOWN" => Ok(feature_set::visibility_feature::DefaultSymbolVisibility::Unknown),
+                    "EXPORT_ALL" => Ok(feature_set::visibility_feature::DefaultSymbolVisibility::ExportAll),
+                    "EXPORT_TOP_LEVEL" => Ok(feature_set::visibility_feature::DefaultSymbolVisibility::ExportTopLevel),
+                    "LOCAL_ALL" => Ok(feature_set::visibility_feature::DefaultSymbolVisibility::LocalAll),
+                    "STRICT" => Ok(feature_set::visibility_feature::DefaultSymbolVisibility::Strict),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }
             }
@@ -4453,6 +4756,9 @@ impl serde::Serialize for FileDescriptorProto {
         if !self.weak_dependency.is_empty() {
             len += 1;
         }
+        if !self.option_dependency.is_empty() {
+            len += 1;
+        }
         if !self.message_type.is_empty() {
             len += 1;
         }
@@ -4492,6 +4798,9 @@ impl serde::Serialize for FileDescriptorProto {
         }
         if !self.weak_dependency.is_empty() {
             struct_ser.serialize_field("weak_dependency", &self.weak_dependency)?;
+        }
+        if !self.option_dependency.is_empty() {
+            struct_ser.serialize_field("option_dependency", &self.option_dependency)?;
         }
         if !self.message_type.is_empty() {
             struct_ser.serialize_field("message_type", &self.message_type)?;
@@ -4536,6 +4845,8 @@ impl<'de> serde::Deserialize<'de> for FileDescriptorProto {
             "publicDependency",
             "weak_dependency",
             "weakDependency",
+            "option_dependency",
+            "optionDependency",
             "message_type",
             "messageType",
             "enum_type",
@@ -4556,6 +4867,7 @@ impl<'de> serde::Deserialize<'de> for FileDescriptorProto {
             Dependency,
             PublicDependency,
             WeakDependency,
+            OptionDependency,
             MessageType,
             EnumType,
             Service,
@@ -4590,6 +4902,7 @@ impl<'de> serde::Deserialize<'de> for FileDescriptorProto {
                             "dependency" => Ok(GeneratedField::Dependency),
                             "publicDependency" | "public_dependency" => Ok(GeneratedField::PublicDependency),
                             "weakDependency" | "weak_dependency" => Ok(GeneratedField::WeakDependency),
+                            "optionDependency" | "option_dependency" => Ok(GeneratedField::OptionDependency),
                             "messageType" | "message_type" => Ok(GeneratedField::MessageType),
                             "enumType" | "enum_type" => Ok(GeneratedField::EnumType),
                             "service" => Ok(GeneratedField::Service),
@@ -4622,6 +4935,7 @@ impl<'de> serde::Deserialize<'de> for FileDescriptorProto {
                 let mut dependency__ = None;
                 let mut public_dependency__ = None;
                 let mut weak_dependency__ = None;
+                let mut option_dependency__ = None;
                 let mut message_type__ = None;
                 let mut enum_type__ = None;
                 let mut service__ = None;
@@ -4667,6 +4981,12 @@ impl<'de> serde::Deserialize<'de> for FileDescriptorProto {
                                 Some(map_.next_value::<Vec<::pbjson::private::NumberDeserialize<_>>>()?
                                     .into_iter().map(|x| x.0).collect())
                             ;
+                        }
+                        GeneratedField::OptionDependency => {
+                            if option_dependency__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("optionDependency"));
+                            }
+                            option_dependency__ = Some(map_.next_value()?);
                         }
                         GeneratedField::MessageType => {
                             if message_type__.is_some() {
@@ -4724,6 +5044,7 @@ impl<'de> serde::Deserialize<'de> for FileDescriptorProto {
                     dependency: dependency__.unwrap_or_default(),
                     public_dependency: public_dependency__.unwrap_or_default(),
                     weak_dependency: weak_dependency__.unwrap_or_default(),
+                    option_dependency: option_dependency__.unwrap_or_default(),
                     message_type: message_type__.unwrap_or_default(),
                     enum_type: enum_type__.unwrap_or_default(),
                     service: service__.unwrap_or_default(),
@@ -7636,6 +7957,80 @@ impl<'de> serde::Deserialize<'de> for Struct {
             }
         }
         deserializer.deserialize_struct("google.protobuf.Struct", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for SymbolVisibility {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let variant = match self {
+            Self::VisibilityUnset => "VISIBILITY_UNSET",
+            Self::VisibilityLocal => "VISIBILITY_LOCAL",
+            Self::VisibilityExport => "VISIBILITY_EXPORT",
+        };
+        serializer.serialize_str(variant)
+    }
+}
+impl<'de> serde::Deserialize<'de> for SymbolVisibility {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "VISIBILITY_UNSET",
+            "VISIBILITY_LOCAL",
+            "VISIBILITY_EXPORT",
+        ];
+
+        struct GeneratedVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = SymbolVisibility;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(formatter, "expected one of: {:?}", &FIELDS)
+            }
+
+            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
+                    })
+            }
+
+            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
+                    })
+            }
+
+            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                match value {
+                    "VISIBILITY_UNSET" => Ok(SymbolVisibility::VisibilityUnset),
+                    "VISIBILITY_LOCAL" => Ok(SymbolVisibility::VisibilityLocal),
+                    "VISIBILITY_EXPORT" => Ok(SymbolVisibility::VisibilityExport),
+                    _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
+                }
+            }
+        }
+        deserializer.deserialize_any(GeneratedVisitor)
     }
 }
 impl serde::Serialize for Timestamp {

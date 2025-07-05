@@ -89,6 +89,116 @@ impl<'de> serde::Deserialize<'de> for Authority {
         deserializer.deserialize_struct("xds.core.v3.Authority", FIELDS, GeneratedVisitor)
     }
 }
+impl serde::Serialize for CidrRange {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.address_prefix.is_empty() {
+            len += 1;
+        }
+        if self.prefix_len.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("xds.core.v3.CidrRange", len)?;
+        if !self.address_prefix.is_empty() {
+            struct_ser.serialize_field("address_prefix", &self.address_prefix)?;
+        }
+        if let Some(v) = self.prefix_len.as_ref() {
+            struct_ser.serialize_field("prefix_len", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for CidrRange {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "address_prefix",
+            "addressPrefix",
+            "prefix_len",
+            "prefixLen",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            AddressPrefix,
+            PrefixLen,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "addressPrefix" | "address_prefix" => Ok(GeneratedField::AddressPrefix),
+                            "prefixLen" | "prefix_len" => Ok(GeneratedField::PrefixLen),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = CidrRange;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct xds.core.v3.CidrRange")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<CidrRange, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut address_prefix__ = None;
+                let mut prefix_len__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::AddressPrefix => {
+                            if address_prefix__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("addressPrefix"));
+                            }
+                            address_prefix__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::PrefixLen => {
+                            if prefix_len__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("prefixLen"));
+                            }
+                            prefix_len__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(CidrRange {
+                    address_prefix: address_prefix__.unwrap_or_default(),
+                    prefix_len: prefix_len__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("xds.core.v3.CidrRange", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for CollectionEntry {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>

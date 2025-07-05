@@ -108,6 +108,77 @@ impl<'de> serde::Deserialize<'de> for Action {
         deserializer.deserialize_struct("envoy.config.rbac.v3.Action", FIELDS, GeneratedVisitor)
     }
 }
+impl serde::Serialize for MetadataSource {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let variant = match self {
+            Self::Dynamic => "DYNAMIC",
+            Self::Route => "ROUTE",
+        };
+        serializer.serialize_str(variant)
+    }
+}
+impl<'de> serde::Deserialize<'de> for MetadataSource {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "DYNAMIC",
+            "ROUTE",
+        ];
+
+        struct GeneratedVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = MetadataSource;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(formatter, "expected one of: {:?}", &FIELDS)
+            }
+
+            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
+                    })
+            }
+
+            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
+                    })
+            }
+
+            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                match value {
+                    "DYNAMIC" => Ok(MetadataSource::Dynamic),
+                    "ROUTE" => Ok(MetadataSource::Route),
+                    _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
+                }
+            }
+        }
+        deserializer.deserialize_any(GeneratedVisitor)
+    }
+}
 impl serde::Serialize for Permission {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -161,6 +232,9 @@ impl serde::Serialize for Permission {
                 permission::Rule::UriTemplate(v) => {
                     struct_ser.serialize_field("uri_template", v)?;
                 }
+                permission::Rule::SourcedMetadata(v) => {
+                    struct_ser.serialize_field("sourced_metadata", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -195,6 +269,8 @@ impl<'de> serde::Deserialize<'de> for Permission {
             "matcher",
             "uri_template",
             "uriTemplate",
+            "sourced_metadata",
+            "sourcedMetadata",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -212,6 +288,7 @@ impl<'de> serde::Deserialize<'de> for Permission {
             RequestedServerName,
             Matcher,
             UriTemplate,
+            SourcedMetadata,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -246,6 +323,7 @@ impl<'de> serde::Deserialize<'de> for Permission {
                             "requestedServerName" | "requested_server_name" => Ok(GeneratedField::RequestedServerName),
                             "matcher" => Ok(GeneratedField::Matcher),
                             "uriTemplate" | "uri_template" => Ok(GeneratedField::UriTemplate),
+                            "sourcedMetadata" | "sourced_metadata" => Ok(GeneratedField::SourcedMetadata),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -355,6 +433,13 @@ impl<'de> serde::Deserialize<'de> for Permission {
                                 return Err(serde::de::Error::duplicate_field("uriTemplate"));
                             }
                             rule__ = map_.next_value::<::std::option::Option<_>>()?.map(permission::Rule::UriTemplate)
+;
+                        }
+                        GeneratedField::SourcedMetadata => {
+                            if rule__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("sourcedMetadata"));
+                            }
+                            rule__ = map_.next_value::<::std::option::Option<_>>()?.map(permission::Rule::SourcedMetadata)
 ;
                         }
                     }
@@ -651,6 +736,12 @@ impl serde::Serialize for Principal {
                 principal::Identifier::NotId(v) => {
                     struct_ser.serialize_field("not_id", v)?;
                 }
+                principal::Identifier::SourcedMetadata(v) => {
+                    struct_ser.serialize_field("sourced_metadata", v)?;
+                }
+                principal::Identifier::Custom(v) => {
+                    struct_ser.serialize_field("custom", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -683,6 +774,9 @@ impl<'de> serde::Deserialize<'de> for Principal {
             "filterState",
             "not_id",
             "notId",
+            "sourced_metadata",
+            "sourcedMetadata",
+            "custom",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -699,6 +793,8 @@ impl<'de> serde::Deserialize<'de> for Principal {
             Metadata,
             FilterState,
             NotId,
+            SourcedMetadata,
+            Custom,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -732,6 +828,8 @@ impl<'de> serde::Deserialize<'de> for Principal {
                             "metadata" => Ok(GeneratedField::Metadata),
                             "filterState" | "filter_state" => Ok(GeneratedField::FilterState),
                             "notId" | "not_id" => Ok(GeneratedField::NotId),
+                            "sourcedMetadata" | "sourced_metadata" => Ok(GeneratedField::SourcedMetadata),
+                            "custom" => Ok(GeneratedField::Custom),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -835,6 +933,20 @@ impl<'de> serde::Deserialize<'de> for Principal {
                                 return Err(serde::de::Error::duplicate_field("notId"));
                             }
                             identifier__ = map_.next_value::<::std::option::Option<_>>()?.map(principal::Identifier::NotId)
+;
+                        }
+                        GeneratedField::SourcedMetadata => {
+                            if identifier__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("sourcedMetadata"));
+                            }
+                            identifier__ = map_.next_value::<::std::option::Option<_>>()?.map(principal::Identifier::SourcedMetadata)
+;
+                        }
+                        GeneratedField::Custom => {
+                            if identifier__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("custom"));
+                            }
+                            identifier__ = map_.next_value::<::std::option::Option<_>>()?.map(principal::Identifier::Custom)
 ;
                         }
                     }
@@ -1531,5 +1643,117 @@ impl<'de> serde::Deserialize<'de> for rbac::audit_logging_options::AuditLoggerCo
             }
         }
         deserializer.deserialize_struct("envoy.config.rbac.v3.RBAC.AuditLoggingOptions.AuditLoggerConfig", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for SourcedMetadata {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.metadata_matcher.is_some() {
+            len += 1;
+        }
+        if self.metadata_source != 0 {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.rbac.v3.SourcedMetadata", len)?;
+        if let Some(v) = self.metadata_matcher.as_ref() {
+            struct_ser.serialize_field("metadata_matcher", v)?;
+        }
+        if self.metadata_source != 0 {
+            let v = MetadataSource::try_from(self.metadata_source)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", self.metadata_source)))?;
+            struct_ser.serialize_field("metadata_source", &v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for SourcedMetadata {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "metadata_matcher",
+            "metadataMatcher",
+            "metadata_source",
+            "metadataSource",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            MetadataMatcher,
+            MetadataSource,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "metadataMatcher" | "metadata_matcher" => Ok(GeneratedField::MetadataMatcher),
+                            "metadataSource" | "metadata_source" => Ok(GeneratedField::MetadataSource),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = SourcedMetadata;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.rbac.v3.SourcedMetadata")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<SourcedMetadata, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut metadata_matcher__ = None;
+                let mut metadata_source__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::MetadataMatcher => {
+                            if metadata_matcher__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("metadataMatcher"));
+                            }
+                            metadata_matcher__ = map_.next_value()?;
+                        }
+                        GeneratedField::MetadataSource => {
+                            if metadata_source__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("metadataSource"));
+                            }
+                            metadata_source__ = Some(map_.next_value::<MetadataSource>()? as i32);
+                        }
+                    }
+                }
+                Ok(SourcedMetadata {
+                    metadata_matcher: metadata_matcher__,
+                    metadata_source: metadata_source__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.rbac.v3.SourcedMetadata", FIELDS, GeneratedVisitor)
     }
 }

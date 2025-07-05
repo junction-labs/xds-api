@@ -248,6 +248,10 @@ pub enum ClientConfigStatus {
     /// config dump is not the NACKed version, but the most recent accepted one. If
     /// no config is accepted yet, the attached config dump will be empty.
     ClientNacked = 3,
+    /// Client received an error from the control plane. The attached config
+    /// dump is the most recent accepted one. If no config is accepted yet,
+    /// the attached config dump will be empty.
+    ClientReceivedError = 4,
 }
 impl ClientConfigStatus {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -260,6 +264,7 @@ impl ClientConfigStatus {
             Self::ClientRequested => "CLIENT_REQUESTED",
             Self::ClientAcked => "CLIENT_ACKED",
             Self::ClientNacked => "CLIENT_NACKED",
+            Self::ClientReceivedError => "CLIENT_RECEIVED_ERROR",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -269,6 +274,7 @@ impl ClientConfigStatus {
             "CLIENT_REQUESTED" => Some(Self::ClientRequested),
             "CLIENT_ACKED" => Some(Self::ClientAcked),
             "CLIENT_NACKED" => Some(Self::ClientNacked),
+            "CLIENT_RECEIVED_ERROR" => Some(Self::ClientReceivedError),
             _ => None,
         }
     }
@@ -293,7 +299,7 @@ pub mod client_status_discovery_service_client {
     }
     impl<T> ClientStatusDiscoveryServiceClient<T>
     where
-        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T: tonic::client::GrpcService<tonic::body::Body>,
         T::Error: Into<StdError>,
         T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
@@ -314,13 +320,13 @@ pub mod client_status_discovery_service_client {
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
             T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
+                http::Request<tonic::body::Body>,
                 Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                    <T as tonic::client::GrpcService<tonic::body::Body>>::ResponseBody,
                 >,
             >,
             <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
+                http::Request<tonic::body::Body>,
             >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             ClientStatusDiscoveryServiceClient::new(
@@ -523,7 +529,7 @@ pub mod client_status_discovery_service_server {
         B: Body + std::marker::Send + 'static,
         B::Error: Into<StdError> + std::marker::Send + 'static,
     {
-        type Response = http::Response<tonic::body::BoxBody>;
+        type Response = http::Response<tonic::body::Body>;
         type Error = std::convert::Infallible;
         type Future = BoxFuture<Self::Response, Self::Error>;
         fn poll_ready(
@@ -641,7 +647,9 @@ pub mod client_status_discovery_service_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        let mut response = http::Response::new(empty_body());
+                        let mut response = http::Response::new(
+                            tonic::body::Body::default(),
+                        );
                         let headers = response.headers_mut();
                         headers
                             .insert(

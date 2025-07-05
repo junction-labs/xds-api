@@ -1019,10 +1019,16 @@ impl serde::Serialize for matcher::OnMatch {
     {
         use serde::ser::SerializeStruct;
         let mut len = 0;
+        if self.keep_matching {
+            len += 1;
+        }
         if self.on_match.is_some() {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("xds.r#type.matcher.v3.Matcher.OnMatch", len)?;
+        if self.keep_matching {
+            struct_ser.serialize_field("keep_matching", &self.keep_matching)?;
+        }
         if let Some(v) = self.on_match.as_ref() {
             match v {
                 matcher::on_match::OnMatch::Matcher(v) => {
@@ -1043,12 +1049,15 @@ impl<'de> serde::Deserialize<'de> for matcher::OnMatch {
         D: serde::Deserializer<'de>,
     {
         const FIELDS: &[&str] = &[
+            "keep_matching",
+            "keepMatching",
             "matcher",
             "action",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
+            KeepMatching,
             Matcher,
             Action,
         }
@@ -1072,6 +1081,7 @@ impl<'de> serde::Deserialize<'de> for matcher::OnMatch {
                         E: serde::de::Error,
                     {
                         match value {
+                            "keepMatching" | "keep_matching" => Ok(GeneratedField::KeepMatching),
                             "matcher" => Ok(GeneratedField::Matcher),
                             "action" => Ok(GeneratedField::Action),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
@@ -1093,9 +1103,16 @@ impl<'de> serde::Deserialize<'de> for matcher::OnMatch {
                 where
                     V: serde::de::MapAccess<'de>,
             {
+                let mut keep_matching__ = None;
                 let mut on_match__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
+                        GeneratedField::KeepMatching => {
+                            if keep_matching__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("keepMatching"));
+                            }
+                            keep_matching__ = Some(map_.next_value()?);
+                        }
                         GeneratedField::Matcher => {
                             if on_match__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("matcher"));
@@ -1113,6 +1130,7 @@ impl<'de> serde::Deserialize<'de> for matcher::OnMatch {
                     }
                 }
                 Ok(matcher::OnMatch {
+                    keep_matching: keep_matching__.unwrap_or_default(),
                     on_match: on_match__,
                 })
             }

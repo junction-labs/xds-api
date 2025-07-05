@@ -1,4 +1,4 @@
-#[cfg(all(test, feature = "pbjson"))]
+#[cfg(all(test, feature = "pbjson", not(feature = "generate_only")))]
 mod pbjson {
 
     use serde_json::json;

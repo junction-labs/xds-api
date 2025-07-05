@@ -169,6 +169,7 @@ impl ::prost::Name for HttpStreamedTraceSegment {
     }
 }
 /// Event in a socket trace.
+/// \[#next-free-field: 6\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SocketEvent {
     /// Timestamp for event.
@@ -176,6 +177,9 @@ pub struct SocketEvent {
     pub timestamp: ::core::option::Option<
         super::super::super::super::google::protobuf::Timestamp,
     >,
+    /// Connection information per event
+    #[prost(message, optional, tag = "5")]
+    pub connection: ::core::option::Option<Connection>,
     /// Read or write with content as bytes string.
     #[prost(oneof = "socket_event::EventSelector", tags = "2, 3, 4")]
     pub event_selector: ::core::option::Option<socket_event::EventSelector>,
@@ -290,6 +294,22 @@ impl ::prost::Name for SocketBufferedTrace {
         "type.googleapis.com/envoy.data.tap.v3.SocketBufferedTrace".into()
     }
 }
+/// A message for the sequence of observed events
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SocketEvents {
+    #[prost(message, repeated, tag = "1")]
+    pub events: ::prost::alloc::vec::Vec<SocketEvent>,
+}
+impl ::prost::Name for SocketEvents {
+    const NAME: &'static str = "SocketEvents";
+    const PACKAGE: &'static str = "envoy.data.tap.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.data.tap.v3.SocketEvents".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.data.tap.v3.SocketEvents".into()
+    }
+}
 /// A streamed socket trace segment. Multiple segments make up a full trace.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SocketStreamedTraceSegment {
@@ -297,7 +317,7 @@ pub struct SocketStreamedTraceSegment {
     /// for long term stable uniqueness. Matches connection IDs used in Envoy logs.
     #[prost(uint64, tag = "1")]
     pub trace_id: u64,
-    #[prost(oneof = "socket_streamed_trace_segment::MessagePiece", tags = "2, 3")]
+    #[prost(oneof = "socket_streamed_trace_segment::MessagePiece", tags = "2, 3, 4")]
     pub message_piece: ::core::option::Option<
         socket_streamed_trace_segment::MessagePiece,
     >,
@@ -312,6 +332,9 @@ pub mod socket_streamed_trace_segment {
         /// Socket event.
         #[prost(message, tag = "3")]
         Event(super::SocketEvent),
+        /// Sequence of observed events.
+        #[prost(message, tag = "4")]
+        Events(super::SocketEvents),
     }
 }
 impl ::prost::Name for SocketStreamedTraceSegment {

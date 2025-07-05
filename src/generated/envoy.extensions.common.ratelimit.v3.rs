@@ -52,6 +52,12 @@ pub struct RateLimitDescriptor {
     /// Optional rate limit override to supply to the ratelimit service.
     #[prost(message, optional, tag = "2")]
     pub limit: ::core::option::Option<rate_limit_descriptor::RateLimitOverride>,
+    /// Optional hits_addend for the rate limit descriptor. If set the value will override the
+    /// request level hits_addend.
+    #[prost(message, optional, tag = "3")]
+    pub hits_addend: ::core::option::Option<
+        super::super::super::super::super::google::protobuf::UInt64Value,
+    >,
 }
 /// Nested message and enum types in `RateLimitDescriptor`.
 pub mod rate_limit_descriptor {
@@ -60,7 +66,9 @@ pub mod rate_limit_descriptor {
         /// Descriptor key.
         #[prost(string, tag = "1")]
         pub key: ::prost::alloc::string::String,
-        /// Descriptor value.
+        /// Descriptor value. Blank value is treated as wildcard to create dynamic token buckets for each unique value.
+        /// Blank Values as wild card is currently supported only with envoy server instance level HTTP local rate limiting
+        /// and will not work if HTTP local rate limiting is enabled per connection level.
         #[prost(string, tag = "2")]
         pub value: ::prost::alloc::string::String,
     }
@@ -114,6 +122,13 @@ impl ::prost::Name for RateLimitDescriptor {
             .into()
     }
 }
+/// Configuration used to enable local rate limiting.
+///
+/// .. note::
+///    The ``LocalRateLimitDescriptor`` is used to configure a local rate limit rule with a token
+///    bucket algorithm. The ``RateLimitDescriptor`` is used to represent a list of symbols that
+///    are used to match against the rate limit rule.
+///
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LocalRateLimitDescriptor {
     /// Descriptor entries.
@@ -133,6 +148,28 @@ impl ::prost::Name for LocalRateLimitDescriptor {
     }
     fn type_url() -> ::prost::alloc::string::String {
         "type.googleapis.com/envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor"
+            .into()
+    }
+}
+/// Configuration used to enable local cluster level rate limiting where the token buckets
+/// will be shared across all the Envoy instances in the local cluster.
+/// A share will be calculated based on the membership of the local cluster dynamically
+/// and the configuration. When the limiter refilling the token bucket, the share will be
+/// applied. By default, the token bucket will be shared evenly.
+///
+/// See :ref:`local cluster name
+/// <envoy_v3_api_field_config.bootstrap.v3.ClusterManager.local_cluster_name>` for more context
+/// about local cluster.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct LocalClusterRateLimit {}
+impl ::prost::Name for LocalClusterRateLimit {
+    const NAME: &'static str = "LocalClusterRateLimit";
+    const PACKAGE: &'static str = "envoy.extensions.common.ratelimit.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit"
             .into()
     }
 }

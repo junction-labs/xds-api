@@ -336,6 +336,13 @@ pub mod envoy {
                 include!("envoy.service.metrics.v3.serde.rs");
             }
         }
+        pub mod network_ext_proc {
+            pub mod v3 {
+                include!("envoy.service.network_ext_proc.v3.rs");
+                #[cfg(feature = "pbjson")]
+                include!("envoy.service.network_ext_proc.v3.serde.rs");
+            }
+        }
         pub mod rate_limit_quota {
             pub mod v3 {
                 include!("envoy.service.rate_limit_quota.v3.rs");
@@ -348,6 +355,13 @@ pub mod envoy {
                 include!("envoy.service.ratelimit.v3.rs");
                 #[cfg(feature = "pbjson")]
                 include!("envoy.service.ratelimit.v3.serde.rs");
+            }
+        }
+        pub mod redis_auth {
+            pub mod v3 {
+                include!("envoy.service.redis_auth.v3.rs");
+                #[cfg(feature = "pbjson")]
+                include!("envoy.service.redis_auth.v3.serde.rs");
             }
         }
         pub mod route {
@@ -385,13 +399,6 @@ pub mod envoy {
                 include!("envoy.service.tap.v3.serde.rs");
             }
         }
-        pub mod trace {
-            pub mod v3 {
-                include!("envoy.service.trace.v3.rs");
-                #[cfg(feature = "pbjson")]
-                include!("envoy.service.trace.v3.serde.rs");
-            }
-        }
     }
 }
 pub mod google {
@@ -424,24 +431,6 @@ pub mod io {
             include!("io.prometheus.client.rs");
             #[cfg(feature = "pbjson")]
             include!("io.prometheus.client.serde.rs");
-        }
-    }
-}
-pub mod opencensus {
-    pub mod proto {
-        pub mod resource {
-            pub mod v1 {
-                include!("opencensus.proto.resource.v1.rs");
-                #[cfg(feature = "pbjson")]
-                include!("opencensus.proto.resource.v1.serde.rs");
-            }
-        }
-        pub mod trace {
-            pub mod v1 {
-                include!("opencensus.proto.trace.v1.rs");
-                #[cfg(feature = "pbjson")]
-                include!("opencensus.proto.trace.v1.serde.rs");
-            }
         }
     }
 }

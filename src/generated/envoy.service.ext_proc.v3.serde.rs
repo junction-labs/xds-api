@@ -20,6 +20,9 @@ impl serde::Serialize for BodyMutation {
                 body_mutation::Mutation::ClearBody(v) => {
                     struct_ser.serialize_field("clear_body", v)?;
                 }
+                body_mutation::Mutation::StreamedResponse(v) => {
+                    struct_ser.serialize_field("streamed_response", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -35,12 +38,15 @@ impl<'de> serde::Deserialize<'de> for BodyMutation {
             "body",
             "clear_body",
             "clearBody",
+            "streamed_response",
+            "streamedResponse",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Body,
             ClearBody,
+            StreamedResponse,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -64,6 +70,7 @@ impl<'de> serde::Deserialize<'de> for BodyMutation {
                         match value {
                             "body" => Ok(GeneratedField::Body),
                             "clearBody" | "clear_body" => Ok(GeneratedField::ClearBody),
+                            "streamedResponse" | "streamed_response" => Ok(GeneratedField::StreamedResponse),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -97,6 +104,13 @@ impl<'de> serde::Deserialize<'de> for BodyMutation {
                                 return Err(serde::de::Error::duplicate_field("clearBody"));
                             }
                             mutation__ = map_.next_value::<::std::option::Option<_>>()?.map(body_mutation::Mutation::ClearBody);
+                        }
+                        GeneratedField::StreamedResponse => {
+                            if mutation__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("streamedResponse"));
+                            }
+                            mutation__ = map_.next_value::<::std::option::Option<_>>()?.map(body_mutation::Mutation::StreamedResponse)
+;
                         }
                     }
                 }
@@ -1241,6 +1255,9 @@ impl serde::Serialize for ProcessingRequest {
         if self.observability_mode {
             len += 1;
         }
+        if self.protocol_config.is_some() {
+            len += 1;
+        }
         if self.request.is_some() {
             len += 1;
         }
@@ -1253,6 +1270,9 @@ impl serde::Serialize for ProcessingRequest {
         }
         if self.observability_mode {
             struct_ser.serialize_field("observability_mode", &self.observability_mode)?;
+        }
+        if let Some(v) = self.protocol_config.as_ref() {
+            struct_ser.serialize_field("protocol_config", v)?;
         }
         if let Some(v) = self.request.as_ref() {
             match v {
@@ -1291,6 +1311,8 @@ impl<'de> serde::Deserialize<'de> for ProcessingRequest {
             "attributes",
             "observability_mode",
             "observabilityMode",
+            "protocol_config",
+            "protocolConfig",
             "request_headers",
             "requestHeaders",
             "response_headers",
@@ -1310,6 +1332,7 @@ impl<'de> serde::Deserialize<'de> for ProcessingRequest {
             MetadataContext,
             Attributes,
             ObservabilityMode,
+            ProtocolConfig,
             RequestHeaders,
             ResponseHeaders,
             RequestBody,
@@ -1340,6 +1363,7 @@ impl<'de> serde::Deserialize<'de> for ProcessingRequest {
                             "metadataContext" | "metadata_context" => Ok(GeneratedField::MetadataContext),
                             "attributes" => Ok(GeneratedField::Attributes),
                             "observabilityMode" | "observability_mode" => Ok(GeneratedField::ObservabilityMode),
+                            "protocolConfig" | "protocol_config" => Ok(GeneratedField::ProtocolConfig),
                             "requestHeaders" | "request_headers" => Ok(GeneratedField::RequestHeaders),
                             "responseHeaders" | "response_headers" => Ok(GeneratedField::ResponseHeaders),
                             "requestBody" | "request_body" => Ok(GeneratedField::RequestBody),
@@ -1368,6 +1392,7 @@ impl<'de> serde::Deserialize<'de> for ProcessingRequest {
                 let mut metadata_context__ = None;
                 let mut attributes__ = None;
                 let mut observability_mode__ = None;
+                let mut protocol_config__ = None;
                 let mut request__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
@@ -1390,6 +1415,12 @@ impl<'de> serde::Deserialize<'de> for ProcessingRequest {
                                 return Err(serde::de::Error::duplicate_field("observabilityMode"));
                             }
                             observability_mode__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::ProtocolConfig => {
+                            if protocol_config__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("protocolConfig"));
+                            }
+                            protocol_config__ = map_.next_value()?;
                         }
                         GeneratedField::RequestHeaders => {
                             if request__.is_some() {
@@ -1439,6 +1470,7 @@ impl<'de> serde::Deserialize<'de> for ProcessingRequest {
                     metadata_context: metadata_context__,
                     attributes: attributes__.unwrap_or_default(),
                     observability_mode: observability_mode__.unwrap_or_default(),
+                    protocol_config: protocol_config__,
                     request: request__,
                 })
             }
@@ -1679,6 +1711,251 @@ impl<'de> serde::Deserialize<'de> for ProcessingResponse {
             }
         }
         deserializer.deserialize_struct("envoy.service.ext_proc.v3.ProcessingResponse", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for ProtocolConfiguration {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.request_body_mode != 0 {
+            len += 1;
+        }
+        if self.response_body_mode != 0 {
+            len += 1;
+        }
+        if self.send_body_without_waiting_for_header_response {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.service.ext_proc.v3.ProtocolConfiguration", len)?;
+        if self.request_body_mode != 0 {
+            let v = super::super::super::extensions::filters::http::ext_proc::v3::processing_mode::BodySendMode::try_from(self.request_body_mode)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", self.request_body_mode)))?;
+            struct_ser.serialize_field("request_body_mode", &v)?;
+        }
+        if self.response_body_mode != 0 {
+            let v = super::super::super::extensions::filters::http::ext_proc::v3::processing_mode::BodySendMode::try_from(self.response_body_mode)
+                .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", self.response_body_mode)))?;
+            struct_ser.serialize_field("response_body_mode", &v)?;
+        }
+        if self.send_body_without_waiting_for_header_response {
+            struct_ser.serialize_field("send_body_without_waiting_for_header_response", &self.send_body_without_waiting_for_header_response)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for ProtocolConfiguration {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "request_body_mode",
+            "requestBodyMode",
+            "response_body_mode",
+            "responseBodyMode",
+            "send_body_without_waiting_for_header_response",
+            "sendBodyWithoutWaitingForHeaderResponse",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            RequestBodyMode,
+            ResponseBodyMode,
+            SendBodyWithoutWaitingForHeaderResponse,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "requestBodyMode" | "request_body_mode" => Ok(GeneratedField::RequestBodyMode),
+                            "responseBodyMode" | "response_body_mode" => Ok(GeneratedField::ResponseBodyMode),
+                            "sendBodyWithoutWaitingForHeaderResponse" | "send_body_without_waiting_for_header_response" => Ok(GeneratedField::SendBodyWithoutWaitingForHeaderResponse),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = ProtocolConfiguration;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.service.ext_proc.v3.ProtocolConfiguration")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<ProtocolConfiguration, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut request_body_mode__ = None;
+                let mut response_body_mode__ = None;
+                let mut send_body_without_waiting_for_header_response__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::RequestBodyMode => {
+                            if request_body_mode__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("requestBodyMode"));
+                            }
+                            request_body_mode__ = Some(map_.next_value::<super::super::super::extensions::filters::http::ext_proc::v3::processing_mode::BodySendMode>()? as i32);
+                        }
+                        GeneratedField::ResponseBodyMode => {
+                            if response_body_mode__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("responseBodyMode"));
+                            }
+                            response_body_mode__ = Some(map_.next_value::<super::super::super::extensions::filters::http::ext_proc::v3::processing_mode::BodySendMode>()? as i32);
+                        }
+                        GeneratedField::SendBodyWithoutWaitingForHeaderResponse => {
+                            if send_body_without_waiting_for_header_response__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("sendBodyWithoutWaitingForHeaderResponse"));
+                            }
+                            send_body_without_waiting_for_header_response__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(ProtocolConfiguration {
+                    request_body_mode: request_body_mode__.unwrap_or_default(),
+                    response_body_mode: response_body_mode__.unwrap_or_default(),
+                    send_body_without_waiting_for_header_response: send_body_without_waiting_for_header_response__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.service.ext_proc.v3.ProtocolConfiguration", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for StreamedBodyResponse {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.body.is_empty() {
+            len += 1;
+        }
+        if self.end_of_stream {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.service.ext_proc.v3.StreamedBodyResponse", len)?;
+        if !self.body.is_empty() {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("body", pbjson::private::base64::encode(&self.body).as_str())?;
+        }
+        if self.end_of_stream {
+            struct_ser.serialize_field("end_of_stream", &self.end_of_stream)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for StreamedBodyResponse {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "body",
+            "end_of_stream",
+            "endOfStream",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Body,
+            EndOfStream,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "body" => Ok(GeneratedField::Body),
+                            "endOfStream" | "end_of_stream" => Ok(GeneratedField::EndOfStream),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = StreamedBodyResponse;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.service.ext_proc.v3.StreamedBodyResponse")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<StreamedBodyResponse, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut body__ = None;
+                let mut end_of_stream__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Body => {
+                            if body__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("body"));
+                            }
+                            body__ = 
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::EndOfStream => {
+                            if end_of_stream__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("endOfStream"));
+                            }
+                            end_of_stream__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(StreamedBodyResponse {
+                    body: body__.unwrap_or_default(),
+                    end_of_stream: end_of_stream__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.service.ext_proc.v3.StreamedBodyResponse", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for TrailersResponse {

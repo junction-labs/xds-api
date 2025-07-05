@@ -849,6 +849,9 @@ impl serde::Serialize for OutputConfig {
         if self.streaming {
             len += 1;
         }
+        if self.min_streamed_sent_bytes.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.tap.v3.OutputConfig", len)?;
         if !self.sinks.is_empty() {
             struct_ser.serialize_field("sinks", &self.sinks)?;
@@ -861,6 +864,9 @@ impl serde::Serialize for OutputConfig {
         }
         if self.streaming {
             struct_ser.serialize_field("streaming", &self.streaming)?;
+        }
+        if let Some(v) = self.min_streamed_sent_bytes.as_ref() {
+            struct_ser.serialize_field("min_streamed_sent_bytes", v)?;
         }
         struct_ser.end()
     }
@@ -878,6 +884,8 @@ impl<'de> serde::Deserialize<'de> for OutputConfig {
             "max_buffered_tx_bytes",
             "maxBufferedTxBytes",
             "streaming",
+            "min_streamed_sent_bytes",
+            "minStreamedSentBytes",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -886,6 +894,7 @@ impl<'de> serde::Deserialize<'de> for OutputConfig {
             MaxBufferedRxBytes,
             MaxBufferedTxBytes,
             Streaming,
+            MinStreamedSentBytes,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -911,6 +920,7 @@ impl<'de> serde::Deserialize<'de> for OutputConfig {
                             "maxBufferedRxBytes" | "max_buffered_rx_bytes" => Ok(GeneratedField::MaxBufferedRxBytes),
                             "maxBufferedTxBytes" | "max_buffered_tx_bytes" => Ok(GeneratedField::MaxBufferedTxBytes),
                             "streaming" => Ok(GeneratedField::Streaming),
+                            "minStreamedSentBytes" | "min_streamed_sent_bytes" => Ok(GeneratedField::MinStreamedSentBytes),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -934,6 +944,7 @@ impl<'de> serde::Deserialize<'de> for OutputConfig {
                 let mut max_buffered_rx_bytes__ = None;
                 let mut max_buffered_tx_bytes__ = None;
                 let mut streaming__ = None;
+                let mut min_streamed_sent_bytes__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Sinks => {
@@ -960,6 +971,12 @@ impl<'de> serde::Deserialize<'de> for OutputConfig {
                             }
                             streaming__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::MinStreamedSentBytes => {
+                            if min_streamed_sent_bytes__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("minStreamedSentBytes"));
+                            }
+                            min_streamed_sent_bytes__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(OutputConfig {
@@ -967,6 +984,7 @@ impl<'de> serde::Deserialize<'de> for OutputConfig {
                     max_buffered_rx_bytes: max_buffered_rx_bytes__,
                     max_buffered_tx_bytes: max_buffered_tx_bytes__,
                     streaming: streaming__.unwrap_or_default(),
+                    min_streamed_sent_bytes: min_streamed_sent_bytes__,
                 })
             }
         }

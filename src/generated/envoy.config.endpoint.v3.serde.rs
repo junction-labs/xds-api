@@ -1377,6 +1377,97 @@ impl<'de> serde::Deserialize<'de> for LbEndpoint {
         deserializer.deserialize_struct("envoy.config.endpoint.v3.LbEndpoint", FIELDS, GeneratedVisitor)
     }
 }
+impl serde::Serialize for LbEndpointCollection {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.entries.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.endpoint.v3.LbEndpointCollection", len)?;
+        if let Some(v) = self.entries.as_ref() {
+            struct_ser.serialize_field("entries", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for LbEndpointCollection {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "entries",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Entries,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "entries" => Ok(GeneratedField::Entries),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = LbEndpointCollection;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.endpoint.v3.LbEndpointCollection")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<LbEndpointCollection, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut entries__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Entries => {
+                            if entries__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("entries"));
+                            }
+                            entries__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(LbEndpointCollection {
+                    entries: entries__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.endpoint.v3.LbEndpointCollection", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for LedsClusterLocalityConfig {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -1498,6 +1589,9 @@ impl serde::Serialize for LocalityLbEndpoints {
         if self.locality.is_some() {
             len += 1;
         }
+        if self.metadata.is_some() {
+            len += 1;
+        }
         if !self.lb_endpoints.is_empty() {
             len += 1;
         }
@@ -1516,6 +1610,9 @@ impl serde::Serialize for LocalityLbEndpoints {
         let mut struct_ser = serializer.serialize_struct("envoy.config.endpoint.v3.LocalityLbEndpoints", len)?;
         if let Some(v) = self.locality.as_ref() {
             struct_ser.serialize_field("locality", v)?;
+        }
+        if let Some(v) = self.metadata.as_ref() {
+            struct_ser.serialize_field("metadata", v)?;
         }
         if !self.lb_endpoints.is_empty() {
             struct_ser.serialize_field("lb_endpoints", &self.lb_endpoints)?;
@@ -1550,6 +1647,7 @@ impl<'de> serde::Deserialize<'de> for LocalityLbEndpoints {
     {
         const FIELDS: &[&str] = &[
             "locality",
+            "metadata",
             "lb_endpoints",
             "lbEndpoints",
             "load_balancing_weight",
@@ -1565,6 +1663,7 @@ impl<'de> serde::Deserialize<'de> for LocalityLbEndpoints {
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Locality,
+            Metadata,
             LbEndpoints,
             LoadBalancingWeight,
             Priority,
@@ -1593,6 +1692,7 @@ impl<'de> serde::Deserialize<'de> for LocalityLbEndpoints {
                     {
                         match value {
                             "locality" => Ok(GeneratedField::Locality),
+                            "metadata" => Ok(GeneratedField::Metadata),
                             "lbEndpoints" | "lb_endpoints" => Ok(GeneratedField::LbEndpoints),
                             "loadBalancingWeight" | "load_balancing_weight" => Ok(GeneratedField::LoadBalancingWeight),
                             "priority" => Ok(GeneratedField::Priority),
@@ -1619,6 +1719,7 @@ impl<'de> serde::Deserialize<'de> for LocalityLbEndpoints {
                     V: serde::de::MapAccess<'de>,
             {
                 let mut locality__ = None;
+                let mut metadata__ = None;
                 let mut lb_endpoints__ = None;
                 let mut load_balancing_weight__ = None;
                 let mut priority__ = None;
@@ -1631,6 +1732,12 @@ impl<'de> serde::Deserialize<'de> for LocalityLbEndpoints {
                                 return Err(serde::de::Error::duplicate_field("locality"));
                             }
                             locality__ = map_.next_value()?;
+                        }
+                        GeneratedField::Metadata => {
+                            if metadata__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("metadata"));
+                            }
+                            metadata__ = map_.next_value()?;
                         }
                         GeneratedField::LbEndpoints => {
                             if lb_endpoints__.is_some() {
@@ -1676,6 +1783,7 @@ impl<'de> serde::Deserialize<'de> for LocalityLbEndpoints {
                 }
                 Ok(LocalityLbEndpoints {
                     locality: locality__,
+                    metadata: metadata__,
                     lb_endpoints: lb_endpoints__.unwrap_or_default(),
                     load_balancing_weight: load_balancing_weight__,
                     priority: priority__.unwrap_or_default(),
@@ -1777,6 +1885,122 @@ impl<'de> serde::Deserialize<'de> for locality_lb_endpoints::LbEndpointList {
             }
         }
         deserializer.deserialize_struct("envoy.config.endpoint.v3.LocalityLbEndpoints.LbEndpointList", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for UnnamedEndpointLoadMetricStats {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.num_requests_finished_with_metric != 0 {
+            len += 1;
+        }
+        if self.total_metric_value != 0. {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.endpoint.v3.UnnamedEndpointLoadMetricStats", len)?;
+        if self.num_requests_finished_with_metric != 0 {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("num_requests_finished_with_metric", ToString::to_string(&self.num_requests_finished_with_metric).as_str())?;
+        }
+        if self.total_metric_value != 0. {
+            struct_ser.serialize_field("total_metric_value", &self.total_metric_value)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for UnnamedEndpointLoadMetricStats {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "num_requests_finished_with_metric",
+            "numRequestsFinishedWithMetric",
+            "total_metric_value",
+            "totalMetricValue",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            NumRequestsFinishedWithMetric,
+            TotalMetricValue,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "numRequestsFinishedWithMetric" | "num_requests_finished_with_metric" => Ok(GeneratedField::NumRequestsFinishedWithMetric),
+                            "totalMetricValue" | "total_metric_value" => Ok(GeneratedField::TotalMetricValue),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = UnnamedEndpointLoadMetricStats;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.endpoint.v3.UnnamedEndpointLoadMetricStats")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<UnnamedEndpointLoadMetricStats, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut num_requests_finished_with_metric__ = None;
+                let mut total_metric_value__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::NumRequestsFinishedWithMetric => {
+                            if num_requests_finished_with_metric__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("numRequestsFinishedWithMetric"));
+                            }
+                            num_requests_finished_with_metric__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::TotalMetricValue => {
+                            if total_metric_value__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("totalMetricValue"));
+                            }
+                            total_metric_value__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                    }
+                }
+                Ok(UnnamedEndpointLoadMetricStats {
+                    num_requests_finished_with_metric: num_requests_finished_with_metric__.unwrap_or_default(),
+                    total_metric_value: total_metric_value__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.endpoint.v3.UnnamedEndpointLoadMetricStats", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for UpstreamEndpointStats {
@@ -2016,6 +2240,24 @@ impl serde::Serialize for UpstreamLocalityStats {
         if self.total_issued_requests != 0 {
             len += 1;
         }
+        if self.total_active_connections != 0 {
+            len += 1;
+        }
+        if self.total_new_connections != 0 {
+            len += 1;
+        }
+        if self.total_fail_connections != 0 {
+            len += 1;
+        }
+        if self.cpu_utilization.is_some() {
+            len += 1;
+        }
+        if self.mem_utilization.is_some() {
+            len += 1;
+        }
+        if self.application_utilization.is_some() {
+            len += 1;
+        }
         if !self.load_metric_stats.is_empty() {
             len += 1;
         }
@@ -2049,6 +2291,30 @@ impl serde::Serialize for UpstreamLocalityStats {
             #[allow(clippy::needless_borrows_for_generic_args)]
             struct_ser.serialize_field("total_issued_requests", ToString::to_string(&self.total_issued_requests).as_str())?;
         }
+        if self.total_active_connections != 0 {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("total_active_connections", ToString::to_string(&self.total_active_connections).as_str())?;
+        }
+        if self.total_new_connections != 0 {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("total_new_connections", ToString::to_string(&self.total_new_connections).as_str())?;
+        }
+        if self.total_fail_connections != 0 {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("total_fail_connections", ToString::to_string(&self.total_fail_connections).as_str())?;
+        }
+        if let Some(v) = self.cpu_utilization.as_ref() {
+            struct_ser.serialize_field("cpu_utilization", v)?;
+        }
+        if let Some(v) = self.mem_utilization.as_ref() {
+            struct_ser.serialize_field("mem_utilization", v)?;
+        }
+        if let Some(v) = self.application_utilization.as_ref() {
+            struct_ser.serialize_field("application_utilization", v)?;
+        }
         if !self.load_metric_stats.is_empty() {
             struct_ser.serialize_field("load_metric_stats", &self.load_metric_stats)?;
         }
@@ -2077,6 +2343,18 @@ impl<'de> serde::Deserialize<'de> for UpstreamLocalityStats {
             "totalErrorRequests",
             "total_issued_requests",
             "totalIssuedRequests",
+            "total_active_connections",
+            "totalActiveConnections",
+            "total_new_connections",
+            "totalNewConnections",
+            "total_fail_connections",
+            "totalFailConnections",
+            "cpu_utilization",
+            "cpuUtilization",
+            "mem_utilization",
+            "memUtilization",
+            "application_utilization",
+            "applicationUtilization",
             "load_metric_stats",
             "loadMetricStats",
             "upstream_endpoint_stats",
@@ -2091,6 +2369,12 @@ impl<'de> serde::Deserialize<'de> for UpstreamLocalityStats {
             TotalRequestsInProgress,
             TotalErrorRequests,
             TotalIssuedRequests,
+            TotalActiveConnections,
+            TotalNewConnections,
+            TotalFailConnections,
+            CpuUtilization,
+            MemUtilization,
+            ApplicationUtilization,
             LoadMetricStats,
             UpstreamEndpointStats,
             Priority,
@@ -2120,6 +2404,12 @@ impl<'de> serde::Deserialize<'de> for UpstreamLocalityStats {
                             "totalRequestsInProgress" | "total_requests_in_progress" => Ok(GeneratedField::TotalRequestsInProgress),
                             "totalErrorRequests" | "total_error_requests" => Ok(GeneratedField::TotalErrorRequests),
                             "totalIssuedRequests" | "total_issued_requests" => Ok(GeneratedField::TotalIssuedRequests),
+                            "totalActiveConnections" | "total_active_connections" => Ok(GeneratedField::TotalActiveConnections),
+                            "totalNewConnections" | "total_new_connections" => Ok(GeneratedField::TotalNewConnections),
+                            "totalFailConnections" | "total_fail_connections" => Ok(GeneratedField::TotalFailConnections),
+                            "cpuUtilization" | "cpu_utilization" => Ok(GeneratedField::CpuUtilization),
+                            "memUtilization" | "mem_utilization" => Ok(GeneratedField::MemUtilization),
+                            "applicationUtilization" | "application_utilization" => Ok(GeneratedField::ApplicationUtilization),
                             "loadMetricStats" | "load_metric_stats" => Ok(GeneratedField::LoadMetricStats),
                             "upstreamEndpointStats" | "upstream_endpoint_stats" => Ok(GeneratedField::UpstreamEndpointStats),
                             "priority" => Ok(GeneratedField::Priority),
@@ -2147,6 +2437,12 @@ impl<'de> serde::Deserialize<'de> for UpstreamLocalityStats {
                 let mut total_requests_in_progress__ = None;
                 let mut total_error_requests__ = None;
                 let mut total_issued_requests__ = None;
+                let mut total_active_connections__ = None;
+                let mut total_new_connections__ = None;
+                let mut total_fail_connections__ = None;
+                let mut cpu_utilization__ = None;
+                let mut mem_utilization__ = None;
+                let mut application_utilization__ = None;
                 let mut load_metric_stats__ = None;
                 let mut upstream_endpoint_stats__ = None;
                 let mut priority__ = None;
@@ -2190,6 +2486,48 @@ impl<'de> serde::Deserialize<'de> for UpstreamLocalityStats {
                                 Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
                             ;
                         }
+                        GeneratedField::TotalActiveConnections => {
+                            if total_active_connections__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("totalActiveConnections"));
+                            }
+                            total_active_connections__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::TotalNewConnections => {
+                            if total_new_connections__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("totalNewConnections"));
+                            }
+                            total_new_connections__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::TotalFailConnections => {
+                            if total_fail_connections__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("totalFailConnections"));
+                            }
+                            total_fail_connections__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::CpuUtilization => {
+                            if cpu_utilization__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("cpuUtilization"));
+                            }
+                            cpu_utilization__ = map_.next_value()?;
+                        }
+                        GeneratedField::MemUtilization => {
+                            if mem_utilization__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("memUtilization"));
+                            }
+                            mem_utilization__ = map_.next_value()?;
+                        }
+                        GeneratedField::ApplicationUtilization => {
+                            if application_utilization__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("applicationUtilization"));
+                            }
+                            application_utilization__ = map_.next_value()?;
+                        }
                         GeneratedField::LoadMetricStats => {
                             if load_metric_stats__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("loadMetricStats"));
@@ -2218,6 +2556,12 @@ impl<'de> serde::Deserialize<'de> for UpstreamLocalityStats {
                     total_requests_in_progress: total_requests_in_progress__.unwrap_or_default(),
                     total_error_requests: total_error_requests__.unwrap_or_default(),
                     total_issued_requests: total_issued_requests__.unwrap_or_default(),
+                    total_active_connections: total_active_connections__.unwrap_or_default(),
+                    total_new_connections: total_new_connections__.unwrap_or_default(),
+                    total_fail_connections: total_fail_connections__.unwrap_or_default(),
+                    cpu_utilization: cpu_utilization__,
+                    mem_utilization: mem_utilization__,
+                    application_utilization: application_utilization__,
                     load_metric_stats: load_metric_stats__.unwrap_or_default(),
                     upstream_endpoint_stats: upstream_endpoint_stats__.unwrap_or_default(),
                     priority: priority__.unwrap_or_default(),

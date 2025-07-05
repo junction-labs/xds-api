@@ -50,7 +50,7 @@ impl ::prost::Name for TypedExtensionConfig {
 /// :ref:`admin's <envoy_v3_api_field_config.bootstrap.v3.Admin.socket_options>` socket_options etc.
 ///
 /// It should be noted that the name or level may have different values on different platforms.
-/// \[#next-free-field: 7\]
+/// \[#next-free-field: 8\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SocketOption {
     /// An optional name to give this socket option for debugging, etc.
@@ -67,11 +67,72 @@ pub struct SocketOption {
     /// STATE_PREBIND is currently the only valid value.
     #[prost(enumeration = "socket_option::SocketState", tag = "6")]
     pub state: i32,
+    /// Apply the socket option to the specified `socket type <<https://linux.die.net/man/2/socket>`_.>
+    /// If not specified, the socket option will be applied to all socket types.
+    #[prost(message, optional, tag = "7")]
+    pub r#type: ::core::option::Option<socket_option::SocketType>,
     #[prost(oneof = "socket_option::Value", tags = "4, 5")]
     pub value: ::core::option::Option<socket_option::Value>,
 }
 /// Nested message and enum types in `SocketOption`.
 pub mod socket_option {
+    /// The `socket type <<https://linux.die.net/man/2/socket>`_> to apply the socket option to.
+    /// Only one field should be set. If multiple fields are set, the precedence order will determine
+    /// the selected one. If none of the fields is set, the socket option will be applied to all socket types.
+    ///
+    /// For example:
+    /// If :ref:`stream <envoy_v3_api_field_config.core.v3.SocketOption.SocketType.stream>` is set,
+    /// it takes precedence over :ref:`datagram <envoy_v3_api_field_config.core.v3.SocketOption.SocketType.datagram>`.
+    #[derive(Clone, Copy, PartialEq, ::prost::Message)]
+    pub struct SocketType {
+        /// Apply the socket option to the stream socket type.
+        #[prost(message, optional, tag = "1")]
+        pub stream: ::core::option::Option<socket_type::Stream>,
+        /// Apply the socket option to the datagram socket type.
+        #[prost(message, optional, tag = "2")]
+        pub datagram: ::core::option::Option<socket_type::Datagram>,
+    }
+    /// Nested message and enum types in `SocketType`.
+    pub mod socket_type {
+        /// The stream socket type.
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
+        pub struct Stream {}
+        impl ::prost::Name for Stream {
+            const NAME: &'static str = "Stream";
+            const PACKAGE: &'static str = "envoy.config.core.v3";
+            fn full_name() -> ::prost::alloc::string::String {
+                "envoy.config.core.v3.SocketOption.SocketType.Stream".into()
+            }
+            fn type_url() -> ::prost::alloc::string::String {
+                "type.googleapis.com/envoy.config.core.v3.SocketOption.SocketType.Stream"
+                    .into()
+            }
+        }
+        /// The datagram socket type.
+        #[derive(Clone, Copy, PartialEq, ::prost::Message)]
+        pub struct Datagram {}
+        impl ::prost::Name for Datagram {
+            const NAME: &'static str = "Datagram";
+            const PACKAGE: &'static str = "envoy.config.core.v3";
+            fn full_name() -> ::prost::alloc::string::String {
+                "envoy.config.core.v3.SocketOption.SocketType.Datagram".into()
+            }
+            fn type_url() -> ::prost::alloc::string::String {
+                "type.googleapis.com/envoy.config.core.v3.SocketOption.SocketType.Datagram"
+                    .into()
+            }
+        }
+    }
+    impl ::prost::Name for SocketType {
+        const NAME: &'static str = "SocketType";
+        const PACKAGE: &'static str = "envoy.config.core.v3";
+        fn full_name() -> ::prost::alloc::string::String {
+            "envoy.config.core.v3.SocketOption.SocketType".into()
+        }
+        fn type_url() -> ::prost::alloc::string::String {
+            "type.googleapis.com/envoy.config.core.v3.SocketOption.SocketType".into()
+        }
+    }
     #[derive(
         Clone,
         Copy,
@@ -205,7 +266,7 @@ impl ::prost::Name for EnvoyInternalAddress {
         "type.googleapis.com/envoy.config.core.v3.EnvoyInternalAddress".into()
     }
 }
-/// \[#next-free-field: 7\]
+/// \[#next-free-field: 8\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SocketAddress {
     #[prost(enumeration = "socket_address::Protocol", tag = "1")]
@@ -236,6 +297,20 @@ pub struct SocketAddress {
     /// IPv6 space as ``::FFFF:<IPv4-address>``.
     #[prost(bool, tag = "6")]
     pub ipv4_compat: bool,
+    /// Filepath that specifies the Linux network namespace this socket will be created in (see ``man 7
+    /// network_namespaces``). If this field is set, Envoy will create the socket in the specified
+    /// network namespace.
+    ///
+    /// .. note::
+    ///     Setting this parameter requires Envoy to run with the ``CAP_NET_ADMIN`` capability.
+    ///
+    /// .. note::
+    ///     Currently only used for Listener sockets.
+    ///
+    /// .. attention::
+    ///      Network namespaces are only configurable on Linux. Otherwise, this field has no effect.
+    #[prost(string, tag = "7")]
+    pub network_namespace_filepath: ::prost::alloc::string::String,
     #[prost(oneof = "socket_address::PortSpecifier", tags = "3, 4")]
     pub port_specifier: ::core::option::Option<socket_address::PortSpecifier>,
 }
@@ -882,12 +957,21 @@ impl ::prost::Name for RuntimeFeatureFlag {
         "type.googleapis.com/envoy.config.core.v3.RuntimeFeatureFlag".into()
     }
 }
+/// Please use :ref:`KeyValuePair <envoy_api_msg_config.core.v3.KeyValuePair>` instead.
+/// \[#not-implemented-hide:\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct KeyValue {
     /// The key of the key/value pair.
+    #[deprecated]
     #[prost(string, tag = "1")]
     pub key: ::prost::alloc::string::String,
     /// The value of the key/value pair.
+    ///
+    /// The ``bytes`` type is used. This means if JSON or YAML is used to to represent the
+    /// configuration, the value must be base64 encoded. This is unfriendly for users in most
+    /// use scenarios of this message.
+    ///
+    #[deprecated]
     #[prost(bytes = "vec", tag = "2")]
     pub value: ::prost::alloc::vec::Vec<u8>,
 }
@@ -901,11 +985,39 @@ impl ::prost::Name for KeyValue {
         "type.googleapis.com/envoy.config.core.v3.KeyValue".into()
     }
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct KeyValuePair {
+    /// The key of the key/value pair.
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+    /// The value of the key/value pair.
+    #[prost(message, optional, tag = "2")]
+    pub value: ::core::option::Option<
+        super::super::super::super::google::protobuf::Value,
+    >,
+}
+impl ::prost::Name for KeyValuePair {
+    const NAME: &'static str = "KeyValuePair";
+    const PACKAGE: &'static str = "envoy.config.core.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.core.v3.KeyValuePair".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.core.v3.KeyValuePair".into()
+    }
+}
 /// Key/value pair plus option to control append behavior. This is used to specify
 /// key/value pairs that should be appended to a set of existing key/value pairs.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct KeyValueAppend {
-    /// Key/value pair entry that this option to append or overwrite.
+    /// The single key/value pair record to be appended or overridden. This field must be set.
+    #[prost(message, optional, tag = "3")]
+    pub record: ::core::option::Option<KeyValuePair>,
+    /// Key/value pair entry that this option to append or overwrite. This field is deprecated
+    /// and please use :ref:`record <envoy_v3_api_field_config.core.v3.KeyValueAppend.record>`
+    /// as replacement.
+    /// \[#not-implemented-hide:\]
+    #[deprecated]
     #[prost(message, optional, tag = "1")]
     pub entry: ::core::option::Option<KeyValue>,
     /// Describes the action taken to append/overwrite the given value for an existing
@@ -986,10 +1098,12 @@ impl ::prost::Name for KeyValueAppend {
 /// Key/value pair to append or remove.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct KeyValueMutation {
-    /// Key/value pair to append or overwrite. Only one of ``append`` or ``remove`` can be set.
+    /// Key/value pair to append or overwrite. Only one of ``append`` or ``remove`` can be set or
+    /// the configuration will be rejected.
     #[prost(message, optional, tag = "1")]
     pub append: ::core::option::Option<KeyValueAppend>,
-    /// Key to remove. Only one of ``append`` or ``remove`` can be set.
+    /// Key to remove. Only one of ``append`` or ``remove`` can be set or the configuration will be
+    /// rejected.
     #[prost(string, tag = "2")]
     pub remove: ::prost::alloc::string::String,
 }
@@ -1156,6 +1270,7 @@ impl ::prost::Name for HeaderValueOption {
 /// Wrapper for a set of headers.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeaderMap {
+    /// A list of header names and their values.
     #[prost(message, repeated, tag = "1")]
     pub headers: ::prost::alloc::vec::Vec<HeaderValue>,
 }
@@ -1651,6 +1766,26 @@ impl ::prost::Name for ProxyProtocolPassThroughTlVs {
         "type.googleapis.com/envoy.config.core.v3.ProxyProtocolPassThroughTLVs".into()
     }
 }
+/// Represents a single Type-Length-Value (TLV) entry.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TlvEntry {
+    /// The type of the TLV. Must be a uint8 (0-255) as per the Proxy Protocol v2 specification.
+    #[prost(uint32, tag = "1")]
+    pub r#type: u32,
+    /// The value of the TLV. Must be at least one byte long.
+    #[prost(bytes = "vec", tag = "2")]
+    pub value: ::prost::alloc::vec::Vec<u8>,
+}
+impl ::prost::Name for TlvEntry {
+    const NAME: &'static str = "TlvEntry";
+    const PACKAGE: &'static str = "envoy.config.core.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.core.v3.TlvEntry".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.core.v3.TlvEntry".into()
+    }
+}
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProxyProtocolConfig {
     /// The PROXY protocol version to use. See <https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt> for details
@@ -1660,6 +1795,32 @@ pub struct ProxyProtocolConfig {
     /// V2 header. If there is no setting for this field, no TLVs will be passed through.
     #[prost(message, optional, tag = "2")]
     pub pass_through_tlvs: ::core::option::Option<ProxyProtocolPassThroughTlVs>,
+    /// This config allows additional TLVs to be included in the upstream PROXY protocol
+    /// V2 header. Unlike ``pass_through_tlvs``, which passes TLVs from the downstream request,
+    /// ``added_tlvs`` provides an extension mechanism for defining new TLVs that are included
+    /// with the upstream request. These TLVs may not be present in the downstream request and
+    /// can be defined at either the transport socket level or the host level to provide more
+    /// granular control over the TLVs that are included in the upstream request.
+    ///
+    /// Host-level TLVs are specified in the ``metadata.typed_filter_metadata`` field under the
+    /// ``envoy.transport_sockets.proxy_protocol`` namespace.
+    ///
+    /// .. literalinclude:: /_configs/repo/proxy_protocol.yaml
+    ///     :language: yaml
+    ///     :lines: 49-57
+    ///     :linenos:
+    ///     :lineno-start: 49
+    ///     :caption: :download:`proxy_protocol.yaml </_configs/repo/proxy_protocol.yaml>`
+    ///
+    /// **Precedence behavior**:
+    ///
+    /// - When a TLV is defined at both the host level and the transport socket level, the value
+    ///    from the host level configuration takes precedence. This allows users to define default TLVs
+    ///    at the transport socket level and override them at the host level.
+    /// - Any TLV defined in the ``pass_through_tlvs`` field will be overridden by either the host-level
+    ///    or transport socket-level TLV.
+    #[prost(message, repeated, tag = "3")]
+    pub added_tlvs: ::prost::alloc::vec::Vec<TlvEntry>,
 }
 /// Nested message and enum types in `ProxyProtocolConfig`.
 pub mod proxy_protocol_config {
@@ -1712,6 +1873,22 @@ impl ::prost::Name for ProxyProtocolConfig {
         "type.googleapis.com/envoy.config.core.v3.ProxyProtocolConfig".into()
     }
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PerHostConfig {
+    /// Enables per-host configuration for Proxy Protocol.
+    #[prost(message, repeated, tag = "1")]
+    pub added_tlvs: ::prost::alloc::vec::Vec<TlvEntry>,
+}
+impl ::prost::Name for PerHostConfig {
+    const NAME: &'static str = "PerHostConfig";
+    const PACKAGE: &'static str = "envoy.config.core.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.core.v3.PerHostConfig".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.core.v3.PerHostConfig".into()
+    }
+}
 /// gRPC service configuration. This is used by :ref:`ApiConfigSource
 /// <envoy_v3_api_msg_config.core.v3.ApiConfigSource>` and filter configurations.
 /// \[#next-free-field: 7\]
@@ -1739,6 +1916,7 @@ pub struct GrpcService {
 }
 /// Nested message and enum types in `GrpcService`.
 pub mod grpc_service {
+    /// \[#next-free-field: 6\]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct EnvoyGrpc {
         /// The name of the upstream gRPC cluster. SSL credentials will be supplied
@@ -1764,6 +1942,12 @@ pub mod grpc_service {
         pub max_receive_message_length: ::core::option::Option<
             super::super::super::super::super::google::protobuf::UInt32Value,
         >,
+        /// This provides gRPC client level control over envoy generated headers.
+        /// If false, the header will be sent but it can be overridden by per stream option.
+        /// If true, the header will be removed and can not be overridden by per stream option.
+        /// Default to false.
+        #[prost(bool, tag = "5")]
+        pub skip_envoy_headers: bool,
     }
     impl ::prost::Name for EnvoyGrpc {
         const NAME: &'static str = "EnvoyGrpc";
@@ -2743,13 +2927,13 @@ pub struct HealthCheck {
     pub healthy_edge_interval: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
     >,
-    /// .. attention::
-    /// This field is deprecated in favor of the extension
-    /// :ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
-    /// :ref:`event_log_path <envoy_v3_api_field_extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink.event_log_path>`
-    /// in the file sink extension.
-    ///
     /// Specifies the path to the :ref:`health check event log <arch_overview_health_check_logging>`.
+    ///
+    /// .. attention::
+    ///    This field is deprecated in favor of the extension
+    ///    :ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
+    ///    :ref:`event_log_path <envoy_v3_api_field_extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink.event_log_path>`
+    ///    in the file sink extension.
     #[deprecated]
     #[prost(string, tag = "17")]
     pub event_log_path: ::prost::alloc::string::String,
@@ -3189,7 +3373,7 @@ pub struct QuicKeepAliveSettings {
     ///
     /// The value should be smaller than :ref:`connection idle_timeout <envoy_v3_api_field_config.listener.v3.QuicProtocolOptions.idle_timeout>` to prevent idle timeout and smaller than max_interval to take effect.
     ///
-    /// If absent or zero, disable keepalive probing for a server connection. For a client connection, if :ref:`max_interval <envoy_v3_api_field_config.core.v3.QuicKeepAliveSettings.max_interval>`  is also zero, do not keepalive, otherwise use max_interval or QUICHE default to probe all the time.
+    /// If absent, disable keepalive probing for a server connection. For a client connection, if :ref:`max_interval <envoy_v3_api_field_config.core.v3.QuicKeepAliveSettings.max_interval>` is zero, do not keepalive, otherwise use max_interval or QUICHE default to probe all the time.
     #[prost(message, optional, tag = "2")]
     pub initial_interval: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
@@ -3206,7 +3390,7 @@ impl ::prost::Name for QuicKeepAliveSettings {
     }
 }
 /// QUIC protocol options which apply to both downstream and upstream connections.
-/// \[#next-free-field: 9\]
+/// \[#next-free-field: 10\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QuicProtocolOptions {
     /// Maximum number of streams that the client can negotiate per connection. 100
@@ -3219,8 +3403,11 @@ pub struct QuicProtocolOptions {
     /// <<https://tools.ietf.org/html/draft-ietf-quic-transport-34#section-4.1>`_> size. Valid values range from
     /// 1 to 16777216 (2^24, maximum supported by QUICHE) and defaults to 16777216 (16 * 1024 * 1024).
     ///
-    /// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use 16384 instead.
-    /// QUICHE IETF Quic implementation supports 1 bytes window. We only support increasing the default window size now, so it's also the minimum.
+    /// .. note::
+    ///
+    ///    16384 (2^14) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use
+    ///    16384 instead. QUICHE IETF Quic implementation supports 1 bytes window. We only support increasing the default
+    ///    window size now, so it's also the minimum.
     ///
     /// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
     /// QUIC stream send and receive buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
@@ -3233,8 +3420,11 @@ pub struct QuicProtocolOptions {
     /// flow-control. Valid values rage from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults
     /// to 25165824 (24 * 1024 * 1024).
     ///
-    /// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
-    /// window size now, so it's also the minimum.
+    /// .. note::
+    ///
+    ///    16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
+    ///    window size now, so it's also the minimum.
+    ///
     #[prost(message, optional, tag = "3")]
     pub initial_connection_window_size: ::core::option::Option<
         super::super::super::super::google::protobuf::UInt32Value,
@@ -3267,6 +3457,12 @@ pub struct QuicProtocolOptions {
     pub idle_network_timeout: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
     >,
+    /// Maximum packet length for QUIC connections. It refers to the largest size of a QUIC packet that can be transmitted over the connection.
+    /// If not specified, one of the `default values in QUICHE <<https://github.com/google/quiche/blob/main/quiche/quic/core/quic_constants.h>`_> is used.
+    #[prost(message, optional, tag = "9")]
+    pub max_packet_length: ::core::option::Option<
+        super::super::super::super::google::protobuf::UInt64Value,
+    >,
 }
 impl ::prost::Name for QuicProtocolOptions {
     const NAME: &'static str = "QuicProtocolOptions";
@@ -3285,6 +3481,9 @@ pub struct UpstreamHttpProtocolOptions {
     /// header when :ref:`override_auto_sni_header <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.override_auto_sni_header>`
     /// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
     /// Does nothing if a filter before the http router filter sets the corresponding metadata.
+    ///
+    /// See :ref:`SNI configuration <start_quick_start_securing_sni_client>` for details on how this
+    /// interacts with other validation options.
     #[prost(bool, tag = "1")]
     pub auto_sni: bool,
     /// Automatic validate upstream presented certificate for new upstream connections based on the
@@ -3292,6 +3491,9 @@ pub struct UpstreamHttpProtocolOptions {
     /// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
     /// This field is intended to be set with ``auto_sni`` field.
     /// Does nothing if a filter before the http router filter sets the corresponding metadata.
+    ///
+    /// See :ref:`validation configuration <start_quick_start_securing_validation>` for how this interacts with
+    /// other validation options.
     #[prost(bool, tag = "2")]
     pub auto_san_validation: bool,
     /// An optional alternative to the host/authority header to be used for setting the SNI value.
@@ -3407,7 +3609,7 @@ impl ::prost::Name for AlternateProtocolsCacheOptions {
         "type.googleapis.com/envoy.config.core.v3.AlternateProtocolsCacheOptions".into()
     }
 }
-/// \[#next-free-field: 7\]
+/// \[#next-free-field: 8\]
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct HttpProtocolOptions {
     /// The idle timeout for connections. The idle timeout is defined as the
@@ -3431,20 +3633,44 @@ pub struct HttpProtocolOptions {
         super::super::super::super::google::protobuf::Duration,
     >,
     /// The maximum duration of a connection. The duration is defined as a period since a connection
-    /// was established. If not set, there is no max duration. When max_connection_duration is reached
-    /// and if there are no active streams, the connection will be closed. If the connection is a
-    /// downstream connection and there are any active streams, the drain sequence will kick-in,
-    /// and the connection will be force-closed after the drain period. See :ref:`drain_timeout
+    /// was established. If not set, there is no max duration. When max_connection_duration is reached,
+    /// the drain sequence will kick-in. The connection will be closed after the drain timeout period
+    /// if there are no active streams. See :ref:`drain_timeout
     /// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
     #[prost(message, optional, tag = "3")]
     pub max_connection_duration: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
     >,
-    /// The maximum number of headers. If unconfigured, the default
-    /// maximum number of request headers allowed is 100. Requests that exceed this limit will receive
-    /// a 431 response for HTTP/1.x and cause a stream reset for HTTP/2.
+    /// The maximum number of headers (request headers if configured on HttpConnectionManager,
+    /// response headers when configured on a cluster).
+    /// If unconfigured, the default maximum number of headers allowed is 100.
+    /// The default value for requests can be overridden by setting runtime key ``envoy.reloadable_features.max_request_headers_count``.
+    /// The default value for responses can be overridden by setting runtime key ``envoy.reloadable_features.max_response_headers_count``.
+    /// Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and cause a stream
+    /// reset for HTTP/2.
+    /// Upstream responses that exceed this limit will result in a 502 response.
     #[prost(message, optional, tag = "2")]
     pub max_headers_count: ::core::option::Option<
+        super::super::super::super::google::protobuf::UInt32Value,
+    >,
+    /// The maximum size of response headers.
+    /// If unconfigured, the default is 60 KiB, except for HTTP/1 response headers which have a default
+    /// of 80KiB.
+    /// The default value can be overridden by setting runtime key ``envoy.reloadable_features.max_response_headers_size_kb``.
+    /// Responses that exceed this limit will result in a 503 response.
+    /// In Envoy, this setting is only valid when configured on an upstream cluster, not on the
+    /// :ref:`HTTP Connection Manager
+    /// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.common_http_protocol_options>`.
+    ///
+    /// .. note::
+    ///
+    ///    Currently some protocol codecs impose limits on the maximum size of a single header.
+    ///
+    ///    * HTTP/2 (when using nghttp2) limits a single header to around 100kb.
+    ///    * HTTP/3 limits a single header to around 1024kb.
+    ///
+    #[prost(message, optional, tag = "7")]
+    pub max_response_headers_kb: ::core::option::Option<
         super::super::super::super::google::protobuf::UInt32Value,
     >,
     /// Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be
@@ -3455,9 +3681,15 @@ pub struct HttpProtocolOptions {
     >,
     /// Action to take when a client request with a header name containing underscore characters is received.
     /// If this setting is not specified, the value defaults to ALLOW.
-    /// Note: upstream responses are not affected by this setting.
-    /// Note: this only affects client headers. It does not affect headers added
-    /// by Envoy filters and does not have any impact if added to cluster config.
+    ///
+    /// .. note::
+    ///
+    ///    Upstream responses are not affected by this setting.
+    ///
+    /// .. note::
+    ///
+    ///    This only affects client headers. It does not affect headers added by Envoy filters and does not have any
+    ///    impact if added to cluster config.
     #[prost(
         enumeration = "http_protocol_options::HeadersWithUnderscoresAction",
         tag = "5"
@@ -3536,7 +3768,7 @@ impl ::prost::Name for HttpProtocolOptions {
         "type.googleapis.com/envoy.config.core.v3.HttpProtocolOptions".into()
     }
 }
-/// \[#next-free-field: 11\]
+/// \[#next-free-field: 12\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Http1ProtocolOptions {
     /// Handle HTTP requests with absolute URLs in the requests. These requests
@@ -3627,6 +3859,16 @@ pub struct Http1ProtocolOptions {
     /// to reject custom methods.
     #[prost(bool, tag = "10")]
     pub allow_custom_methods: bool,
+    /// Ignore HTTP/1.1 upgrade values matching any of the supplied matchers.
+    ///
+    /// .. note::
+    ///
+    ///    ``h2c`` upgrades are always removed for backwards compatibility, regardless of the
+    ///    value in this setting.
+    #[prost(message, repeated, tag = "11")]
+    pub ignore_http_11_upgrade: ::prost::alloc::vec::Vec<
+        super::super::super::r#type::matcher::v3::StringMatcher,
+    >,
 }
 /// Nested message and enum types in `Http1ProtocolOptions`.
 pub mod http1_protocol_options {
@@ -3735,7 +3977,7 @@ impl ::prost::Name for KeepaliveSettings {
         "type.googleapis.com/envoy.config.core.v3.KeepaliveSettings".into()
     }
 }
-/// \[#next-free-field: 17\]
+/// \[#next-free-field: 18\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Http2ProtocolOptions {
     /// `Maximum table size <<https://httpwg.org/specs/rfc7541.html#rfc.section.4.2>`_>
@@ -3766,8 +4008,10 @@ pub struct Http2ProtocolOptions {
     /// (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum) and defaults to 268435456
     /// (256 * 1024 * 1024).
     ///
-    /// NOTE: 65535 is the initial window size from HTTP/2 spec. We only support increasing the default
-    /// window size now, so it's also the minimum.
+    /// .. note::
+    ///
+    ///    65535 is the initial window size from HTTP/2 spec. We only support increasing the default window size now,
+    ///    so it's also the minimum.
     ///
     /// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
     /// HTTP/2 codec buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
@@ -3921,6 +4165,11 @@ pub struct Http2ProtocolOptions {
     pub use_oghttp2_codec: ::core::option::Option<
         super::super::super::super::google::protobuf::BoolValue,
     >,
+    /// Configure the maximum amount of metadata than can be handled per stream. Defaults to 1 MB.
+    #[prost(message, optional, tag = "17")]
+    pub max_metadata_size: ::core::option::Option<
+        super::super::super::super::google::protobuf::UInt64Value,
+    >,
 }
 /// Nested message and enum types in `Http2ProtocolOptions`.
 pub mod http2_protocol_options {
@@ -3978,7 +4227,7 @@ impl ::prost::Name for GrpcProtocolOptions {
     }
 }
 /// A message which allows using HTTP/3.
-/// \[#next-free-field: 7\]
+/// \[#next-free-field: 8\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Http3ProtocolOptions {
     #[prost(message, optional, tag = "1")]
@@ -4009,6 +4258,14 @@ pub struct Http3ProtocolOptions {
     /// information.
     #[prost(bool, tag = "6")]
     pub allow_metadata: bool,
+    /// \[#not-implemented-hide:\] Hiding until Envoy has full HTTP/3 upstream support.
+    /// Still under implementation. DO NOT USE.
+    ///
+    /// Disables QPACK compression related features for HTTP/3 including:
+    /// No huffman encoding, zero dynamic table capacity and no cookie crumbing.
+    /// This can be useful for trading off CPU vs bandwidth when an upstream HTTP/3 connection multiplexes multiple downstream connections.
+    #[prost(bool, tag = "7")]
+    pub disable_qpack: bool,
 }
 impl ::prost::Name for Http3ProtocolOptions {
     const NAME: &'static str = "Http3ProtocolOptions";
@@ -4126,6 +4383,34 @@ impl ::prost::Name for UdpSocketConfig {
         "type.googleapis.com/envoy.config.core.v3.UdpSocketConfig".into()
     }
 }
+/// Configuration for socket cmsg headers.
+/// See `:ref:CMSG <<https://man7.org/linux/man-pages/man3/cmsg.3.html>`_> for further information.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct SocketCmsgHeaders {
+    /// cmsg level. Default is unset.
+    #[prost(message, optional, tag = "1")]
+    pub level: ::core::option::Option<
+        super::super::super::super::google::protobuf::UInt32Value,
+    >,
+    /// cmsg type. Default is unset.
+    #[prost(message, optional, tag = "2")]
+    pub r#type: ::core::option::Option<
+        super::super::super::super::google::protobuf::UInt32Value,
+    >,
+    /// Expected size of cmsg value. Default is zero.
+    #[prost(uint32, tag = "3")]
+    pub expected_size: u32,
+}
+impl ::prost::Name for SocketCmsgHeaders {
+    const NAME: &'static str = "SocketCmsgHeaders";
+    const PACKAGE: &'static str = "envoy.config.core.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.core.v3.SocketCmsgHeaders".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.core.v3.SocketCmsgHeaders".into()
+    }
+}
 /// A list of gRPC methods which can be used as an allowlist, for example.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GrpcMethodList {
@@ -4196,6 +4481,11 @@ impl ::prost::Name for HttpService {
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct JsonFormatOptions {
     /// The output JSON string properties will be sorted.
+    ///
+    /// .. note::
+    ///    As the properties are always sorted, this option has no effect and is deprecated.
+    ///
+    #[deprecated]
     #[prost(bool, tag = "1")]
     pub sort_properties: bool,
 }
@@ -4219,6 +4509,12 @@ pub struct SubstitutionFormatString {
     /// * for ``text_format``, the output of the empty operator is changed from ``-`` to an
     ///    empty string, so that empty values are omitted entirely.
     /// * for ``json_format`` the keys with null values are omitted in the output structure.
+    ///
+    /// .. note::
+    ///    This option does not work perfectly with ``json_format`` as keys with ``null`` values
+    ///    will still be included in the output. See <https://github.com/envoyproxy/envoy/issues/37941>
+    ///    for more details.
+    ///
     #[prost(bool, tag = "3")]
     pub omit_empty_values: bool,
     /// Specify a ``content_type`` field.

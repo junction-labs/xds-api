@@ -836,6 +836,7 @@ impl serde::Serialize for scale_timers_overload_action_config::TimerType {
             Self::HttpDownstreamConnectionIdle => "HTTP_DOWNSTREAM_CONNECTION_IDLE",
             Self::HttpDownstreamStreamIdle => "HTTP_DOWNSTREAM_STREAM_IDLE",
             Self::TransportSocketConnect => "TRANSPORT_SOCKET_CONNECT",
+            Self::HttpDownstreamConnectionMax => "HTTP_DOWNSTREAM_CONNECTION_MAX",
         };
         serializer.serialize_str(variant)
     }
@@ -851,6 +852,7 @@ impl<'de> serde::Deserialize<'de> for scale_timers_overload_action_config::Timer
             "HTTP_DOWNSTREAM_CONNECTION_IDLE",
             "HTTP_DOWNSTREAM_STREAM_IDLE",
             "TRANSPORT_SOCKET_CONNECT",
+            "HTTP_DOWNSTREAM_CONNECTION_MAX",
         ];
 
         struct GeneratedVisitor;
@@ -895,6 +897,7 @@ impl<'de> serde::Deserialize<'de> for scale_timers_overload_action_config::Timer
                     "HTTP_DOWNSTREAM_CONNECTION_IDLE" => Ok(scale_timers_overload_action_config::TimerType::HttpDownstreamConnectionIdle),
                     "HTTP_DOWNSTREAM_STREAM_IDLE" => Ok(scale_timers_overload_action_config::TimerType::HttpDownstreamStreamIdle),
                     "TRANSPORT_SOCKET_CONNECT" => Ok(scale_timers_overload_action_config::TimerType::TransportSocketConnect),
+                    "HTTP_DOWNSTREAM_CONNECTION_MAX" => Ok(scale_timers_overload_action_config::TimerType::HttpDownstreamConnectionMax),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }
             }

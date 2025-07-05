@@ -280,13 +280,46 @@ impl ::prost::Name for Policy {
         "type.googleapis.com/envoy.config.rbac.v3.Policy".into()
     }
 }
+/// SourcedMetadata enables matching against metadata from different sources in the request processing
+/// pipeline. It extends the base MetadataMatcher functionality by allowing specification of where the
+/// metadata should be sourced from, rather than only matching against dynamic metadata.
+///
+/// The matcher can be configured to look up metadata from:
+///
+/// * Dynamic metadata: Runtime metadata added by filters during request processing
+/// * Route metadata: Static metadata configured on the route entry
+///
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SourcedMetadata {
+    /// Metadata matcher configuration that defines what metadata to match against. This includes the filter name,
+    /// metadata key path, and expected value.
+    #[prost(message, optional, tag = "1")]
+    pub metadata_matcher: ::core::option::Option<
+        super::super::super::r#type::matcher::v3::MetadataMatcher,
+    >,
+    /// Specifies which metadata source should be used for matching. If not set,
+    /// defaults to DYNAMIC (dynamic metadata). Set to ROUTE to match against
+    /// static metadata configured on the route entry.
+    #[prost(enumeration = "MetadataSource", tag = "2")]
+    pub metadata_source: i32,
+}
+impl ::prost::Name for SourcedMetadata {
+    const NAME: &'static str = "SourcedMetadata";
+    const PACKAGE: &'static str = "envoy.config.rbac.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.config.rbac.v3.SourcedMetadata".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.config.rbac.v3.SourcedMetadata".into()
+    }
+}
 /// Permission defines an action (or actions) that a principal can take.
-/// \[#next-free-field: 14\]
+/// \[#next-free-field: 15\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Permission {
     #[prost(
         oneof = "permission::Rule",
-        tags = "1, 2, 3, 4, 10, 5, 6, 11, 7, 8, 9, 12, 13"
+        tags = "1, 2, 3, 4, 10, 5, 6, 11, 7, 8, 9, 12, 13, 14"
     )]
     pub rule: ::core::option::Option<permission::Rule>,
 }
@@ -320,10 +353,14 @@ pub mod permission {
         /// When any is set, it matches any action.
         #[prost(bool, tag = "3")]
         Any(bool),
-        /// A header (or pseudo-header such as :path or :method) on the incoming HTTP request. Only
-        /// available for HTTP request.
-        /// Note: the pseudo-header :path includes the query and fragment string. Use the ``url_path``
-        /// field if you want to match the URL path without the query and fragment string.
+        /// A header (or pseudo-header such as ``:path`` or ``:method``) on the incoming HTTP request. Only available
+        /// for HTTP request.
+        ///
+        /// .. note::
+        ///
+        ///    The pseudo-header ``:path`` includes the query and fragment string. Use the ``url_path`` field if you
+        ///    want to match the URL path without the query and fragment string.
+        ///
         #[prost(message, tag = "4")]
         Header(super::super::super::route::v3::HeaderMatcher),
         /// A URL path on the incoming HTTP request. Only available for HTTP.
@@ -338,7 +375,8 @@ pub mod permission {
         /// A port number range that describes a range of destination ports connecting to.
         #[prost(message, tag = "11")]
         DestinationPortRange(super::super::super::super::r#type::v3::Int32Range),
-        /// Metadata that describes additional information about the action.
+        /// Metadata that describes additional information about the action. This field is deprecated; please use
+        /// :ref:`sourced_metadata<envoy_v3_api_field_config.rbac.v3.Permission.sourced_metadata>` instead.
         #[prost(message, tag = "7")]
         Metadata(super::super::super::super::r#type::matcher::v3::MetadataMatcher),
         /// Negates matching the provided permission. For instance, if the value of
@@ -346,8 +384,7 @@ pub mod permission {
         /// the value of ``not_rule`` would not match, this permission would match.
         #[prost(message, tag = "8")]
         NotRule(::prost::alloc::boxed::Box<super::Permission>),
-        /// The request server from the client's connection request. This is
-        /// typically TLS SNI.
+        /// The request server from the client's connection request. This is typically TLS SNI.
         ///
         /// .. attention::
         ///
@@ -364,8 +401,7 @@ pub mod permission {
         ///    * A :ref:`listener filter <arch_overview_listener_filters>` may
         ///      overwrite a connection's requested server name within Envoy.
         ///
-        /// Please refer to :ref:`this FAQ entry <faq_how_to_setup_sni>` to learn to
-        /// setup SNI.
+        /// Please refer to :ref:`this FAQ entry <faq_how_to_setup_sni>` to learn how to setup SNI.
         #[prost(message, tag = "9")]
         RequestedServerName(
             super::super::super::super::r#type::matcher::v3::StringMatcher,
@@ -378,6 +414,10 @@ pub mod permission {
         /// \[#extension-category: envoy.path.match\]
         #[prost(message, tag = "13")]
         UriTemplate(super::super::super::core::v3::TypedExtensionConfig),
+        /// Matches against metadata from either dynamic state or route configuration. Preferred over the
+        /// ``metadata`` field as it provides more flexibility in metadata source selection.
+        #[prost(message, tag = "14")]
+        SourcedMetadata(super::SourcedMetadata),
     }
 }
 impl ::prost::Name for Permission {
@@ -392,12 +432,12 @@ impl ::prost::Name for Permission {
 }
 /// Principal defines an identity or a group of identities for a downstream
 /// subject.
-/// \[#next-free-field: 13\]
+/// \[#next-free-field: 15\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Principal {
     #[prost(
         oneof = "principal::Identifier",
-        tags = "1, 2, 3, 4, 5, 10, 11, 6, 9, 7, 12, 8"
+        tags = "1, 2, 3, 4, 5, 10, 11, 6, 9, 7, 12, 8, 13, 14"
     )]
     pub identifier: ::core::option::Option<principal::Identifier>,
 }
@@ -421,11 +461,19 @@ pub mod principal {
         }
     }
     /// Authentication attributes for a downstream.
+    /// It is recommended to NOT use this type, but instead use
+    /// :ref:`MTlsAuthenticated <envoy_v3_api_msg_extensions.rbac.principals.mtls_authenticated.v3.Config>`,
+    /// configured via :ref:`custom <envoy_v3_api_field_config.rbac.v3.Principal.custom>`,
+    /// which should be used for most use cases due to its improved security.
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Authenticated {
         /// The name of the principal. If set, The URI SAN or DNS SAN in that order
         /// is used from the certificate, otherwise the subject field is used. If
-        /// unset, it applies to any user that is authenticated.
+        /// unset, it applies to any user that is allowed by the downstream TLS configuration.
+        /// If :ref:`require_client_certificate <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.require_client_certificate>`
+        /// is false or :ref:`trust_chain_verification <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trust_chain_verification>`
+        /// is set to :ref:`ACCEPT_UNTRUSTED <envoy_v3_api_enum_value_extensions.transport_sockets.tls.v3.CertificateValidationContext.TrustChainVerification.ACCEPT_UNTRUSTED>`,
+        /// then no authentication is required.
         #[prost(message, optional, tag = "2")]
         pub principal_name: ::core::option::Option<
             super::super::super::super::r#type::matcher::v3::StringMatcher,
@@ -443,18 +491,20 @@ pub mod principal {
     }
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Identifier {
-        /// A set of identifiers that all must match in order to define the
-        /// downstream.
+        /// A set of identifiers that all must match in order to define the downstream.
         #[prost(message, tag = "1")]
         AndIds(Set),
-        /// A set of identifiers at least one must match in order to define the
-        /// downstream.
+        /// A set of identifiers at least one must match in order to define the downstream.
         #[prost(message, tag = "2")]
         OrIds(Set),
         /// When any is set, it matches any downstream.
         #[prost(bool, tag = "3")]
         Any(bool),
         /// Authenticated attributes that identify the downstream.
+        /// It is recommended to NOT use this field, but instead use
+        /// :ref:`MTlsAuthenticated <envoy_v3_api_msg_extensions.rbac.principals.mtls_authenticated.v3.Config>`,
+        /// configured via :ref:`custom <envoy_v3_api_field_config.rbac.v3.Principal.custom>`,
+        /// which should be used for most use cases due to its improved security.
         #[prost(message, tag = "4")]
         Authenticated(Authenticated),
         /// A CIDR block that describes the downstream IP.
@@ -467,30 +517,40 @@ pub mod principal {
         #[prost(message, tag = "5")]
         SourceIp(super::super::super::core::v3::CidrRange),
         /// A CIDR block that describes the downstream remote/origin address.
-        /// Note: This is always the physical peer even if the
-        /// :ref:`remote_ip <envoy_v3_api_field_config.rbac.v3.Principal.remote_ip>` is
-        /// inferred from for example the x-forwarder-for header, proxy protocol,
-        /// etc.
+        ///
+        /// .. note::
+        ///
+        ///    This is always the physical peer even if the
+        ///    :ref:`remote_ip <envoy_v3_api_field_config.rbac.v3.Principal.remote_ip>` is inferred from the
+        ///    x-forwarder-for header, the proxy protocol, etc.
+        ///
         #[prost(message, tag = "10")]
         DirectRemoteIp(super::super::super::core::v3::CidrRange),
         /// A CIDR block that describes the downstream remote/origin address.
-        /// Note: This may not be the physical peer and could be different from the
-        /// :ref:`direct_remote_ip
-        /// <envoy_v3_api_field_config.rbac.v3.Principal.direct_remote_ip>`. E.g, if the
-        /// remote ip is inferred from for example the x-forwarder-for header, proxy
-        /// protocol, etc.
+        ///
+        /// .. note::
+        ///
+        ///    This may not be the physical peer and could be different from the :ref:`direct_remote_ip
+        ///    <envoy_v3_api_field_config.rbac.v3.Principal.direct_remote_ip>`. E.g, if the remote ip is inferred from
+        ///    the x-forwarder-for header, the proxy protocol, etc.
+        ///
         #[prost(message, tag = "11")]
         RemoteIp(super::super::super::core::v3::CidrRange),
-        /// A header (or pseudo-header such as :path or :method) on the incoming HTTP
-        /// request. Only available for HTTP request. Note: the pseudo-header :path
-        /// includes the query and fragment string. Use the ``url_path`` field if you
-        /// want to match the URL path without the query and fragment string.
+        /// A header (or pseudo-header such as ``:path`` or ``:method``) on the incoming HTTP request. Only available
+        /// for HTTP request.
+        ///
+        /// .. note::
+        ///
+        ///    The pseudo-header ``:path`` includes the query and fragment string. Use the ``url_path`` field if you
+        ///    want to match the URL path without the query and fragment string.
+        ///
         #[prost(message, tag = "6")]
         Header(super::super::super::route::v3::HeaderMatcher),
         /// A URL path on the incoming HTTP request. Only available for HTTP.
         #[prost(message, tag = "9")]
         UrlPath(super::super::super::super::r#type::matcher::v3::PathMatcher),
-        /// Metadata that describes additional information about the principal.
+        /// Metadata that describes additional information about the principal. This field is deprecated; please use
+        /// :ref:`sourced_metadata<envoy_v3_api_field_config.rbac.v3.Principal.sourced_metadata>` instead.
         #[prost(message, tag = "7")]
         Metadata(super::super::super::super::r#type::matcher::v3::MetadataMatcher),
         /// Identifies the principal using a filter state object.
@@ -501,6 +561,14 @@ pub mod principal {
         /// value of ``not_id`` would not match, this principal would match.
         #[prost(message, tag = "8")]
         NotId(::prost::alloc::boxed::Box<super::Principal>),
+        /// Matches against metadata from either dynamic state or route configuration. Preferred over the
+        /// ``metadata`` field as it provides more flexibility in metadata source selection.
+        #[prost(message, tag = "13")]
+        SourcedMetadata(super::SourcedMetadata),
+        /// Extension for configuring custom principals for RBAC.
+        /// \[#extension-category: envoy.rbac.principals\]
+        #[prost(message, tag = "14")]
+        Custom(super::super::super::core::v3::TypedExtensionConfig),
     }
 }
 impl ::prost::Name for Principal {
@@ -522,7 +590,7 @@ pub struct Action {
     /// The action to take if the matcher matches. Every action either allows or denies a request,
     /// and can also carry out action-specific operations.
     ///
-    /// Actions:
+    /// **Actions:**
     ///
     ///   * ``ALLOW``: If the request gets matched on ALLOW, it is permitted.
     ///   * ``DENY``: If the request gets matched on DENY, it is not permitted.
@@ -531,7 +599,7 @@ pub struct Action {
     ///     ``envoy.common`` will be set to the value ``true``.
     ///   * If the request cannot get matched, it will fallback to ``DENY``.
     ///
-    /// Log behavior:
+    /// **Log behavior:**
     ///
     ///   If the RBAC matcher contains at least one LOG action, the dynamic
     ///   metadata key ``access_log_hint`` will be set based on if the request
@@ -548,5 +616,33 @@ impl ::prost::Name for Action {
     }
     fn type_url() -> ::prost::alloc::string::String {
         "type.googleapis.com/envoy.config.rbac.v3.Action".into()
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum MetadataSource {
+    /// Query :ref:`dynamic metadata <well_known_dynamic_metadata>`
+    Dynamic = 0,
+    /// Query :ref:`route metadata <envoy_v3_api_field_config.route.v3.Route.metadata>`
+    Route = 1,
+}
+impl MetadataSource {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::Dynamic => "DYNAMIC",
+            Self::Route => "ROUTE",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "DYNAMIC" => Some(Self::Dynamic),
+            "ROUTE" => Some(Self::Route),
+            _ => None,
+        }
     }
 }

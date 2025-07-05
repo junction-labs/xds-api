@@ -10,6 +10,8 @@ impl serde::Serialize for ClientResourceStatus {
             Self::DoesNotExist => "DOES_NOT_EXIST",
             Self::Acked => "ACKED",
             Self::Nacked => "NACKED",
+            Self::ReceivedError => "RECEIVED_ERROR",
+            Self::Timeout => "TIMEOUT",
         };
         serializer.serialize_str(variant)
     }
@@ -26,6 +28,8 @@ impl<'de> serde::Deserialize<'de> for ClientResourceStatus {
             "DOES_NOT_EXIST",
             "ACKED",
             "NACKED",
+            "RECEIVED_ERROR",
+            "TIMEOUT",
         ];
 
         struct GeneratedVisitor;
@@ -71,6 +75,8 @@ impl<'de> serde::Deserialize<'de> for ClientResourceStatus {
                     "DOES_NOT_EXIST" => Ok(ClientResourceStatus::DoesNotExist),
                     "ACKED" => Ok(ClientResourceStatus::Acked),
                     "NACKED" => Ok(ClientResourceStatus::Nacked),
+                    "RECEIVED_ERROR" => Ok(ClientResourceStatus::ReceivedError),
+                    "TIMEOUT" => Ok(ClientResourceStatus::Timeout),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }
             }

@@ -184,7 +184,7 @@ impl ::prost::Name for Filter {
 }
 /// See the :ref:`architecture overview <arch_overview_outlier_detection>` for
 /// more information on outlier detection.
-/// \[#next-free-field: 25\]
+/// \[#next-free-field: 26\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OutlierDetection {
     /// The number of consecutive server-side error responses (for HTTP traffic,
@@ -209,8 +209,8 @@ pub struct OutlierDetection {
     pub base_ejection_time: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
     >,
-    /// The maximum % of an upstream cluster that can be ejected due to outlier
-    /// detection. Defaults to 10% but will eject at least one host regardless of the value.
+    /// The maximum % of an upstream cluster that can be ejected due to outlier detection. Defaults to 10% .
+    /// Will eject at least one host regardless of the value if :ref:`always_eject_one_host<envoy_v3_api_field_config.cluster.v3.OutlierDetection.always_eject_one_host>` is enabled.
     #[prost(message, optional, tag = "4")]
     pub max_ejection_percent: ::core::option::Option<
         super::super::super::super::google::protobuf::UInt32Value,
@@ -373,6 +373,12 @@ pub struct OutlierDetection {
     /// \[#not-implemented-hide:\]
     #[prost(message, repeated, tag = "24")]
     pub monitors: ::prost::alloc::vec::Vec<super::super::core::v3::TypedExtensionConfig>,
+    /// If enabled, at least one host is ejected regardless of the value of :ref:`max_ejection_percent<envoy_v3_api_field_config.cluster.v3.OutlierDetection.max_ejection_percent>`.
+    /// Defaults to false.
+    #[prost(message, optional, tag = "25")]
+    pub always_eject_one_host: ::core::option::Option<
+        super::super::super::super::google::protobuf::BoolValue,
+    >,
 }
 impl ::prost::Name for OutlierDetection {
     const NAME: &'static str = "OutlierDetection";
@@ -404,15 +410,17 @@ impl ::prost::Name for ClusterCollection {
     }
 }
 /// Configuration for a single upstream cluster.
-/// \[#next-free-field: 57\]
+/// \[#next-free-field: 59\]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Cluster {
-    /// Configuration to use different transport sockets for different endpoints.
-    /// The entry of ``envoy.transport_socket_match`` in the
-    /// :ref:`LbEndpoint.Metadata <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`
-    /// is used to match against the transport sockets as they appear in the list. The first
-    /// :ref:`match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` is used.
-    /// For example, with the following match
+    /// Configuration to use different transport sockets for different endpoints. The entry of
+    /// ``envoy.transport_socket_match`` in the :ref:`LbEndpoint.Metadata
+    /// <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>` is used to match against the
+    /// transport sockets as they appear in the list. If a match is not found, the search continues in
+    /// :ref:`LocalityLbEndpoints.Metadata
+    /// <envoy_v3_api_field_config.endpoint.v3.LocalityLbEndpoints.metadata>`. The first :ref:`match
+    /// <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` is used. For example, with
+    /// the following match
     ///
     /// .. code-block:: yaml
     ///
@@ -436,8 +444,9 @@ pub struct Cluster {
     /// socket match in case above.
     ///
     /// If an endpoint metadata's value under ``envoy.transport_socket_match`` does not match any
-    /// ``TransportSocketMatch``, socket configuration fallbacks to use the ``tls_context`` or
-    /// ``transport_socket`` specified in this cluster.
+    /// ``TransportSocketMatch``, the locality metadata is then checked for a match. Barring any
+    /// matches in the endpoint or locality metadata, the socket configuration fallbacks to use the
+    /// ``tls_context`` or ``transport_socket`` specified in this cluster.
     ///
     /// This field allows gradual and flexible transport socket configuration changes.
     ///
@@ -468,12 +477,14 @@ pub struct Cluster {
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
     /// An optional alternative to the cluster name to be used for observability. This name is used
-    /// emitting stats for the cluster and access logging the cluster name. This will appear as
+    /// for emitting stats for the cluster and access logging the cluster name. This will appear as
     /// additional information in configuration dumps of a cluster's current status as
     /// :ref:`observability_name <envoy_v3_api_field_admin.v3.ClusterStatus.observability_name>`
-    /// and as an additional tag "upstream_cluster.name" while tracing. Note: Any ``:`` in the name
-    /// will be converted to ``_`` when emitting statistics. This should not be confused with
-    /// :ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
+    /// and as an additional tag "upstream_cluster.name" while tracing.
+    ///
+    /// .. note::
+    ///    Any ``:`` in the name will be converted to ``_`` when emitting statistics. This should not be confused with
+    ///    :ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
     #[prost(string, tag = "28")]
     pub alt_stat_name: ::prost::alloc::string::String,
     /// Configuration to use for EDS updates for the Cluster.
@@ -597,6 +608,7 @@ pub struct Cluster {
     /// "envoy.filters.network.thrift_proxy". See the extension's documentation for details on
     /// specific options.
     /// \[#next-major-version: make this a list of typed extensions.\]
+    /// \[#extension-category: envoy.upstream_options\]
     #[prost(map = "string, message", tag = "36")]
     pub typed_extension_protocol_options: ::std::collections::HashMap<
         ::prost::alloc::string::String,
@@ -611,8 +623,31 @@ pub struct Cluster {
     /// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
     /// and :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`
     /// this setting is ignored.
+    /// This field is deprecated in favor of using the :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>`
+    /// extension point and configuring it with :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
+    /// If :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
+    /// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`, this field will be ignored.
+    #[deprecated]
     #[prost(message, optional, tag = "16")]
     pub dns_refresh_rate: ::core::option::Option<
+        super::super::super::super::google::protobuf::Duration,
+    >,
+    /// DNS jitter can be optionally specified if the cluster type is either
+    /// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`,
+    /// or :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`.
+    /// DNS jitter causes the cluster to refresh DNS entries later by a random amount of time to avoid a
+    /// stampede of DNS requests. This value sets the upper bound (exclusive) for the random amount.
+    /// There will be no jitter if this value is omitted. For cluster types other than
+    /// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
+    /// and :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`
+    /// this setting is ignored.
+    /// This field is deprecated in favor of using the :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>`
+    /// extension point and configuring it with :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
+    /// If :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
+    /// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`, this field will be ignored.
+    #[deprecated]
+    #[prost(message, optional, tag = "58")]
+    pub dns_jitter: ::core::option::Option<
         super::super::super::super::google::protobuf::Duration,
     >,
     /// If the DNS failure refresh rate is specified and the cluster type is either
@@ -623,16 +658,31 @@ pub struct Cluster {
     /// other than :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>` and
     /// :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>` this setting is
     /// ignored.
+    /// This field is deprecated in favor of using the :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>`
+    /// extension point and configuring it with :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
+    /// If :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
+    /// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`, this field will be ignored.
+    #[deprecated]
     #[prost(message, optional, tag = "44")]
     pub dns_failure_refresh_rate: ::core::option::Option<cluster::RefreshRate>,
     /// Optional configuration for setting cluster's DNS refresh rate. If the value is set to true,
     /// cluster's DNS refresh rate will be set to resource record's TTL which comes from DNS
     /// resolution.
+    /// This field is deprecated in favor of using the :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>`
+    /// extension point and configuring it with :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
+    /// If :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
+    /// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`, this field will be ignored.
+    #[deprecated]
     #[prost(bool, tag = "39")]
     pub respect_dns_ttl: bool,
     /// The DNS IP address resolution policy. If this setting is not specified, the
     /// value defaults to
     /// :ref:`AUTO<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DnsLookupFamily.AUTO>`.
+    /// For logical and strict dns cluster, this field is deprecated in favor of using the
+    /// :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>`
+    /// extension point and configuring it with :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
+    /// If :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
+    /// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`, this field will be ignored.
     #[prost(enumeration = "cluster::DnsLookupFamily", tag = "17")]
     pub dns_lookup_family: i32,
     /// If DNS resolvers are specified and the cluster type is either
@@ -674,6 +724,9 @@ pub struct Cluster {
     /// During the transition period when both ``dns_resolution_config`` and ``typed_dns_resolver_config`` exists,
     /// when ``typed_dns_resolver_config`` is in place, Envoy will use it and ignore ``dns_resolution_config``.
     /// When ``typed_dns_resolver_config`` is missing, the default behavior is in place.
+    /// Also note that this field is deprecated for logical dns and strict dns clusters and will be ignored when
+    /// :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
+    /// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
     /// \[#extension-category: envoy.network.dns_resolver\]
     #[prost(message, optional, tag = "55")]
     pub typed_dns_resolver_config: ::core::option::Option<
@@ -795,6 +848,25 @@ pub struct Cluster {
     /// from the LRS stream here.]
     #[prost(message, optional, tag = "42")]
     pub lrs_server: ::core::option::Option<super::super::core::v3::ConfigSource>,
+    /// A list of metric names from :ref:`ORCA load reports <envoy_v3_api_msg_.xds.data.orca.v3.OrcaLoadReport>` to propagate to LRS.
+    ///
+    /// If not specified, then ORCA load reports will not be propagated to LRS.
+    ///
+    /// For map fields in the ORCA proto, the string will be of the form ``<map_field_name>.<map_key>``.
+    /// For example, the string ``named_metrics.foo`` will mean to look for the key ``foo`` in the ORCA
+    /// :ref:`named_metrics <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.named_metrics>` field.
+    ///
+    /// The special map key ``*`` means to report all entries in the map (e.g., ``named_metrics.*`` means to
+    /// report all entries in the ORCA named_metrics field). Note that this should be used only with trusted
+    /// backends.
+    ///
+    /// The metric names in LRS will follow the same semantics as this field. In other words, if this field
+    /// contains ``named_metrics.foo``, then the LRS load report will include the data with that same string
+    /// as the key.
+    #[prost(string, repeated, tag = "57")]
+    pub lrs_report_endpoint_metrics: ::prost::alloc::vec::Vec<
+        ::prost::alloc::string::String,
+    >,
     /// If track_timeout_budgets is true, the :ref:`timeout budget histograms
     /// <config_cluster_manager_cluster_stats_timeout_budgets>` will be published for each
     /// request. These show what percentage of a request's per try and global timeout was used. A value
@@ -862,7 +934,7 @@ pub mod cluster {
         /// The name of the match, used in stats generation.
         #[prost(string, tag = "1")]
         pub name: ::prost::alloc::string::String,
-        /// Optional endpoint metadata match criteria.
+        /// Optional metadata match criteria.
         /// The connection to the endpoint with metadata matching what is set in this field
         /// will use the transport socket configuration specified here.
         /// The endpoint's metadata entry in ``envoy.transport_socket_match`` is used to match
@@ -1553,9 +1625,10 @@ pub mod cluster {
         /// If this is not set, we default to a merge window of 1000ms. To disable it, set the merge
         /// window to 0.
         ///
-        /// Note: merging does not apply to cluster membership changes (e.g.: adds/removes); this is
-        /// because merging those updates isn't currently safe. See
-        /// <https://github.com/envoyproxy/envoy/pull/3941.>
+        /// .. note::
+        ///    Merging does not apply to cluster membership changes (e.g.: adds/removes); this is
+        ///    because merging those updates isn't currently safe. See
+        ///    <https://github.com/envoyproxy/envoy/pull/3941.>
         #[prost(message, optional, tag = "4")]
         pub update_merge_window: ::core::option::Option<
             super::super::super::super::super::google::protobuf::Duration,
@@ -2256,7 +2329,7 @@ pub struct TrackClusterStats {
     pub timeout_budgets: bool,
     /// If request_response_sizes is true, then the :ref:`histograms
     /// <config_cluster_manager_cluster_stats_request_response_sizes>`  tracking header and body sizes
-    /// of requests and responses will be published.
+    /// of requests and responses will be published. Additionally, number of headers in the requests and responses will be tracked.
     #[prost(bool, tag = "2")]
     pub request_response_sizes: bool,
     /// If true, some stats will be emitted per-endpoint, similar to the stats in admin ``/clusters``

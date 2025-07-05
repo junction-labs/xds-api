@@ -115,6 +115,9 @@ impl serde::Serialize for HttpConnectionManager {
         if self.common_http_protocol_options.is_some() {
             len += 1;
         }
+        if self.http1_safe_max_connection_duration {
+            len += 1;
+        }
         if self.http_protocol_options.is_some() {
             len += 1;
         }
@@ -276,6 +279,9 @@ impl serde::Serialize for HttpConnectionManager {
         }
         if let Some(v) = self.common_http_protocol_options.as_ref() {
             struct_ser.serialize_field("common_http_protocol_options", v)?;
+        }
+        if self.http1_safe_max_connection_duration {
+            struct_ser.serialize_field("http1_safe_max_connection_duration", &self.http1_safe_max_connection_duration)?;
         }
         if let Some(v) = self.http_protocol_options.as_ref() {
             struct_ser.serialize_field("http_protocol_options", v)?;
@@ -459,6 +465,8 @@ impl<'de> serde::Deserialize<'de> for HttpConnectionManager {
             "tracing",
             "common_http_protocol_options",
             "commonHttpProtocolOptions",
+            "http1_safe_max_connection_duration",
+            "http1SafeMaxConnectionDuration",
             "http_protocol_options",
             "httpProtocolOptions",
             "http2_protocol_options",
@@ -565,6 +573,7 @@ impl<'de> serde::Deserialize<'de> for HttpConnectionManager {
             AddUserAgent,
             Tracing,
             CommonHttpProtocolOptions,
+            Http1SafeMaxConnectionDuration,
             HttpProtocolOptions,
             Http2ProtocolOptions,
             Http3ProtocolOptions,
@@ -641,6 +650,7 @@ impl<'de> serde::Deserialize<'de> for HttpConnectionManager {
                             "addUserAgent" | "add_user_agent" => Ok(GeneratedField::AddUserAgent),
                             "tracing" => Ok(GeneratedField::Tracing),
                             "commonHttpProtocolOptions" | "common_http_protocol_options" => Ok(GeneratedField::CommonHttpProtocolOptions),
+                            "http1SafeMaxConnectionDuration" | "http1_safe_max_connection_duration" => Ok(GeneratedField::Http1SafeMaxConnectionDuration),
                             "httpProtocolOptions" | "http_protocol_options" => Ok(GeneratedField::HttpProtocolOptions),
                             "http2ProtocolOptions" | "http2_protocol_options" => Ok(GeneratedField::Http2ProtocolOptions),
                             "http3ProtocolOptions" | "http3_protocol_options" => Ok(GeneratedField::Http3ProtocolOptions),
@@ -715,6 +725,7 @@ impl<'de> serde::Deserialize<'de> for HttpConnectionManager {
                 let mut add_user_agent__ = None;
                 let mut tracing__ = None;
                 let mut common_http_protocol_options__ = None;
+                let mut http1_safe_max_connection_duration__ = None;
                 let mut http_protocol_options__ = None;
                 let mut http2_protocol_options__ = None;
                 let mut http3_protocol_options__ = None;
@@ -799,6 +810,12 @@ impl<'de> serde::Deserialize<'de> for HttpConnectionManager {
                                 return Err(serde::de::Error::duplicate_field("commonHttpProtocolOptions"));
                             }
                             common_http_protocol_options__ = map_.next_value()?;
+                        }
+                        GeneratedField::Http1SafeMaxConnectionDuration => {
+                            if http1_safe_max_connection_duration__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("http1SafeMaxConnectionDuration"));
+                            }
+                            http1_safe_max_connection_duration__ = Some(map_.next_value()?);
                         }
                         GeneratedField::HttpProtocolOptions => {
                             if http_protocol_options__.is_some() {
@@ -1108,6 +1125,7 @@ impl<'de> serde::Deserialize<'de> for HttpConnectionManager {
                     add_user_agent: add_user_agent__,
                     tracing: tracing__,
                     common_http_protocol_options: common_http_protocol_options__,
+                    http1_safe_max_connection_duration: http1_safe_max_connection_duration__.unwrap_or_default(),
                     http_protocol_options: http_protocol_options__,
                     http2_protocol_options: http2_protocol_options__,
                     http3_protocol_options: http3_protocol_options__,

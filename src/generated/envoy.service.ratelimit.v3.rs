@@ -21,6 +21,8 @@ pub struct RateLimitRequest {
     >,
     /// Rate limit requests can optionally specify the number of hits a request adds to the matched
     /// limit. If the value is not set in the message, a request increases the matched limit by 1.
+    /// This value can be overridden by setting filter state value ``envoy.ratelimit.hits_addend``
+    /// to the desired number. Invalid number (< 0) or number will be ignored.
     #[prost(uint32, tag = "3")]
     pub hits_addend: u32,
 }
@@ -127,6 +129,8 @@ pub mod rate_limit_response {
             Hour = 3,
             /// The time unit representing a day.
             Day = 4,
+            /// The time unit representing a week.
+            Week = 7,
             /// The time unit representing a month.
             Month = 5,
             /// The time unit representing a year.
@@ -144,6 +148,7 @@ pub mod rate_limit_response {
                     Self::Minute => "MINUTE",
                     Self::Hour => "HOUR",
                     Self::Day => "DAY",
+                    Self::Week => "WEEK",
                     Self::Month => "MONTH",
                     Self::Year => "YEAR",
                 }
@@ -156,6 +161,7 @@ pub mod rate_limit_response {
                     "MINUTE" => Some(Self::Minute),
                     "HOUR" => Some(Self::Hour),
                     "DAY" => Some(Self::Day),
+                    "WEEK" => Some(Self::Week),
                     "MONTH" => Some(Self::Month),
                     "YEAR" => Some(Self::Year),
                     _ => None,
@@ -348,7 +354,7 @@ pub mod rate_limit_service_client {
     }
     impl<T> RateLimitServiceClient<T>
     where
-        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T: tonic::client::GrpcService<tonic::body::Body>,
         T::Error: Into<StdError>,
         T::ResponseBody: Body<Data = Bytes> + std::marker::Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + std::marker::Send,
@@ -369,13 +375,13 @@ pub mod rate_limit_service_client {
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
             T: tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
+                http::Request<tonic::body::Body>,
                 Response = http::Response<
-                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                    <T as tonic::client::GrpcService<tonic::body::Body>>::ResponseBody,
                 >,
             >,
             <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
+                http::Request<tonic::body::Body>,
             >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
             RateLimitServiceClient::new(InterceptedService::new(inner, interceptor))
@@ -530,7 +536,7 @@ pub mod rate_limit_service_server {
         B: Body + std::marker::Send + 'static,
         B::Error: Into<StdError> + std::marker::Send + 'static,
     {
-        type Response = http::Response<tonic::body::BoxBody>;
+        type Response = http::Response<tonic::body::Body>;
         type Error = std::convert::Infallible;
         type Future = BoxFuture<Self::Response, Self::Error>;
         fn poll_ready(
@@ -589,7 +595,9 @@ pub mod rate_limit_service_server {
                 }
                 _ => {
                     Box::pin(async move {
-                        let mut response = http::Response::new(empty_body());
+                        let mut response = http::Response::new(
+                            tonic::body::Body::default(),
+                        );
                         let headers = response.headers_mut();
                         headers
                             .insert(

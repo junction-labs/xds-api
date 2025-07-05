@@ -1237,6 +1237,9 @@ impl serde::Serialize for expr::Comprehension {
         if !self.iter_var.is_empty() {
             len += 1;
         }
+        if !self.iter_var2.is_empty() {
+            len += 1;
+        }
         if self.iter_range.is_some() {
             len += 1;
         }
@@ -1258,6 +1261,9 @@ impl serde::Serialize for expr::Comprehension {
         let mut struct_ser = serializer.serialize_struct("google.api.expr.v1alpha1.Expr.Comprehension", len)?;
         if !self.iter_var.is_empty() {
             struct_ser.serialize_field("iter_var", &self.iter_var)?;
+        }
+        if !self.iter_var2.is_empty() {
+            struct_ser.serialize_field("iter_var2", &self.iter_var2)?;
         }
         if let Some(v) = self.iter_range.as_ref() {
             struct_ser.serialize_field("iter_range", v)?;
@@ -1289,6 +1295,8 @@ impl<'de> serde::Deserialize<'de> for expr::Comprehension {
         const FIELDS: &[&str] = &[
             "iter_var",
             "iterVar",
+            "iter_var2",
+            "iterVar2",
             "iter_range",
             "iterRange",
             "accu_var",
@@ -1305,6 +1313,7 @@ impl<'de> serde::Deserialize<'de> for expr::Comprehension {
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             IterVar,
+            IterVar2,
             IterRange,
             AccuVar,
             AccuInit,
@@ -1333,6 +1342,7 @@ impl<'de> serde::Deserialize<'de> for expr::Comprehension {
                     {
                         match value {
                             "iterVar" | "iter_var" => Ok(GeneratedField::IterVar),
+                            "iterVar2" | "iter_var2" => Ok(GeneratedField::IterVar2),
                             "iterRange" | "iter_range" => Ok(GeneratedField::IterRange),
                             "accuVar" | "accu_var" => Ok(GeneratedField::AccuVar),
                             "accuInit" | "accu_init" => Ok(GeneratedField::AccuInit),
@@ -1359,6 +1369,7 @@ impl<'de> serde::Deserialize<'de> for expr::Comprehension {
                     V: serde::de::MapAccess<'de>,
             {
                 let mut iter_var__ = None;
+                let mut iter_var2__ = None;
                 let mut iter_range__ = None;
                 let mut accu_var__ = None;
                 let mut accu_init__ = None;
@@ -1372,6 +1383,12 @@ impl<'de> serde::Deserialize<'de> for expr::Comprehension {
                                 return Err(serde::de::Error::duplicate_field("iterVar"));
                             }
                             iter_var__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::IterVar2 => {
+                            if iter_var2__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("iterVar2"));
+                            }
+                            iter_var2__ = Some(map_.next_value()?);
                         }
                         GeneratedField::IterRange => {
                             if iter_range__.is_some() {
@@ -1413,6 +1430,7 @@ impl<'de> serde::Deserialize<'de> for expr::Comprehension {
                 }
                 Ok(expr::Comprehension {
                     iter_var: iter_var__.unwrap_or_default(),
+                    iter_var2: iter_var2__.unwrap_or_default(),
                     iter_range: iter_range__,
                     accu_var: accu_var__.unwrap_or_default(),
                     accu_init: accu_init__,
@@ -2287,6 +2305,9 @@ impl serde::Serialize for SourceInfo {
         if !self.macro_calls.is_empty() {
             len += 1;
         }
+        if !self.extensions.is_empty() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("google.api.expr.v1alpha1.SourceInfo", len)?;
         if !self.syntax_version.is_empty() {
             struct_ser.serialize_field("syntax_version", &self.syntax_version)?;
@@ -2302,6 +2323,9 @@ impl serde::Serialize for SourceInfo {
         }
         if !self.macro_calls.is_empty() {
             struct_ser.serialize_field("macro_calls", &self.macro_calls)?;
+        }
+        if !self.extensions.is_empty() {
+            struct_ser.serialize_field("extensions", &self.extensions)?;
         }
         struct_ser.end()
     }
@@ -2321,6 +2345,7 @@ impl<'de> serde::Deserialize<'de> for SourceInfo {
             "positions",
             "macro_calls",
             "macroCalls",
+            "extensions",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -2330,6 +2355,7 @@ impl<'de> serde::Deserialize<'de> for SourceInfo {
             LineOffsets,
             Positions,
             MacroCalls,
+            Extensions,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -2356,6 +2382,7 @@ impl<'de> serde::Deserialize<'de> for SourceInfo {
                             "lineOffsets" | "line_offsets" => Ok(GeneratedField::LineOffsets),
                             "positions" => Ok(GeneratedField::Positions),
                             "macroCalls" | "macro_calls" => Ok(GeneratedField::MacroCalls),
+                            "extensions" => Ok(GeneratedField::Extensions),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -2380,6 +2407,7 @@ impl<'de> serde::Deserialize<'de> for SourceInfo {
                 let mut line_offsets__ = None;
                 let mut positions__ = None;
                 let mut macro_calls__ = None;
+                let mut extensions__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::SyntaxVersion => {
@@ -2421,6 +2449,12 @@ impl<'de> serde::Deserialize<'de> for SourceInfo {
                                     .into_iter().map(|(k,v)| (k.0, v)).collect()
                             );
                         }
+                        GeneratedField::Extensions => {
+                            if extensions__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("extensions"));
+                            }
+                            extensions__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(SourceInfo {
@@ -2429,10 +2463,334 @@ impl<'de> serde::Deserialize<'de> for SourceInfo {
                     line_offsets: line_offsets__.unwrap_or_default(),
                     positions: positions__.unwrap_or_default(),
                     macro_calls: macro_calls__.unwrap_or_default(),
+                    extensions: extensions__.unwrap_or_default(),
                 })
             }
         }
         deserializer.deserialize_struct("google.api.expr.v1alpha1.SourceInfo", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for source_info::Extension {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.id.is_empty() {
+            len += 1;
+        }
+        if !self.affected_components.is_empty() {
+            len += 1;
+        }
+        if self.version.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("google.api.expr.v1alpha1.SourceInfo.Extension", len)?;
+        if !self.id.is_empty() {
+            struct_ser.serialize_field("id", &self.id)?;
+        }
+        if !self.affected_components.is_empty() {
+            let v = self.affected_components.iter().cloned().map(|v| {
+                source_info::extension::Component::try_from(v)
+                    .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", v)))
+                }).collect::<std::result::Result<Vec<_>, _>>()?;
+            struct_ser.serialize_field("affected_components", &v)?;
+        }
+        if let Some(v) = self.version.as_ref() {
+            struct_ser.serialize_field("version", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for source_info::Extension {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "id",
+            "affected_components",
+            "affectedComponents",
+            "version",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Id,
+            AffectedComponents,
+            Version,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "id" => Ok(GeneratedField::Id),
+                            "affectedComponents" | "affected_components" => Ok(GeneratedField::AffectedComponents),
+                            "version" => Ok(GeneratedField::Version),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = source_info::Extension;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct google.api.expr.v1alpha1.SourceInfo.Extension")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<source_info::Extension, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut id__ = None;
+                let mut affected_components__ = None;
+                let mut version__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Id => {
+                            if id__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("id"));
+                            }
+                            id__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::AffectedComponents => {
+                            if affected_components__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("affectedComponents"));
+                            }
+                            affected_components__ = Some(map_.next_value::<Vec<source_info::extension::Component>>()?.into_iter().map(|x| x as i32).collect());
+                        }
+                        GeneratedField::Version => {
+                            if version__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("version"));
+                            }
+                            version__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(source_info::Extension {
+                    id: id__.unwrap_or_default(),
+                    affected_components: affected_components__.unwrap_or_default(),
+                    version: version__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("google.api.expr.v1alpha1.SourceInfo.Extension", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for source_info::extension::Component {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let variant = match self {
+            Self::Unspecified => "COMPONENT_UNSPECIFIED",
+            Self::Parser => "COMPONENT_PARSER",
+            Self::TypeChecker => "COMPONENT_TYPE_CHECKER",
+            Self::Runtime => "COMPONENT_RUNTIME",
+        };
+        serializer.serialize_str(variant)
+    }
+}
+impl<'de> serde::Deserialize<'de> for source_info::extension::Component {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "COMPONENT_UNSPECIFIED",
+            "COMPONENT_PARSER",
+            "COMPONENT_TYPE_CHECKER",
+            "COMPONENT_RUNTIME",
+        ];
+
+        struct GeneratedVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = source_info::extension::Component;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(formatter, "expected one of: {:?}", &FIELDS)
+            }
+
+            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
+                    })
+            }
+
+            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                i32::try_from(v)
+                    .ok()
+                    .and_then(|x| x.try_into().ok())
+                    .ok_or_else(|| {
+                        serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
+                    })
+            }
+
+            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                match value {
+                    "COMPONENT_UNSPECIFIED" => Ok(source_info::extension::Component::Unspecified),
+                    "COMPONENT_PARSER" => Ok(source_info::extension::Component::Parser),
+                    "COMPONENT_TYPE_CHECKER" => Ok(source_info::extension::Component::TypeChecker),
+                    "COMPONENT_RUNTIME" => Ok(source_info::extension::Component::Runtime),
+                    _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
+                }
+            }
+        }
+        deserializer.deserialize_any(GeneratedVisitor)
+    }
+}
+impl serde::Serialize for source_info::extension::Version {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.major != 0 {
+            len += 1;
+        }
+        if self.minor != 0 {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("google.api.expr.v1alpha1.SourceInfo.Extension.Version", len)?;
+        if self.major != 0 {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("major", ToString::to_string(&self.major).as_str())?;
+        }
+        if self.minor != 0 {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("minor", ToString::to_string(&self.minor).as_str())?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for source_info::extension::Version {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "major",
+            "minor",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Major,
+            Minor,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "major" => Ok(GeneratedField::Major),
+                            "minor" => Ok(GeneratedField::Minor),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = source_info::extension::Version;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct google.api.expr.v1alpha1.SourceInfo.Extension.Version")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<source_info::extension::Version, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut major__ = None;
+                let mut minor__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Major => {
+                            if major__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("major"));
+                            }
+                            major__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::Minor => {
+                            if minor__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("minor"));
+                            }
+                            minor__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                    }
+                }
+                Ok(source_info::extension::Version {
+                    major: major__.unwrap_or_default(),
+                    minor: minor__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("google.api.expr.v1alpha1.SourceInfo.Extension.Version", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for SourcePosition {

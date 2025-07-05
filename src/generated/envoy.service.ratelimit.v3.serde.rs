@@ -845,6 +845,7 @@ impl serde::Serialize for rate_limit_response::rate_limit::Unit {
             Self::Minute => "MINUTE",
             Self::Hour => "HOUR",
             Self::Day => "DAY",
+            Self::Week => "WEEK",
             Self::Month => "MONTH",
             Self::Year => "YEAR",
         };
@@ -863,6 +864,7 @@ impl<'de> serde::Deserialize<'de> for rate_limit_response::rate_limit::Unit {
             "MINUTE",
             "HOUR",
             "DAY",
+            "WEEK",
             "MONTH",
             "YEAR",
         ];
@@ -910,6 +912,7 @@ impl<'de> serde::Deserialize<'de> for rate_limit_response::rate_limit::Unit {
                     "MINUTE" => Ok(rate_limit_response::rate_limit::Unit::Minute),
                     "HOUR" => Ok(rate_limit_response::rate_limit::Unit::Hour),
                     "DAY" => Ok(rate_limit_response::rate_limit::Unit::Day),
+                    "WEEK" => Ok(rate_limit_response::rate_limit::Unit::Week),
                     "MONTH" => Ok(rate_limit_response::rate_limit::Unit::Month),
                     "YEAR" => Ok(rate_limit_response::rate_limit::Unit::Year),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),

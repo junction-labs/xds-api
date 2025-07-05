@@ -16,6 +16,9 @@ pub struct Cookie {
     /// If no path is specified here, no path will be set for the cookie.
     #[prost(string, tag = "3")]
     pub path: ::prost::alloc::string::String,
+    /// Additional attributes for the cookie. They will be used when generating a new cookie.
+    #[prost(message, repeated, tag = "4")]
+    pub attributes: ::prost::alloc::vec::Vec<CookieAttribute>,
 }
 impl ::prost::Name for Cookie {
     const NAME: &'static str = "Cookie";
@@ -25,6 +28,26 @@ impl ::prost::Name for Cookie {
     }
     fn type_url() -> ::prost::alloc::string::String {
         "type.googleapis.com/envoy.type.http.v3.Cookie".into()
+    }
+}
+/// CookieAttribute defines an API for adding additional attributes for a HTTP cookie.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CookieAttribute {
+    /// The name of the cookie attribute.
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+    /// The optional value of the cookie attribute.
+    #[prost(string, tag = "2")]
+    pub value: ::prost::alloc::string::String,
+}
+impl ::prost::Name for CookieAttribute {
+    const NAME: &'static str = "CookieAttribute";
+    const PACKAGE: &'static str = "envoy.type.http.v3";
+    fn full_name() -> ::prost::alloc::string::String {
+        "envoy.type.http.v3.CookieAttribute".into()
+    }
+    fn type_url() -> ::prost::alloc::string::String {
+        "type.googleapis.com/envoy.type.http.v3.CookieAttribute".into()
     }
 }
 #[derive(Clone, PartialEq, ::prost::Message)]

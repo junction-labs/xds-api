@@ -3269,6 +3269,9 @@ impl serde::Serialize for grpc_service::EnvoyGrpc {
         if self.max_receive_message_length.is_some() {
             len += 1;
         }
+        if self.skip_envoy_headers {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.GrpcService.EnvoyGrpc", len)?;
         if !self.cluster_name.is_empty() {
             struct_ser.serialize_field("cluster_name", &self.cluster_name)?;
@@ -3281,6 +3284,9 @@ impl serde::Serialize for grpc_service::EnvoyGrpc {
         }
         if let Some(v) = self.max_receive_message_length.as_ref() {
             struct_ser.serialize_field("max_receive_message_length", v)?;
+        }
+        if self.skip_envoy_headers {
+            struct_ser.serialize_field("skip_envoy_headers", &self.skip_envoy_headers)?;
         }
         struct_ser.end()
     }
@@ -3299,6 +3305,8 @@ impl<'de> serde::Deserialize<'de> for grpc_service::EnvoyGrpc {
             "retryPolicy",
             "max_receive_message_length",
             "maxReceiveMessageLength",
+            "skip_envoy_headers",
+            "skipEnvoyHeaders",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -3307,6 +3315,7 @@ impl<'de> serde::Deserialize<'de> for grpc_service::EnvoyGrpc {
             Authority,
             RetryPolicy,
             MaxReceiveMessageLength,
+            SkipEnvoyHeaders,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -3332,6 +3341,7 @@ impl<'de> serde::Deserialize<'de> for grpc_service::EnvoyGrpc {
                             "authority" => Ok(GeneratedField::Authority),
                             "retryPolicy" | "retry_policy" => Ok(GeneratedField::RetryPolicy),
                             "maxReceiveMessageLength" | "max_receive_message_length" => Ok(GeneratedField::MaxReceiveMessageLength),
+                            "skipEnvoyHeaders" | "skip_envoy_headers" => Ok(GeneratedField::SkipEnvoyHeaders),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -3355,6 +3365,7 @@ impl<'de> serde::Deserialize<'de> for grpc_service::EnvoyGrpc {
                 let mut authority__ = None;
                 let mut retry_policy__ = None;
                 let mut max_receive_message_length__ = None;
+                let mut skip_envoy_headers__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::ClusterName => {
@@ -3381,6 +3392,12 @@ impl<'de> serde::Deserialize<'de> for grpc_service::EnvoyGrpc {
                             }
                             max_receive_message_length__ = map_.next_value()?;
                         }
+                        GeneratedField::SkipEnvoyHeaders => {
+                            if skip_envoy_headers__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("skipEnvoyHeaders"));
+                            }
+                            skip_envoy_headers__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(grpc_service::EnvoyGrpc {
@@ -3388,6 +3405,7 @@ impl<'de> serde::Deserialize<'de> for grpc_service::EnvoyGrpc {
                     authority: authority__.unwrap_or_default(),
                     retry_policy: retry_policy__,
                     max_receive_message_length: max_receive_message_length__,
+                    skip_envoy_headers: skip_envoy_headers__.unwrap_or_default(),
                 })
             }
         }
@@ -7014,6 +7032,9 @@ impl serde::Serialize for Http1ProtocolOptions {
         if self.allow_custom_methods {
             len += 1;
         }
+        if !self.ignore_http_11_upgrade.is_empty() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.Http1ProtocolOptions", len)?;
         if let Some(v) = self.allow_absolute_url.as_ref() {
             struct_ser.serialize_field("allow_absolute_url", v)?;
@@ -7045,6 +7066,9 @@ impl serde::Serialize for Http1ProtocolOptions {
         if self.allow_custom_methods {
             struct_ser.serialize_field("allow_custom_methods", &self.allow_custom_methods)?;
         }
+        if !self.ignore_http_11_upgrade.is_empty() {
+            struct_ser.serialize_field("ignore_http_11_upgrade", &self.ignore_http_11_upgrade)?;
+        }
         struct_ser.end()
     }
 }
@@ -7075,6 +7099,8 @@ impl<'de> serde::Deserialize<'de> for Http1ProtocolOptions {
             "useBalsaParser",
             "allow_custom_methods",
             "allowCustomMethods",
+            "ignore_http_11_upgrade",
+            "ignoreHttp11Upgrade",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -7089,6 +7115,7 @@ impl<'de> serde::Deserialize<'de> for Http1ProtocolOptions {
             SendFullyQualifiedUrl,
             UseBalsaParser,
             AllowCustomMethods,
+            IgnoreHttp11Upgrade,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -7120,6 +7147,7 @@ impl<'de> serde::Deserialize<'de> for Http1ProtocolOptions {
                             "sendFullyQualifiedUrl" | "send_fully_qualified_url" => Ok(GeneratedField::SendFullyQualifiedUrl),
                             "useBalsaParser" | "use_balsa_parser" => Ok(GeneratedField::UseBalsaParser),
                             "allowCustomMethods" | "allow_custom_methods" => Ok(GeneratedField::AllowCustomMethods),
+                            "ignoreHttp11Upgrade" | "ignore_http_11_upgrade" => Ok(GeneratedField::IgnoreHttp11Upgrade),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -7149,6 +7177,7 @@ impl<'de> serde::Deserialize<'de> for Http1ProtocolOptions {
                 let mut send_fully_qualified_url__ = None;
                 let mut use_balsa_parser__ = None;
                 let mut allow_custom_methods__ = None;
+                let mut ignore_http_11_upgrade__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::AllowAbsoluteUrl => {
@@ -7211,6 +7240,12 @@ impl<'de> serde::Deserialize<'de> for Http1ProtocolOptions {
                             }
                             allow_custom_methods__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::IgnoreHttp11Upgrade => {
+                            if ignore_http_11_upgrade__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("ignoreHttp11Upgrade"));
+                            }
+                            ignore_http_11_upgrade__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(Http1ProtocolOptions {
@@ -7224,6 +7259,7 @@ impl<'de> serde::Deserialize<'de> for Http1ProtocolOptions {
                     send_fully_qualified_url: send_fully_qualified_url__.unwrap_or_default(),
                     use_balsa_parser: use_balsa_parser__,
                     allow_custom_methods: allow_custom_methods__.unwrap_or_default(),
+                    ignore_http_11_upgrade: ignore_http_11_upgrade__.unwrap_or_default(),
                 })
             }
         }
@@ -7468,6 +7504,9 @@ impl serde::Serialize for Http2ProtocolOptions {
         if self.use_oghttp2_codec.is_some() {
             len += 1;
         }
+        if self.max_metadata_size.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.Http2ProtocolOptions", len)?;
         if let Some(v) = self.hpack_table_size.as_ref() {
             struct_ser.serialize_field("hpack_table_size", v)?;
@@ -7517,6 +7556,9 @@ impl serde::Serialize for Http2ProtocolOptions {
         if let Some(v) = self.use_oghttp2_codec.as_ref() {
             struct_ser.serialize_field("use_oghttp2_codec", v)?;
         }
+        if let Some(v) = self.max_metadata_size.as_ref() {
+            struct_ser.serialize_field("max_metadata_size", v)?;
+        }
         struct_ser.end()
     }
 }
@@ -7559,6 +7601,8 @@ impl<'de> serde::Deserialize<'de> for Http2ProtocolOptions {
             "connectionKeepalive",
             "use_oghttp2_codec",
             "useOghttp2Codec",
+            "max_metadata_size",
+            "maxMetadataSize",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -7579,6 +7623,7 @@ impl<'de> serde::Deserialize<'de> for Http2ProtocolOptions {
             CustomSettingsParameters,
             ConnectionKeepalive,
             UseOghttp2Codec,
+            MaxMetadataSize,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -7616,6 +7661,7 @@ impl<'de> serde::Deserialize<'de> for Http2ProtocolOptions {
                             "customSettingsParameters" | "custom_settings_parameters" => Ok(GeneratedField::CustomSettingsParameters),
                             "connectionKeepalive" | "connection_keepalive" => Ok(GeneratedField::ConnectionKeepalive),
                             "useOghttp2Codec" | "use_oghttp2_codec" => Ok(GeneratedField::UseOghttp2Codec),
+                            "maxMetadataSize" | "max_metadata_size" => Ok(GeneratedField::MaxMetadataSize),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -7651,6 +7697,7 @@ impl<'de> serde::Deserialize<'de> for Http2ProtocolOptions {
                 let mut custom_settings_parameters__ = None;
                 let mut connection_keepalive__ = None;
                 let mut use_oghttp2_codec__ = None;
+                let mut max_metadata_size__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::HpackTableSize => {
@@ -7749,6 +7796,12 @@ impl<'de> serde::Deserialize<'de> for Http2ProtocolOptions {
                             }
                             use_oghttp2_codec__ = map_.next_value()?;
                         }
+                        GeneratedField::MaxMetadataSize => {
+                            if max_metadata_size__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("maxMetadataSize"));
+                            }
+                            max_metadata_size__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(Http2ProtocolOptions {
@@ -7768,6 +7821,7 @@ impl<'de> serde::Deserialize<'de> for Http2ProtocolOptions {
                     custom_settings_parameters: custom_settings_parameters__.unwrap_or_default(),
                     connection_keepalive: connection_keepalive__,
                     use_oghttp2_codec: use_oghttp2_codec__,
+                    max_metadata_size: max_metadata_size__,
                 })
             }
         }
@@ -7902,6 +7956,9 @@ impl serde::Serialize for Http3ProtocolOptions {
         if self.allow_metadata {
             len += 1;
         }
+        if self.disable_qpack {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.Http3ProtocolOptions", len)?;
         if let Some(v) = self.quic_protocol_options.as_ref() {
             struct_ser.serialize_field("quic_protocol_options", v)?;
@@ -7914,6 +7971,9 @@ impl serde::Serialize for Http3ProtocolOptions {
         }
         if self.allow_metadata {
             struct_ser.serialize_field("allow_metadata", &self.allow_metadata)?;
+        }
+        if self.disable_qpack {
+            struct_ser.serialize_field("disable_qpack", &self.disable_qpack)?;
         }
         struct_ser.end()
     }
@@ -7933,6 +7993,8 @@ impl<'de> serde::Deserialize<'de> for Http3ProtocolOptions {
             "allowExtendedConnect",
             "allow_metadata",
             "allowMetadata",
+            "disable_qpack",
+            "disableQpack",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -7941,6 +8003,7 @@ impl<'de> serde::Deserialize<'de> for Http3ProtocolOptions {
             OverrideStreamErrorOnInvalidHttpMessage,
             AllowExtendedConnect,
             AllowMetadata,
+            DisableQpack,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -7966,6 +8029,7 @@ impl<'de> serde::Deserialize<'de> for Http3ProtocolOptions {
                             "overrideStreamErrorOnInvalidHttpMessage" | "override_stream_error_on_invalid_http_message" => Ok(GeneratedField::OverrideStreamErrorOnInvalidHttpMessage),
                             "allowExtendedConnect" | "allow_extended_connect" => Ok(GeneratedField::AllowExtendedConnect),
                             "allowMetadata" | "allow_metadata" => Ok(GeneratedField::AllowMetadata),
+                            "disableQpack" | "disable_qpack" => Ok(GeneratedField::DisableQpack),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -7989,6 +8053,7 @@ impl<'de> serde::Deserialize<'de> for Http3ProtocolOptions {
                 let mut override_stream_error_on_invalid_http_message__ = None;
                 let mut allow_extended_connect__ = None;
                 let mut allow_metadata__ = None;
+                let mut disable_qpack__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::QuicProtocolOptions => {
@@ -8015,6 +8080,12 @@ impl<'de> serde::Deserialize<'de> for Http3ProtocolOptions {
                             }
                             allow_metadata__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::DisableQpack => {
+                            if disable_qpack__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("disableQpack"));
+                            }
+                            disable_qpack__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(Http3ProtocolOptions {
@@ -8022,6 +8093,7 @@ impl<'de> serde::Deserialize<'de> for Http3ProtocolOptions {
                     override_stream_error_on_invalid_http_message: override_stream_error_on_invalid_http_message__,
                     allow_extended_connect: allow_extended_connect__.unwrap_or_default(),
                     allow_metadata: allow_metadata__.unwrap_or_default(),
+                    disable_qpack: disable_qpack__.unwrap_or_default(),
                 })
             }
         }
@@ -8045,6 +8117,9 @@ impl serde::Serialize for HttpProtocolOptions {
         if self.max_headers_count.is_some() {
             len += 1;
         }
+        if self.max_response_headers_kb.is_some() {
+            len += 1;
+        }
         if self.max_stream_duration.is_some() {
             len += 1;
         }
@@ -8063,6 +8138,9 @@ impl serde::Serialize for HttpProtocolOptions {
         }
         if let Some(v) = self.max_headers_count.as_ref() {
             struct_ser.serialize_field("max_headers_count", v)?;
+        }
+        if let Some(v) = self.max_response_headers_kb.as_ref() {
+            struct_ser.serialize_field("max_response_headers_kb", v)?;
         }
         if let Some(v) = self.max_stream_duration.as_ref() {
             struct_ser.serialize_field("max_stream_duration", v)?;
@@ -8091,6 +8169,8 @@ impl<'de> serde::Deserialize<'de> for HttpProtocolOptions {
             "maxConnectionDuration",
             "max_headers_count",
             "maxHeadersCount",
+            "max_response_headers_kb",
+            "maxResponseHeadersKb",
             "max_stream_duration",
             "maxStreamDuration",
             "headers_with_underscores_action",
@@ -8104,6 +8184,7 @@ impl<'de> serde::Deserialize<'de> for HttpProtocolOptions {
             IdleTimeout,
             MaxConnectionDuration,
             MaxHeadersCount,
+            MaxResponseHeadersKb,
             MaxStreamDuration,
             HeadersWithUnderscoresAction,
             MaxRequestsPerConnection,
@@ -8131,6 +8212,7 @@ impl<'de> serde::Deserialize<'de> for HttpProtocolOptions {
                             "idleTimeout" | "idle_timeout" => Ok(GeneratedField::IdleTimeout),
                             "maxConnectionDuration" | "max_connection_duration" => Ok(GeneratedField::MaxConnectionDuration),
                             "maxHeadersCount" | "max_headers_count" => Ok(GeneratedField::MaxHeadersCount),
+                            "maxResponseHeadersKb" | "max_response_headers_kb" => Ok(GeneratedField::MaxResponseHeadersKb),
                             "maxStreamDuration" | "max_stream_duration" => Ok(GeneratedField::MaxStreamDuration),
                             "headersWithUnderscoresAction" | "headers_with_underscores_action" => Ok(GeneratedField::HeadersWithUnderscoresAction),
                             "maxRequestsPerConnection" | "max_requests_per_connection" => Ok(GeneratedField::MaxRequestsPerConnection),
@@ -8156,6 +8238,7 @@ impl<'de> serde::Deserialize<'de> for HttpProtocolOptions {
                 let mut idle_timeout__ = None;
                 let mut max_connection_duration__ = None;
                 let mut max_headers_count__ = None;
+                let mut max_response_headers_kb__ = None;
                 let mut max_stream_duration__ = None;
                 let mut headers_with_underscores_action__ = None;
                 let mut max_requests_per_connection__ = None;
@@ -8178,6 +8261,12 @@ impl<'de> serde::Deserialize<'de> for HttpProtocolOptions {
                                 return Err(serde::de::Error::duplicate_field("maxHeadersCount"));
                             }
                             max_headers_count__ = map_.next_value()?;
+                        }
+                        GeneratedField::MaxResponseHeadersKb => {
+                            if max_response_headers_kb__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("maxResponseHeadersKb"));
+                            }
+                            max_response_headers_kb__ = map_.next_value()?;
                         }
                         GeneratedField::MaxStreamDuration => {
                             if max_stream_duration__.is_some() {
@@ -8203,6 +8292,7 @@ impl<'de> serde::Deserialize<'de> for HttpProtocolOptions {
                     idle_timeout: idle_timeout__,
                     max_connection_duration: max_connection_duration__,
                     max_headers_count: max_headers_count__,
+                    max_response_headers_kb: max_response_headers_kb__,
                     max_stream_duration: max_stream_duration__,
                     headers_with_underscores_action: headers_with_underscores_action__.unwrap_or_default(),
                     max_requests_per_connection: max_requests_per_connection__,
@@ -8881,6 +8971,9 @@ impl serde::Serialize for KeyValueAppend {
     {
         use serde::ser::SerializeStruct;
         let mut len = 0;
+        if self.record.is_some() {
+            len += 1;
+        }
         if self.entry.is_some() {
             len += 1;
         }
@@ -8888,6 +8981,9 @@ impl serde::Serialize for KeyValueAppend {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.KeyValueAppend", len)?;
+        if let Some(v) = self.record.as_ref() {
+            struct_ser.serialize_field("record", v)?;
+        }
         if let Some(v) = self.entry.as_ref() {
             struct_ser.serialize_field("entry", v)?;
         }
@@ -8906,12 +9002,14 @@ impl<'de> serde::Deserialize<'de> for KeyValueAppend {
         D: serde::Deserializer<'de>,
     {
         const FIELDS: &[&str] = &[
+            "record",
             "entry",
             "action",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
+            Record,
             Entry,
             Action,
         }
@@ -8935,6 +9033,7 @@ impl<'de> serde::Deserialize<'de> for KeyValueAppend {
                         E: serde::de::Error,
                     {
                         match value {
+                            "record" => Ok(GeneratedField::Record),
                             "entry" => Ok(GeneratedField::Entry),
                             "action" => Ok(GeneratedField::Action),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
@@ -8956,10 +9055,17 @@ impl<'de> serde::Deserialize<'de> for KeyValueAppend {
                 where
                     V: serde::de::MapAccess<'de>,
             {
+                let mut record__ = None;
                 let mut entry__ = None;
                 let mut action__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
+                        GeneratedField::Record => {
+                            if record__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("record"));
+                            }
+                            record__ = map_.next_value()?;
+                        }
                         GeneratedField::Entry => {
                             if entry__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("entry"));
@@ -8975,6 +9081,7 @@ impl<'de> serde::Deserialize<'de> for KeyValueAppend {
                     }
                 }
                 Ok(KeyValueAppend {
+                    record: record__,
                     entry: entry__,
                     action: action__.unwrap_or_default(),
                 })
@@ -9166,6 +9273,114 @@ impl<'de> serde::Deserialize<'de> for KeyValueMutation {
             }
         }
         deserializer.deserialize_struct("envoy.config.core.v3.KeyValueMutation", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for KeyValuePair {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.key.is_empty() {
+            len += 1;
+        }
+        if self.value.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.KeyValuePair", len)?;
+        if !self.key.is_empty() {
+            struct_ser.serialize_field("key", &self.key)?;
+        }
+        if let Some(v) = self.value.as_ref() {
+            struct_ser.serialize_field("value", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for KeyValuePair {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "key",
+            "value",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Key,
+            Value,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "key" => Ok(GeneratedField::Key),
+                            "value" => Ok(GeneratedField::Value),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = KeyValuePair;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.KeyValuePair")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<KeyValuePair, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut key__ = None;
+                let mut value__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Key => {
+                            if key__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("key"));
+                            }
+                            key__ = Some(map_.next_value()?);
+                        }
+                        GeneratedField::Value => {
+                            if value__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("value"));
+                            }
+                            value__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(KeyValuePair {
+                    key: key__.unwrap_or_default(),
+                    value: value__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.KeyValuePair", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for Locality {
@@ -9786,6 +10001,98 @@ impl<'de> serde::Deserialize<'de> for PathConfigSource {
         deserializer.deserialize_struct("envoy.config.core.v3.PathConfigSource", FIELDS, GeneratedVisitor)
     }
 }
+impl serde::Serialize for PerHostConfig {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.added_tlvs.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.PerHostConfig", len)?;
+        if !self.added_tlvs.is_empty() {
+            struct_ser.serialize_field("added_tlvs", &self.added_tlvs)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for PerHostConfig {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "added_tlvs",
+            "addedTlvs",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            AddedTlvs,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "addedTlvs" | "added_tlvs" => Ok(GeneratedField::AddedTlvs),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = PerHostConfig;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.PerHostConfig")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<PerHostConfig, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut added_tlvs__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::AddedTlvs => {
+                            if added_tlvs__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("addedTlvs"));
+                            }
+                            added_tlvs__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(PerHostConfig {
+                    added_tlvs: added_tlvs__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.PerHostConfig", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for Pipe {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -9910,6 +10217,9 @@ impl serde::Serialize for ProxyProtocolConfig {
         if self.pass_through_tlvs.is_some() {
             len += 1;
         }
+        if !self.added_tlvs.is_empty() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.ProxyProtocolConfig", len)?;
         if self.version != 0 {
             let v = proxy_protocol_config::Version::try_from(self.version)
@@ -9918,6 +10228,9 @@ impl serde::Serialize for ProxyProtocolConfig {
         }
         if let Some(v) = self.pass_through_tlvs.as_ref() {
             struct_ser.serialize_field("pass_through_tlvs", v)?;
+        }
+        if !self.added_tlvs.is_empty() {
+            struct_ser.serialize_field("added_tlvs", &self.added_tlvs)?;
         }
         struct_ser.end()
     }
@@ -9932,12 +10245,15 @@ impl<'de> serde::Deserialize<'de> for ProxyProtocolConfig {
             "version",
             "pass_through_tlvs",
             "passThroughTlvs",
+            "added_tlvs",
+            "addedTlvs",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Version,
             PassThroughTlvs,
+            AddedTlvs,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -9961,6 +10277,7 @@ impl<'de> serde::Deserialize<'de> for ProxyProtocolConfig {
                         match value {
                             "version" => Ok(GeneratedField::Version),
                             "passThroughTlvs" | "pass_through_tlvs" => Ok(GeneratedField::PassThroughTlvs),
+                            "addedTlvs" | "added_tlvs" => Ok(GeneratedField::AddedTlvs),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -9982,6 +10299,7 @@ impl<'de> serde::Deserialize<'de> for ProxyProtocolConfig {
             {
                 let mut version__ = None;
                 let mut pass_through_tlvs__ = None;
+                let mut added_tlvs__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Version => {
@@ -9996,11 +10314,18 @@ impl<'de> serde::Deserialize<'de> for ProxyProtocolConfig {
                             }
                             pass_through_tlvs__ = map_.next_value()?;
                         }
+                        GeneratedField::AddedTlvs => {
+                            if added_tlvs__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("addedTlvs"));
+                            }
+                            added_tlvs__ = Some(map_.next_value()?);
+                        }
                     }
                 }
                 Ok(ProxyProtocolConfig {
                     version: version__.unwrap_or_default(),
                     pass_through_tlvs: pass_through_tlvs__,
+                    added_tlvs: added_tlvs__.unwrap_or_default(),
                 })
             }
         }
@@ -10514,6 +10839,9 @@ impl serde::Serialize for QuicProtocolOptions {
         if self.idle_network_timeout.is_some() {
             len += 1;
         }
+        if self.max_packet_length.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.QuicProtocolOptions", len)?;
         if let Some(v) = self.max_concurrent_streams.as_ref() {
             struct_ser.serialize_field("max_concurrent_streams", v)?;
@@ -10538,6 +10866,9 @@ impl serde::Serialize for QuicProtocolOptions {
         }
         if let Some(v) = self.idle_network_timeout.as_ref() {
             struct_ser.serialize_field("idle_network_timeout", v)?;
+        }
+        if let Some(v) = self.max_packet_length.as_ref() {
+            struct_ser.serialize_field("max_packet_length", v)?;
         }
         struct_ser.end()
     }
@@ -10565,6 +10896,8 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
             "clientConnectionOptions",
             "idle_network_timeout",
             "idleNetworkTimeout",
+            "max_packet_length",
+            "maxPacketLength",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -10577,6 +10910,7 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
             ConnectionOptions,
             ClientConnectionOptions,
             IdleNetworkTimeout,
+            MaxPacketLength,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -10606,6 +10940,7 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                             "connectionOptions" | "connection_options" => Ok(GeneratedField::ConnectionOptions),
                             "clientConnectionOptions" | "client_connection_options" => Ok(GeneratedField::ClientConnectionOptions),
                             "idleNetworkTimeout" | "idle_network_timeout" => Ok(GeneratedField::IdleNetworkTimeout),
+                            "maxPacketLength" | "max_packet_length" => Ok(GeneratedField::MaxPacketLength),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -10633,6 +10968,7 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                 let mut connection_options__ = None;
                 let mut client_connection_options__ = None;
                 let mut idle_network_timeout__ = None;
+                let mut max_packet_length__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::MaxConcurrentStreams => {
@@ -10683,6 +11019,12 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                             }
                             idle_network_timeout__ = map_.next_value()?;
                         }
+                        GeneratedField::MaxPacketLength => {
+                            if max_packet_length__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("maxPacketLength"));
+                            }
+                            max_packet_length__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(QuicProtocolOptions {
@@ -10694,6 +11036,7 @@ impl<'de> serde::Deserialize<'de> for QuicProtocolOptions {
                     connection_options: connection_options__.unwrap_or_default(),
                     client_connection_options: client_connection_options__.unwrap_or_default(),
                     idle_network_timeout: idle_network_timeout__,
+                    max_packet_length: max_packet_length__,
                 })
             }
         }
@@ -12299,6 +12642,9 @@ impl serde::Serialize for SocketAddress {
         if self.ipv4_compat {
             len += 1;
         }
+        if !self.network_namespace_filepath.is_empty() {
+            len += 1;
+        }
         if self.port_specifier.is_some() {
             len += 1;
         }
@@ -12316,6 +12662,9 @@ impl serde::Serialize for SocketAddress {
         }
         if self.ipv4_compat {
             struct_ser.serialize_field("ipv4_compat", &self.ipv4_compat)?;
+        }
+        if !self.network_namespace_filepath.is_empty() {
+            struct_ser.serialize_field("network_namespace_filepath", &self.network_namespace_filepath)?;
         }
         if let Some(v) = self.port_specifier.as_ref() {
             match v {
@@ -12343,6 +12692,8 @@ impl<'de> serde::Deserialize<'de> for SocketAddress {
             "resolverName",
             "ipv4_compat",
             "ipv4Compat",
+            "network_namespace_filepath",
+            "networkNamespaceFilepath",
             "port_value",
             "portValue",
             "named_port",
@@ -12355,6 +12706,7 @@ impl<'de> serde::Deserialize<'de> for SocketAddress {
             Address,
             ResolverName,
             Ipv4Compat,
+            NetworkNamespaceFilepath,
             PortValue,
             NamedPort,
         }
@@ -12382,6 +12734,7 @@ impl<'de> serde::Deserialize<'de> for SocketAddress {
                             "address" => Ok(GeneratedField::Address),
                             "resolverName" | "resolver_name" => Ok(GeneratedField::ResolverName),
                             "ipv4Compat" | "ipv4_compat" => Ok(GeneratedField::Ipv4Compat),
+                            "networkNamespaceFilepath" | "network_namespace_filepath" => Ok(GeneratedField::NetworkNamespaceFilepath),
                             "portValue" | "port_value" => Ok(GeneratedField::PortValue),
                             "namedPort" | "named_port" => Ok(GeneratedField::NamedPort),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
@@ -12407,6 +12760,7 @@ impl<'de> serde::Deserialize<'de> for SocketAddress {
                 let mut address__ = None;
                 let mut resolver_name__ = None;
                 let mut ipv4_compat__ = None;
+                let mut network_namespace_filepath__ = None;
                 let mut port_specifier__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
@@ -12434,6 +12788,12 @@ impl<'de> serde::Deserialize<'de> for SocketAddress {
                             }
                             ipv4_compat__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::NetworkNamespaceFilepath => {
+                            if network_namespace_filepath__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("networkNamespaceFilepath"));
+                            }
+                            network_namespace_filepath__ = Some(map_.next_value()?);
+                        }
                         GeneratedField::PortValue => {
                             if port_specifier__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("portValue"));
@@ -12453,6 +12813,7 @@ impl<'de> serde::Deserialize<'de> for SocketAddress {
                     address: address__.unwrap_or_default(),
                     resolver_name: resolver_name__.unwrap_or_default(),
                     ipv4_compat: ipv4_compat__.unwrap_or_default(),
+                    network_namespace_filepath: network_namespace_filepath__.unwrap_or_default(),
                     port_specifier: port_specifier__,
                 })
             }
@@ -12531,6 +12892,134 @@ impl<'de> serde::Deserialize<'de> for socket_address::Protocol {
         deserializer.deserialize_any(GeneratedVisitor)
     }
 }
+impl serde::Serialize for SocketCmsgHeaders {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.level.is_some() {
+            len += 1;
+        }
+        if self.r#type.is_some() {
+            len += 1;
+        }
+        if self.expected_size != 0 {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.SocketCmsgHeaders", len)?;
+        if let Some(v) = self.level.as_ref() {
+            struct_ser.serialize_field("level", v)?;
+        }
+        if let Some(v) = self.r#type.as_ref() {
+            struct_ser.serialize_field("type", v)?;
+        }
+        if self.expected_size != 0 {
+            struct_ser.serialize_field("expected_size", &self.expected_size)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for SocketCmsgHeaders {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "level",
+            "type",
+            "expected_size",
+            "expectedSize",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Level,
+            Type,
+            ExpectedSize,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "level" => Ok(GeneratedField::Level),
+                            "type" => Ok(GeneratedField::Type),
+                            "expectedSize" | "expected_size" => Ok(GeneratedField::ExpectedSize),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = SocketCmsgHeaders;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.SocketCmsgHeaders")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<SocketCmsgHeaders, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut level__ = None;
+                let mut r#type__ = None;
+                let mut expected_size__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Level => {
+                            if level__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("level"));
+                            }
+                            level__ = map_.next_value()?;
+                        }
+                        GeneratedField::Type => {
+                            if r#type__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("type"));
+                            }
+                            r#type__ = map_.next_value()?;
+                        }
+                        GeneratedField::ExpectedSize => {
+                            if expected_size__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("expectedSize"));
+                            }
+                            expected_size__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                    }
+                }
+                Ok(SocketCmsgHeaders {
+                    level: level__,
+                    r#type: r#type__,
+                    expected_size: expected_size__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.SocketCmsgHeaders", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for SocketOption {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -12549,6 +13038,9 @@ impl serde::Serialize for SocketOption {
             len += 1;
         }
         if self.state != 0 {
+            len += 1;
+        }
+        if self.r#type.is_some() {
             len += 1;
         }
         if self.value.is_some() {
@@ -12572,6 +13064,9 @@ impl serde::Serialize for SocketOption {
             let v = socket_option::SocketState::try_from(self.state)
                 .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", self.state)))?;
             struct_ser.serialize_field("state", &v)?;
+        }
+        if let Some(v) = self.r#type.as_ref() {
+            struct_ser.serialize_field("type", v)?;
         }
         if let Some(v) = self.value.as_ref() {
             match v {
@@ -12601,6 +13096,7 @@ impl<'de> serde::Deserialize<'de> for SocketOption {
             "level",
             "name",
             "state",
+            "type",
             "int_value",
             "intValue",
             "buf_value",
@@ -12613,6 +13109,7 @@ impl<'de> serde::Deserialize<'de> for SocketOption {
             Level,
             Name,
             State,
+            Type,
             IntValue,
             BufValue,
         }
@@ -12640,6 +13137,7 @@ impl<'de> serde::Deserialize<'de> for SocketOption {
                             "level" => Ok(GeneratedField::Level),
                             "name" => Ok(GeneratedField::Name),
                             "state" => Ok(GeneratedField::State),
+                            "type" => Ok(GeneratedField::Type),
                             "intValue" | "int_value" => Ok(GeneratedField::IntValue),
                             "bufValue" | "buf_value" => Ok(GeneratedField::BufValue),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
@@ -12665,6 +13163,7 @@ impl<'de> serde::Deserialize<'de> for SocketOption {
                 let mut level__ = None;
                 let mut name__ = None;
                 let mut state__ = None;
+                let mut r#type__ = None;
                 let mut value__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
@@ -12696,6 +13195,12 @@ impl<'de> serde::Deserialize<'de> for SocketOption {
                             }
                             state__ = Some(map_.next_value::<socket_option::SocketState>()? as i32);
                         }
+                        GeneratedField::Type => {
+                            if r#type__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("type"));
+                            }
+                            r#type__ = map_.next_value()?;
+                        }
                         GeneratedField::IntValue => {
                             if value__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("intValue"));
@@ -12715,6 +13220,7 @@ impl<'de> serde::Deserialize<'de> for SocketOption {
                     level: level__.unwrap_or_default(),
                     name: name__.unwrap_or_default(),
                     state: state__.unwrap_or_default(),
+                    r#type: r#type__,
                     value: value__,
                 })
             }
@@ -12794,6 +13300,256 @@ impl<'de> serde::Deserialize<'de> for socket_option::SocketState {
             }
         }
         deserializer.deserialize_any(GeneratedVisitor)
+    }
+}
+impl serde::Serialize for socket_option::SocketType {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.stream.is_some() {
+            len += 1;
+        }
+        if self.datagram.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.SocketOption.SocketType", len)?;
+        if let Some(v) = self.stream.as_ref() {
+            struct_ser.serialize_field("stream", v)?;
+        }
+        if let Some(v) = self.datagram.as_ref() {
+            struct_ser.serialize_field("datagram", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for socket_option::SocketType {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "stream",
+            "datagram",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Stream,
+            Datagram,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "stream" => Ok(GeneratedField::Stream),
+                            "datagram" => Ok(GeneratedField::Datagram),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = socket_option::SocketType;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.SocketOption.SocketType")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<socket_option::SocketType, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut stream__ = None;
+                let mut datagram__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Stream => {
+                            if stream__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("stream"));
+                            }
+                            stream__ = map_.next_value()?;
+                        }
+                        GeneratedField::Datagram => {
+                            if datagram__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("datagram"));
+                            }
+                            datagram__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(socket_option::SocketType {
+                    stream: stream__,
+                    datagram: datagram__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.SocketOption.SocketType", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for socket_option::socket_type::Datagram {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let len = 0;
+        let struct_ser = serializer.serialize_struct("envoy.config.core.v3.SocketOption.SocketType.Datagram", len)?;
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for socket_option::socket_type::Datagram {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                            Err(serde::de::Error::unknown_field(value, FIELDS))
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = socket_option::socket_type::Datagram;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.SocketOption.SocketType.Datagram")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<socket_option::socket_type::Datagram, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                while map_.next_key::<GeneratedField>()?.is_some() {
+                    let _ = map_.next_value::<serde::de::IgnoredAny>()?;
+                }
+                Ok(socket_option::socket_type::Datagram {
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.SocketOption.SocketType.Datagram", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for socket_option::socket_type::Stream {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let len = 0;
+        let struct_ser = serializer.serialize_struct("envoy.config.core.v3.SocketOption.SocketType.Stream", len)?;
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for socket_option::socket_type::Stream {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                            Err(serde::de::Error::unknown_field(value, FIELDS))
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = socket_option::socket_type::Stream;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.SocketOption.SocketType.Stream")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<socket_option::socket_type::Stream, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                while map_.next_key::<GeneratedField>()?.is_some() {
+                    let _ = map_.next_value::<serde::de::IgnoredAny>()?;
+                }
+                Ok(socket_option::socket_type::Stream {
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.SocketOption.SocketType.Stream", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for SocketOptionsOverride {
@@ -13280,6 +14036,120 @@ impl<'de> serde::Deserialize<'de> for TcpProtocolOptions {
             }
         }
         deserializer.deserialize_struct("envoy.config.core.v3.TcpProtocolOptions", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for TlvEntry {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.r#type != 0 {
+            len += 1;
+        }
+        if !self.value.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.core.v3.TlvEntry", len)?;
+        if self.r#type != 0 {
+            struct_ser.serialize_field("type", &self.r#type)?;
+        }
+        if !self.value.is_empty() {
+            #[allow(clippy::needless_borrow)]
+            #[allow(clippy::needless_borrows_for_generic_args)]
+            struct_ser.serialize_field("value", pbjson::private::base64::encode(&self.value).as_str())?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for TlvEntry {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "type",
+            "value",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Type,
+            Value,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "type" => Ok(GeneratedField::Type),
+                            "value" => Ok(GeneratedField::Value),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = TlvEntry;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.core.v3.TlvEntry")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<TlvEntry, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut r#type__ = None;
+                let mut value__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Type => {
+                            if r#type__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("type"));
+                            }
+                            r#type__ = 
+                                Some(map_.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0)
+                            ;
+                        }
+                        GeneratedField::Value => {
+                            if value__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("value"));
+                            }
+                            value__ = 
+                                Some(map_.next_value::<::pbjson::private::BytesDeserialize<_>>()?.0)
+                            ;
+                        }
+                    }
+                }
+                Ok(TlvEntry {
+                    r#type: r#type__.unwrap_or_default(),
+                    value: value__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.core.v3.TlvEntry", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for TrafficDirection {

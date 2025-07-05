@@ -495,6 +495,9 @@ impl serde::Serialize for Cluster {
         if self.dns_refresh_rate.is_some() {
             len += 1;
         }
+        if self.dns_jitter.is_some() {
+            len += 1;
+        }
         if self.dns_failure_refresh_rate.is_some() {
             len += 1;
         }
@@ -559,6 +562,9 @@ impl serde::Serialize for Cluster {
             len += 1;
         }
         if self.lrs_server.is_some() {
+            len += 1;
+        }
+        if !self.lrs_report_endpoint_metrics.is_empty() {
             len += 1;
         }
         if self.track_timeout_budgets {
@@ -636,6 +642,9 @@ impl serde::Serialize for Cluster {
         if let Some(v) = self.dns_refresh_rate.as_ref() {
             struct_ser.serialize_field("dns_refresh_rate", v)?;
         }
+        if let Some(v) = self.dns_jitter.as_ref() {
+            struct_ser.serialize_field("dns_jitter", v)?;
+        }
         if let Some(v) = self.dns_failure_refresh_rate.as_ref() {
             struct_ser.serialize_field("dns_failure_refresh_rate", v)?;
         }
@@ -705,6 +714,9 @@ impl serde::Serialize for Cluster {
         }
         if let Some(v) = self.lrs_server.as_ref() {
             struct_ser.serialize_field("lrs_server", v)?;
+        }
+        if !self.lrs_report_endpoint_metrics.is_empty() {
+            struct_ser.serialize_field("lrs_report_endpoint_metrics", &self.lrs_report_endpoint_metrics)?;
         }
         if self.track_timeout_budgets {
             struct_ser.serialize_field("track_timeout_budgets", &self.track_timeout_budgets)?;
@@ -795,6 +807,8 @@ impl<'de> serde::Deserialize<'de> for Cluster {
             "typedExtensionProtocolOptions",
             "dns_refresh_rate",
             "dnsRefreshRate",
+            "dns_jitter",
+            "dnsJitter",
             "dns_failure_refresh_rate",
             "dnsFailureRefreshRate",
             "respect_dns_ttl",
@@ -837,6 +851,8 @@ impl<'de> serde::Deserialize<'de> for Cluster {
             "loadBalancingPolicy",
             "lrs_server",
             "lrsServer",
+            "lrs_report_endpoint_metrics",
+            "lrsReportEndpointMetrics",
             "track_timeout_budgets",
             "trackTimeoutBudgets",
             "upstream_config",
@@ -881,6 +897,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
             Http2ProtocolOptions,
             TypedExtensionProtocolOptions,
             DnsRefreshRate,
+            DnsJitter,
             DnsFailureRefreshRate,
             RespectDnsTtl,
             DnsLookupFamily,
@@ -903,6 +920,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
             Filters,
             LoadBalancingPolicy,
             LrsServer,
+            LrsReportEndpointMetrics,
             TrackTimeoutBudgets,
             UpstreamConfig,
             TrackClusterStats,
@@ -953,6 +971,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                             "http2ProtocolOptions" | "http2_protocol_options" => Ok(GeneratedField::Http2ProtocolOptions),
                             "typedExtensionProtocolOptions" | "typed_extension_protocol_options" => Ok(GeneratedField::TypedExtensionProtocolOptions),
                             "dnsRefreshRate" | "dns_refresh_rate" => Ok(GeneratedField::DnsRefreshRate),
+                            "dnsJitter" | "dns_jitter" => Ok(GeneratedField::DnsJitter),
                             "dnsFailureRefreshRate" | "dns_failure_refresh_rate" => Ok(GeneratedField::DnsFailureRefreshRate),
                             "respectDnsTtl" | "respect_dns_ttl" => Ok(GeneratedField::RespectDnsTtl),
                             "dnsLookupFamily" | "dns_lookup_family" => Ok(GeneratedField::DnsLookupFamily),
@@ -975,6 +994,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                             "filters" => Ok(GeneratedField::Filters),
                             "loadBalancingPolicy" | "load_balancing_policy" => Ok(GeneratedField::LoadBalancingPolicy),
                             "lrsServer" | "lrs_server" => Ok(GeneratedField::LrsServer),
+                            "lrsReportEndpointMetrics" | "lrs_report_endpoint_metrics" => Ok(GeneratedField::LrsReportEndpointMetrics),
                             "trackTimeoutBudgets" | "track_timeout_budgets" => Ok(GeneratedField::TrackTimeoutBudgets),
                             "upstreamConfig" | "upstream_config" => Ok(GeneratedField::UpstreamConfig),
                             "trackClusterStats" | "track_cluster_stats" => Ok(GeneratedField::TrackClusterStats),
@@ -1023,6 +1043,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                 let mut http2_protocol_options__ = None;
                 let mut typed_extension_protocol_options__ = None;
                 let mut dns_refresh_rate__ = None;
+                let mut dns_jitter__ = None;
                 let mut dns_failure_refresh_rate__ = None;
                 let mut respect_dns_ttl__ = None;
                 let mut dns_lookup_family__ = None;
@@ -1045,6 +1066,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                 let mut filters__ = None;
                 let mut load_balancing_policy__ = None;
                 let mut lrs_server__ = None;
+                let mut lrs_report_endpoint_metrics__ = None;
                 let mut track_timeout_budgets__ = None;
                 let mut upstream_config__ = None;
                 let mut track_cluster_stats__ = None;
@@ -1157,6 +1179,12 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                                 return Err(serde::de::Error::duplicate_field("dnsRefreshRate"));
                             }
                             dns_refresh_rate__ = map_.next_value()?;
+                        }
+                        GeneratedField::DnsJitter => {
+                            if dns_jitter__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("dnsJitter"));
+                            }
+                            dns_jitter__ = map_.next_value()?;
                         }
                         GeneratedField::DnsFailureRefreshRate => {
                             if dns_failure_refresh_rate__.is_some() {
@@ -1290,6 +1318,12 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                             }
                             lrs_server__ = map_.next_value()?;
                         }
+                        GeneratedField::LrsReportEndpointMetrics => {
+                            if lrs_report_endpoint_metrics__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("lrsReportEndpointMetrics"));
+                            }
+                            lrs_report_endpoint_metrics__ = Some(map_.next_value()?);
+                        }
                         GeneratedField::TrackTimeoutBudgets => {
                             if track_timeout_budgets__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("trackTimeoutBudgets"));
@@ -1388,6 +1422,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                     http2_protocol_options: http2_protocol_options__,
                     typed_extension_protocol_options: typed_extension_protocol_options__.unwrap_or_default(),
                     dns_refresh_rate: dns_refresh_rate__,
+                    dns_jitter: dns_jitter__,
                     dns_failure_refresh_rate: dns_failure_refresh_rate__,
                     respect_dns_ttl: respect_dns_ttl__.unwrap_or_default(),
                     dns_lookup_family: dns_lookup_family__.unwrap_or_default(),
@@ -1410,6 +1445,7 @@ impl<'de> serde::Deserialize<'de> for Cluster {
                     filters: filters__.unwrap_or_default(),
                     load_balancing_policy: load_balancing_policy__,
                     lrs_server: lrs_server__,
+                    lrs_report_endpoint_metrics: lrs_report_endpoint_metrics__.unwrap_or_default(),
                     track_timeout_budgets: track_timeout_budgets__.unwrap_or_default(),
                     upstream_config: upstream_config__,
                     track_cluster_stats: track_cluster_stats__,
@@ -4694,6 +4730,9 @@ impl serde::Serialize for OutlierDetection {
         if !self.monitors.is_empty() {
             len += 1;
         }
+        if self.always_eject_one_host.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.cluster.v3.OutlierDetection", len)?;
         if let Some(v) = self.consecutive_5xx.as_ref() {
             struct_ser.serialize_field("consecutive_5xx", v)?;
@@ -4767,6 +4806,9 @@ impl serde::Serialize for OutlierDetection {
         if !self.monitors.is_empty() {
             struct_ser.serialize_field("monitors", &self.monitors)?;
         }
+        if let Some(v) = self.always_eject_one_host.as_ref() {
+            struct_ser.serialize_field("always_eject_one_host", v)?;
+        }
         struct_ser.end()
     }
 }
@@ -4823,6 +4865,8 @@ impl<'de> serde::Deserialize<'de> for OutlierDetection {
             "successful_active_health_check_uneject_host",
             "successfulActiveHealthCheckUnejectHost",
             "monitors",
+            "always_eject_one_host",
+            "alwaysEjectOneHost",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -4851,6 +4895,7 @@ impl<'de> serde::Deserialize<'de> for OutlierDetection {
             MaxEjectionTimeJitter,
             SuccessfulActiveHealthCheckUnejectHost,
             Monitors,
+            AlwaysEjectOneHost,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -4896,6 +4941,7 @@ impl<'de> serde::Deserialize<'de> for OutlierDetection {
                             "maxEjectionTimeJitter" | "max_ejection_time_jitter" => Ok(GeneratedField::MaxEjectionTimeJitter),
                             "successfulActiveHealthCheckUnejectHost" | "successful_active_health_check_uneject_host" => Ok(GeneratedField::SuccessfulActiveHealthCheckUnejectHost),
                             "monitors" => Ok(GeneratedField::Monitors),
+                            "alwaysEjectOneHost" | "always_eject_one_host" => Ok(GeneratedField::AlwaysEjectOneHost),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -4939,6 +4985,7 @@ impl<'de> serde::Deserialize<'de> for OutlierDetection {
                 let mut max_ejection_time_jitter__ = None;
                 let mut successful_active_health_check_uneject_host__ = None;
                 let mut monitors__ = None;
+                let mut always_eject_one_host__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Consecutive5xx => {
@@ -5085,6 +5132,12 @@ impl<'de> serde::Deserialize<'de> for OutlierDetection {
                             }
                             monitors__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::AlwaysEjectOneHost => {
+                            if always_eject_one_host__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("alwaysEjectOneHost"));
+                            }
+                            always_eject_one_host__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(OutlierDetection {
@@ -5112,6 +5165,7 @@ impl<'de> serde::Deserialize<'de> for OutlierDetection {
                     max_ejection_time_jitter: max_ejection_time_jitter__,
                     successful_active_health_check_uneject_host: successful_active_health_check_uneject_host__,
                     monitors: monitors__.unwrap_or_default(),
+                    always_eject_one_host: always_eject_one_host__,
                 })
             }
         }

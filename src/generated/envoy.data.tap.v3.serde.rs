@@ -871,12 +871,18 @@ impl serde::Serialize for SocketEvent {
         if self.timestamp.is_some() {
             len += 1;
         }
+        if self.connection.is_some() {
+            len += 1;
+        }
         if self.event_selector.is_some() {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("envoy.data.tap.v3.SocketEvent", len)?;
         if let Some(v) = self.timestamp.as_ref() {
             struct_ser.serialize_field("timestamp", v)?;
+        }
+        if let Some(v) = self.connection.as_ref() {
+            struct_ser.serialize_field("connection", v)?;
         }
         if let Some(v) = self.event_selector.as_ref() {
             match v {
@@ -902,6 +908,7 @@ impl<'de> serde::Deserialize<'de> for SocketEvent {
     {
         const FIELDS: &[&str] = &[
             "timestamp",
+            "connection",
             "read",
             "write",
             "closed",
@@ -910,6 +917,7 @@ impl<'de> serde::Deserialize<'de> for SocketEvent {
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Timestamp,
+            Connection,
             Read,
             Write,
             Closed,
@@ -935,6 +943,7 @@ impl<'de> serde::Deserialize<'de> for SocketEvent {
                     {
                         match value {
                             "timestamp" => Ok(GeneratedField::Timestamp),
+                            "connection" => Ok(GeneratedField::Connection),
                             "read" => Ok(GeneratedField::Read),
                             "write" => Ok(GeneratedField::Write),
                             "closed" => Ok(GeneratedField::Closed),
@@ -958,6 +967,7 @@ impl<'de> serde::Deserialize<'de> for SocketEvent {
                     V: serde::de::MapAccess<'de>,
             {
                 let mut timestamp__ = None;
+                let mut connection__ = None;
                 let mut event_selector__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
@@ -966,6 +976,12 @@ impl<'de> serde::Deserialize<'de> for SocketEvent {
                                 return Err(serde::de::Error::duplicate_field("timestamp"));
                             }
                             timestamp__ = map_.next_value()?;
+                        }
+                        GeneratedField::Connection => {
+                            if connection__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("connection"));
+                            }
+                            connection__ = map_.next_value()?;
                         }
                         GeneratedField::Read => {
                             if event_selector__.is_some() {
@@ -992,6 +1008,7 @@ impl<'de> serde::Deserialize<'de> for SocketEvent {
                 }
                 Ok(SocketEvent {
                     timestamp: timestamp__,
+                    connection: connection__,
                     event_selector: event_selector__,
                 })
             }
@@ -1270,6 +1287,97 @@ impl<'de> serde::Deserialize<'de> for socket_event::Write {
         deserializer.deserialize_struct("envoy.data.tap.v3.SocketEvent.Write", FIELDS, GeneratedVisitor)
     }
 }
+impl serde::Serialize for SocketEvents {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if !self.events.is_empty() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.data.tap.v3.SocketEvents", len)?;
+        if !self.events.is_empty() {
+            struct_ser.serialize_field("events", &self.events)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for SocketEvents {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "events",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            Events,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "events" => Ok(GeneratedField::Events),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = SocketEvents;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.data.tap.v3.SocketEvents")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<SocketEvents, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut events__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::Events => {
+                            if events__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("events"));
+                            }
+                            events__ = Some(map_.next_value()?);
+                        }
+                    }
+                }
+                Ok(SocketEvents {
+                    events: events__.unwrap_or_default(),
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.data.tap.v3.SocketEvents", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for SocketStreamedTraceSegment {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -1298,6 +1406,9 @@ impl serde::Serialize for SocketStreamedTraceSegment {
                 socket_streamed_trace_segment::MessagePiece::Event(v) => {
                     struct_ser.serialize_field("event", v)?;
                 }
+                socket_streamed_trace_segment::MessagePiece::Events(v) => {
+                    struct_ser.serialize_field("events", v)?;
+                }
             }
         }
         struct_ser.end()
@@ -1314,6 +1425,7 @@ impl<'de> serde::Deserialize<'de> for SocketStreamedTraceSegment {
             "traceId",
             "connection",
             "event",
+            "events",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -1321,6 +1433,7 @@ impl<'de> serde::Deserialize<'de> for SocketStreamedTraceSegment {
             TraceId,
             Connection,
             Event,
+            Events,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -1345,6 +1458,7 @@ impl<'de> serde::Deserialize<'de> for SocketStreamedTraceSegment {
                             "traceId" | "trace_id" => Ok(GeneratedField::TraceId),
                             "connection" => Ok(GeneratedField::Connection),
                             "event" => Ok(GeneratedField::Event),
+                            "events" => Ok(GeneratedField::Events),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -1388,6 +1502,13 @@ impl<'de> serde::Deserialize<'de> for SocketStreamedTraceSegment {
                                 return Err(serde::de::Error::duplicate_field("event"));
                             }
                             message_piece__ = map_.next_value::<::std::option::Option<_>>()?.map(socket_streamed_trace_segment::MessagePiece::Event)
+;
+                        }
+                        GeneratedField::Events => {
+                            if message_piece__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("events"));
+                            }
+                            message_piece__ = map_.next_value::<::std::option::Option<_>>()?.map(socket_streamed_trace_segment::MessagePiece::Events)
 ;
                         }
                     }

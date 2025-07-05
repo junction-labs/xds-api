@@ -647,6 +647,12 @@ pub enum ClientResourceStatus {
     Acked = 3,
     /// Client received this resource and replied with NACK.
     Nacked = 4,
+    /// Client received an error from the control plane. The attached config
+    /// dump is the most recent accepted one. If no config is accepted yet,
+    /// the attached config dump will be empty.
+    ReceivedError = 5,
+    /// Client timed out waiting for the resource from the control plane.
+    Timeout = 6,
 }
 impl ClientResourceStatus {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -660,6 +666,8 @@ impl ClientResourceStatus {
             Self::DoesNotExist => "DOES_NOT_EXIST",
             Self::Acked => "ACKED",
             Self::Nacked => "NACKED",
+            Self::ReceivedError => "RECEIVED_ERROR",
+            Self::Timeout => "TIMEOUT",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -670,6 +678,8 @@ impl ClientResourceStatus {
             "DOES_NOT_EXIST" => Some(Self::DoesNotExist),
             "ACKED" => Some(Self::Acked),
             "NACKED" => Some(Self::Nacked),
+            "RECEIVED_ERROR" => Some(Self::ReceivedError),
+            "TIMEOUT" => Some(Self::Timeout),
             _ => None,
         }
     }

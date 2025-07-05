@@ -172,6 +172,11 @@ pub mod scale_timers_overload_action_config {
         /// This affects the value of
         /// :ref:`FilterChain.transport_socket_connect_timeout <envoy_v3_api_field_config.listener.v3.FilterChain.transport_socket_connect_timeout>`.
         TransportSocketConnect = 3,
+        /// Adjusts the max connection duration timer for downstream HTTP connections.
+        /// This affects the value of
+        /// :ref:`HttpConnectionManager.common_http_protocol_options.max_connection_duration
+        /// <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_connection_duration>`.
+        HttpDownstreamConnectionMax = 4,
     }
     impl TimerType {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -184,6 +189,7 @@ pub mod scale_timers_overload_action_config {
                 Self::HttpDownstreamConnectionIdle => "HTTP_DOWNSTREAM_CONNECTION_IDLE",
                 Self::HttpDownstreamStreamIdle => "HTTP_DOWNSTREAM_STREAM_IDLE",
                 Self::TransportSocketConnect => "TRANSPORT_SOCKET_CONNECT",
+                Self::HttpDownstreamConnectionMax => "HTTP_DOWNSTREAM_CONNECTION_MAX",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -195,6 +201,9 @@ pub mod scale_timers_overload_action_config {
                 }
                 "HTTP_DOWNSTREAM_STREAM_IDLE" => Some(Self::HttpDownstreamStreamIdle),
                 "TRANSPORT_SOCKET_CONNECT" => Some(Self::TransportSocketConnect),
+                "HTTP_DOWNSTREAM_CONNECTION_MAX" => {
+                    Some(Self::HttpDownstreamConnectionMax)
+                }
                 _ => None,
             }
         }

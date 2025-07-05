@@ -1,3 +1,74 @@
+impl serde::Serialize for LocalClusterRateLimit {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let len = 0;
+        let struct_ser = serializer.serialize_struct("envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit", len)?;
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for LocalClusterRateLimit {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                            Err(serde::de::Error::unknown_field(value, FIELDS))
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = LocalClusterRateLimit;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<LocalClusterRateLimit, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                while map_.next_key::<GeneratedField>()?.is_some() {
+                    let _ = map_.next_value::<serde::de::IgnoredAny>()?;
+                }
+                Ok(LocalClusterRateLimit {
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit", FIELDS, GeneratedVisitor)
+    }
+}
 impl serde::Serialize for LocalRateLimitDescriptor {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -121,12 +192,18 @@ impl serde::Serialize for RateLimitDescriptor {
         if self.limit.is_some() {
             len += 1;
         }
+        if self.hits_addend.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.extensions.common.ratelimit.v3.RateLimitDescriptor", len)?;
         if !self.entries.is_empty() {
             struct_ser.serialize_field("entries", &self.entries)?;
         }
         if let Some(v) = self.limit.as_ref() {
             struct_ser.serialize_field("limit", v)?;
+        }
+        if let Some(v) = self.hits_addend.as_ref() {
+            struct_ser.serialize_field("hits_addend", v)?;
         }
         struct_ser.end()
     }
@@ -140,12 +217,15 @@ impl<'de> serde::Deserialize<'de> for RateLimitDescriptor {
         const FIELDS: &[&str] = &[
             "entries",
             "limit",
+            "hits_addend",
+            "hitsAddend",
         ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
             Entries,
             Limit,
+            HitsAddend,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -169,6 +249,7 @@ impl<'de> serde::Deserialize<'de> for RateLimitDescriptor {
                         match value {
                             "entries" => Ok(GeneratedField::Entries),
                             "limit" => Ok(GeneratedField::Limit),
+                            "hitsAddend" | "hits_addend" => Ok(GeneratedField::HitsAddend),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -190,6 +271,7 @@ impl<'de> serde::Deserialize<'de> for RateLimitDescriptor {
             {
                 let mut entries__ = None;
                 let mut limit__ = None;
+                let mut hits_addend__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::Entries => {
@@ -204,11 +286,18 @@ impl<'de> serde::Deserialize<'de> for RateLimitDescriptor {
                             }
                             limit__ = map_.next_value()?;
                         }
+                        GeneratedField::HitsAddend => {
+                            if hits_addend__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("hitsAddend"));
+                            }
+                            hits_addend__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(RateLimitDescriptor {
                     entries: entries__.unwrap_or_default(),
                     limit: limit__,
+                    hits_addend: hits_addend__,
                 })
             }
         }

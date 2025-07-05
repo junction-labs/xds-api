@@ -165,6 +165,9 @@ impl serde::Serialize for DatadogConfig {
         if !self.collector_hostname.is_empty() {
             len += 1;
         }
+        if self.remote_config.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.trace.v3.DatadogConfig", len)?;
         if !self.collector_cluster.is_empty() {
             struct_ser.serialize_field("collector_cluster", &self.collector_cluster)?;
@@ -174,6 +177,9 @@ impl serde::Serialize for DatadogConfig {
         }
         if !self.collector_hostname.is_empty() {
             struct_ser.serialize_field("collector_hostname", &self.collector_hostname)?;
+        }
+        if let Some(v) = self.remote_config.as_ref() {
+            struct_ser.serialize_field("remote_config", v)?;
         }
         struct_ser.end()
     }
@@ -191,6 +197,8 @@ impl<'de> serde::Deserialize<'de> for DatadogConfig {
             "serviceName",
             "collector_hostname",
             "collectorHostname",
+            "remote_config",
+            "remoteConfig",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -198,6 +206,7 @@ impl<'de> serde::Deserialize<'de> for DatadogConfig {
             CollectorCluster,
             ServiceName,
             CollectorHostname,
+            RemoteConfig,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -222,6 +231,7 @@ impl<'de> serde::Deserialize<'de> for DatadogConfig {
                             "collectorCluster" | "collector_cluster" => Ok(GeneratedField::CollectorCluster),
                             "serviceName" | "service_name" => Ok(GeneratedField::ServiceName),
                             "collectorHostname" | "collector_hostname" => Ok(GeneratedField::CollectorHostname),
+                            "remoteConfig" | "remote_config" => Ok(GeneratedField::RemoteConfig),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -244,6 +254,7 @@ impl<'de> serde::Deserialize<'de> for DatadogConfig {
                 let mut collector_cluster__ = None;
                 let mut service_name__ = None;
                 let mut collector_hostname__ = None;
+                let mut remote_config__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::CollectorCluster => {
@@ -264,16 +275,115 @@ impl<'de> serde::Deserialize<'de> for DatadogConfig {
                             }
                             collector_hostname__ = Some(map_.next_value()?);
                         }
+                        GeneratedField::RemoteConfig => {
+                            if remote_config__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("remoteConfig"));
+                            }
+                            remote_config__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(DatadogConfig {
                     collector_cluster: collector_cluster__.unwrap_or_default(),
                     service_name: service_name__.unwrap_or_default(),
                     collector_hostname: collector_hostname__.unwrap_or_default(),
+                    remote_config: remote_config__,
                 })
             }
         }
         deserializer.deserialize_struct("envoy.config.trace.v3.DatadogConfig", FIELDS, GeneratedVisitor)
+    }
+}
+impl serde::Serialize for DatadogRemoteConfig {
+    #[allow(deprecated)]
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut len = 0;
+        if self.polling_interval.is_some() {
+            len += 1;
+        }
+        let mut struct_ser = serializer.serialize_struct("envoy.config.trace.v3.DatadogRemoteConfig", len)?;
+        if let Some(v) = self.polling_interval.as_ref() {
+            struct_ser.serialize_field("polling_interval", v)?;
+        }
+        struct_ser.end()
+    }
+}
+impl<'de> serde::Deserialize<'de> for DatadogRemoteConfig {
+    #[allow(deprecated)]
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        const FIELDS: &[&str] = &[
+            "polling_interval",
+            "pollingInterval",
+        ];
+
+        #[allow(clippy::enum_variant_names)]
+        enum GeneratedField {
+            PollingInterval,
+        }
+        impl<'de> serde::Deserialize<'de> for GeneratedField {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                struct GeneratedVisitor;
+
+                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+                    type Value = GeneratedField;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(formatter, "expected one of: {:?}", &FIELDS)
+                    }
+
+                    #[allow(unused_variables)]
+                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match value {
+                            "pollingInterval" | "polling_interval" => Ok(GeneratedField::PollingInterval),
+                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
+                        }
+                    }
+                }
+                deserializer.deserialize_identifier(GeneratedVisitor)
+            }
+        }
+        struct GeneratedVisitor;
+        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
+            type Value = DatadogRemoteConfig;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct envoy.config.trace.v3.DatadogRemoteConfig")
+            }
+
+            fn visit_map<V>(self, mut map_: V) -> std::result::Result<DatadogRemoteConfig, V::Error>
+                where
+                    V: serde::de::MapAccess<'de>,
+            {
+                let mut polling_interval__ = None;
+                while let Some(k) = map_.next_key()? {
+                    match k {
+                        GeneratedField::PollingInterval => {
+                            if polling_interval__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("pollingInterval"));
+                            }
+                            polling_interval__ = map_.next_value()?;
+                        }
+                    }
+                }
+                Ok(DatadogRemoteConfig {
+                    polling_interval: polling_interval__,
+                })
+            }
+        }
+        deserializer.deserialize_struct("envoy.config.trace.v3.DatadogRemoteConfig", FIELDS, GeneratedVisitor)
     }
 }
 impl serde::Serialize for DynamicOtConfig {
@@ -611,402 +721,6 @@ impl<'de> serde::Deserialize<'de> for lightstep_config::PropagationMode {
         deserializer.deserialize_any(GeneratedVisitor)
     }
 }
-impl serde::Serialize for OpenCensusConfig {
-    #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeStruct;
-        let mut len = 0;
-        if self.trace_config.is_some() {
-            len += 1;
-        }
-        if self.stdout_exporter_enabled {
-            len += 1;
-        }
-        if self.stackdriver_exporter_enabled {
-            len += 1;
-        }
-        if !self.stackdriver_project_id.is_empty() {
-            len += 1;
-        }
-        if !self.stackdriver_address.is_empty() {
-            len += 1;
-        }
-        if self.stackdriver_grpc_service.is_some() {
-            len += 1;
-        }
-        if self.zipkin_exporter_enabled {
-            len += 1;
-        }
-        if !self.zipkin_url.is_empty() {
-            len += 1;
-        }
-        if self.ocagent_exporter_enabled {
-            len += 1;
-        }
-        if !self.ocagent_address.is_empty() {
-            len += 1;
-        }
-        if self.ocagent_grpc_service.is_some() {
-            len += 1;
-        }
-        if !self.incoming_trace_context.is_empty() {
-            len += 1;
-        }
-        if !self.outgoing_trace_context.is_empty() {
-            len += 1;
-        }
-        let mut struct_ser = serializer.serialize_struct("envoy.config.trace.v3.OpenCensusConfig", len)?;
-        if let Some(v) = self.trace_config.as_ref() {
-            struct_ser.serialize_field("trace_config", v)?;
-        }
-        if self.stdout_exporter_enabled {
-            struct_ser.serialize_field("stdout_exporter_enabled", &self.stdout_exporter_enabled)?;
-        }
-        if self.stackdriver_exporter_enabled {
-            struct_ser.serialize_field("stackdriver_exporter_enabled", &self.stackdriver_exporter_enabled)?;
-        }
-        if !self.stackdriver_project_id.is_empty() {
-            struct_ser.serialize_field("stackdriver_project_id", &self.stackdriver_project_id)?;
-        }
-        if !self.stackdriver_address.is_empty() {
-            struct_ser.serialize_field("stackdriver_address", &self.stackdriver_address)?;
-        }
-        if let Some(v) = self.stackdriver_grpc_service.as_ref() {
-            struct_ser.serialize_field("stackdriver_grpc_service", v)?;
-        }
-        if self.zipkin_exporter_enabled {
-            struct_ser.serialize_field("zipkin_exporter_enabled", &self.zipkin_exporter_enabled)?;
-        }
-        if !self.zipkin_url.is_empty() {
-            struct_ser.serialize_field("zipkin_url", &self.zipkin_url)?;
-        }
-        if self.ocagent_exporter_enabled {
-            struct_ser.serialize_field("ocagent_exporter_enabled", &self.ocagent_exporter_enabled)?;
-        }
-        if !self.ocagent_address.is_empty() {
-            struct_ser.serialize_field("ocagent_address", &self.ocagent_address)?;
-        }
-        if let Some(v) = self.ocagent_grpc_service.as_ref() {
-            struct_ser.serialize_field("ocagent_grpc_service", v)?;
-        }
-        if !self.incoming_trace_context.is_empty() {
-            let v = self.incoming_trace_context.iter().cloned().map(|v| {
-                open_census_config::TraceContext::try_from(v)
-                    .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", v)))
-                }).collect::<std::result::Result<Vec<_>, _>>()?;
-            struct_ser.serialize_field("incoming_trace_context", &v)?;
-        }
-        if !self.outgoing_trace_context.is_empty() {
-            let v = self.outgoing_trace_context.iter().cloned().map(|v| {
-                open_census_config::TraceContext::try_from(v)
-                    .map_err(|_| serde::ser::Error::custom(format!("Invalid variant {}", v)))
-                }).collect::<std::result::Result<Vec<_>, _>>()?;
-            struct_ser.serialize_field("outgoing_trace_context", &v)?;
-        }
-        struct_ser.end()
-    }
-}
-impl<'de> serde::Deserialize<'de> for OpenCensusConfig {
-    #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        const FIELDS: &[&str] = &[
-            "trace_config",
-            "traceConfig",
-            "stdout_exporter_enabled",
-            "stdoutExporterEnabled",
-            "stackdriver_exporter_enabled",
-            "stackdriverExporterEnabled",
-            "stackdriver_project_id",
-            "stackdriverProjectId",
-            "stackdriver_address",
-            "stackdriverAddress",
-            "stackdriver_grpc_service",
-            "stackdriverGrpcService",
-            "zipkin_exporter_enabled",
-            "zipkinExporterEnabled",
-            "zipkin_url",
-            "zipkinUrl",
-            "ocagent_exporter_enabled",
-            "ocagentExporterEnabled",
-            "ocagent_address",
-            "ocagentAddress",
-            "ocagent_grpc_service",
-            "ocagentGrpcService",
-            "incoming_trace_context",
-            "incomingTraceContext",
-            "outgoing_trace_context",
-            "outgoingTraceContext",
-        ];
-
-        #[allow(clippy::enum_variant_names)]
-        enum GeneratedField {
-            TraceConfig,
-            StdoutExporterEnabled,
-            StackdriverExporterEnabled,
-            StackdriverProjectId,
-            StackdriverAddress,
-            StackdriverGrpcService,
-            ZipkinExporterEnabled,
-            ZipkinUrl,
-            OcagentExporterEnabled,
-            OcagentAddress,
-            OcagentGrpcService,
-            IncomingTraceContext,
-            OutgoingTraceContext,
-        }
-        impl<'de> serde::Deserialize<'de> for GeneratedField {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
-            where
-                D: serde::Deserializer<'de>,
-            {
-                struct GeneratedVisitor;
-
-                impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
-                    type Value = GeneratedField;
-
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                        write!(formatter, "expected one of: {:?}", &FIELDS)
-                    }
-
-                    #[allow(unused_variables)]
-                    fn visit_str<E>(self, value: &str) -> std::result::Result<GeneratedField, E>
-                    where
-                        E: serde::de::Error,
-                    {
-                        match value {
-                            "traceConfig" | "trace_config" => Ok(GeneratedField::TraceConfig),
-                            "stdoutExporterEnabled" | "stdout_exporter_enabled" => Ok(GeneratedField::StdoutExporterEnabled),
-                            "stackdriverExporterEnabled" | "stackdriver_exporter_enabled" => Ok(GeneratedField::StackdriverExporterEnabled),
-                            "stackdriverProjectId" | "stackdriver_project_id" => Ok(GeneratedField::StackdriverProjectId),
-                            "stackdriverAddress" | "stackdriver_address" => Ok(GeneratedField::StackdriverAddress),
-                            "stackdriverGrpcService" | "stackdriver_grpc_service" => Ok(GeneratedField::StackdriverGrpcService),
-                            "zipkinExporterEnabled" | "zipkin_exporter_enabled" => Ok(GeneratedField::ZipkinExporterEnabled),
-                            "zipkinUrl" | "zipkin_url" => Ok(GeneratedField::ZipkinUrl),
-                            "ocagentExporterEnabled" | "ocagent_exporter_enabled" => Ok(GeneratedField::OcagentExporterEnabled),
-                            "ocagentAddress" | "ocagent_address" => Ok(GeneratedField::OcagentAddress),
-                            "ocagentGrpcService" | "ocagent_grpc_service" => Ok(GeneratedField::OcagentGrpcService),
-                            "incomingTraceContext" | "incoming_trace_context" => Ok(GeneratedField::IncomingTraceContext),
-                            "outgoingTraceContext" | "outgoing_trace_context" => Ok(GeneratedField::OutgoingTraceContext),
-                            _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
-                        }
-                    }
-                }
-                deserializer.deserialize_identifier(GeneratedVisitor)
-            }
-        }
-        struct GeneratedVisitor;
-        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
-            type Value = OpenCensusConfig;
-
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                formatter.write_str("struct envoy.config.trace.v3.OpenCensusConfig")
-            }
-
-            fn visit_map<V>(self, mut map_: V) -> std::result::Result<OpenCensusConfig, V::Error>
-                where
-                    V: serde::de::MapAccess<'de>,
-            {
-                let mut trace_config__ = None;
-                let mut stdout_exporter_enabled__ = None;
-                let mut stackdriver_exporter_enabled__ = None;
-                let mut stackdriver_project_id__ = None;
-                let mut stackdriver_address__ = None;
-                let mut stackdriver_grpc_service__ = None;
-                let mut zipkin_exporter_enabled__ = None;
-                let mut zipkin_url__ = None;
-                let mut ocagent_exporter_enabled__ = None;
-                let mut ocagent_address__ = None;
-                let mut ocagent_grpc_service__ = None;
-                let mut incoming_trace_context__ = None;
-                let mut outgoing_trace_context__ = None;
-                while let Some(k) = map_.next_key()? {
-                    match k {
-                        GeneratedField::TraceConfig => {
-                            if trace_config__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("traceConfig"));
-                            }
-                            trace_config__ = map_.next_value()?;
-                        }
-                        GeneratedField::StdoutExporterEnabled => {
-                            if stdout_exporter_enabled__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("stdoutExporterEnabled"));
-                            }
-                            stdout_exporter_enabled__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::StackdriverExporterEnabled => {
-                            if stackdriver_exporter_enabled__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("stackdriverExporterEnabled"));
-                            }
-                            stackdriver_exporter_enabled__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::StackdriverProjectId => {
-                            if stackdriver_project_id__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("stackdriverProjectId"));
-                            }
-                            stackdriver_project_id__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::StackdriverAddress => {
-                            if stackdriver_address__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("stackdriverAddress"));
-                            }
-                            stackdriver_address__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::StackdriverGrpcService => {
-                            if stackdriver_grpc_service__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("stackdriverGrpcService"));
-                            }
-                            stackdriver_grpc_service__ = map_.next_value()?;
-                        }
-                        GeneratedField::ZipkinExporterEnabled => {
-                            if zipkin_exporter_enabled__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("zipkinExporterEnabled"));
-                            }
-                            zipkin_exporter_enabled__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::ZipkinUrl => {
-                            if zipkin_url__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("zipkinUrl"));
-                            }
-                            zipkin_url__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::OcagentExporterEnabled => {
-                            if ocagent_exporter_enabled__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("ocagentExporterEnabled"));
-                            }
-                            ocagent_exporter_enabled__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::OcagentAddress => {
-                            if ocagent_address__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("ocagentAddress"));
-                            }
-                            ocagent_address__ = Some(map_.next_value()?);
-                        }
-                        GeneratedField::OcagentGrpcService => {
-                            if ocagent_grpc_service__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("ocagentGrpcService"));
-                            }
-                            ocagent_grpc_service__ = map_.next_value()?;
-                        }
-                        GeneratedField::IncomingTraceContext => {
-                            if incoming_trace_context__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("incomingTraceContext"));
-                            }
-                            incoming_trace_context__ = Some(map_.next_value::<Vec<open_census_config::TraceContext>>()?.into_iter().map(|x| x as i32).collect());
-                        }
-                        GeneratedField::OutgoingTraceContext => {
-                            if outgoing_trace_context__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("outgoingTraceContext"));
-                            }
-                            outgoing_trace_context__ = Some(map_.next_value::<Vec<open_census_config::TraceContext>>()?.into_iter().map(|x| x as i32).collect());
-                        }
-                    }
-                }
-                Ok(OpenCensusConfig {
-                    trace_config: trace_config__,
-                    stdout_exporter_enabled: stdout_exporter_enabled__.unwrap_or_default(),
-                    stackdriver_exporter_enabled: stackdriver_exporter_enabled__.unwrap_or_default(),
-                    stackdriver_project_id: stackdriver_project_id__.unwrap_or_default(),
-                    stackdriver_address: stackdriver_address__.unwrap_or_default(),
-                    stackdriver_grpc_service: stackdriver_grpc_service__,
-                    zipkin_exporter_enabled: zipkin_exporter_enabled__.unwrap_or_default(),
-                    zipkin_url: zipkin_url__.unwrap_or_default(),
-                    ocagent_exporter_enabled: ocagent_exporter_enabled__.unwrap_or_default(),
-                    ocagent_address: ocagent_address__.unwrap_or_default(),
-                    ocagent_grpc_service: ocagent_grpc_service__,
-                    incoming_trace_context: incoming_trace_context__.unwrap_or_default(),
-                    outgoing_trace_context: outgoing_trace_context__.unwrap_or_default(),
-                })
-            }
-        }
-        deserializer.deserialize_struct("envoy.config.trace.v3.OpenCensusConfig", FIELDS, GeneratedVisitor)
-    }
-}
-impl serde::Serialize for open_census_config::TraceContext {
-    #[allow(deprecated)]
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let variant = match self {
-            Self::None => "NONE",
-            Self::TraceContext => "TRACE_CONTEXT",
-            Self::GrpcTraceBin => "GRPC_TRACE_BIN",
-            Self::CloudTraceContext => "CLOUD_TRACE_CONTEXT",
-            Self::B3 => "B3",
-        };
-        serializer.serialize_str(variant)
-    }
-}
-impl<'de> serde::Deserialize<'de> for open_census_config::TraceContext {
-    #[allow(deprecated)]
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        const FIELDS: &[&str] = &[
-            "NONE",
-            "TRACE_CONTEXT",
-            "GRPC_TRACE_BIN",
-            "CLOUD_TRACE_CONTEXT",
-            "B3",
-        ];
-
-        struct GeneratedVisitor;
-
-        impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
-            type Value = open_census_config::TraceContext;
-
-            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(formatter, "expected one of: {:?}", &FIELDS)
-            }
-
-            fn visit_i64<E>(self, v: i64) -> std::result::Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                i32::try_from(v)
-                    .ok()
-                    .and_then(|x| x.try_into().ok())
-                    .ok_or_else(|| {
-                        serde::de::Error::invalid_value(serde::de::Unexpected::Signed(v), &self)
-                    })
-            }
-
-            fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                i32::try_from(v)
-                    .ok()
-                    .and_then(|x| x.try_into().ok())
-                    .ok_or_else(|| {
-                        serde::de::Error::invalid_value(serde::de::Unexpected::Unsigned(v), &self)
-                    })
-            }
-
-            fn visit_str<E>(self, value: &str) -> std::result::Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                match value {
-                    "NONE" => Ok(open_census_config::TraceContext::None),
-                    "TRACE_CONTEXT" => Ok(open_census_config::TraceContext::TraceContext),
-                    "GRPC_TRACE_BIN" => Ok(open_census_config::TraceContext::GrpcTraceBin),
-                    "CLOUD_TRACE_CONTEXT" => Ok(open_census_config::TraceContext::CloudTraceContext),
-                    "B3" => Ok(open_census_config::TraceContext::B3),
-                    _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
-                }
-            }
-        }
-        deserializer.deserialize_any(GeneratedVisitor)
-    }
-}
 impl serde::Serialize for OpenTelemetryConfig {
     #[allow(deprecated)]
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -1030,6 +744,9 @@ impl serde::Serialize for OpenTelemetryConfig {
         if self.sampler.is_some() {
             len += 1;
         }
+        if self.max_cache_size.is_some() {
+            len += 1;
+        }
         let mut struct_ser = serializer.serialize_struct("envoy.config.trace.v3.OpenTelemetryConfig", len)?;
         if let Some(v) = self.grpc_service.as_ref() {
             struct_ser.serialize_field("grpc_service", v)?;
@@ -1045,6 +762,9 @@ impl serde::Serialize for OpenTelemetryConfig {
         }
         if let Some(v) = self.sampler.as_ref() {
             struct_ser.serialize_field("sampler", v)?;
+        }
+        if let Some(v) = self.max_cache_size.as_ref() {
+            struct_ser.serialize_field("max_cache_size", v)?;
         }
         struct_ser.end()
     }
@@ -1065,6 +785,8 @@ impl<'de> serde::Deserialize<'de> for OpenTelemetryConfig {
             "resource_detectors",
             "resourceDetectors",
             "sampler",
+            "max_cache_size",
+            "maxCacheSize",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -1074,6 +796,7 @@ impl<'de> serde::Deserialize<'de> for OpenTelemetryConfig {
             ServiceName,
             ResourceDetectors,
             Sampler,
+            MaxCacheSize,
         }
         impl<'de> serde::Deserialize<'de> for GeneratedField {
             fn deserialize<D>(deserializer: D) -> std::result::Result<GeneratedField, D::Error>
@@ -1100,6 +823,7 @@ impl<'de> serde::Deserialize<'de> for OpenTelemetryConfig {
                             "serviceName" | "service_name" => Ok(GeneratedField::ServiceName),
                             "resourceDetectors" | "resource_detectors" => Ok(GeneratedField::ResourceDetectors),
                             "sampler" => Ok(GeneratedField::Sampler),
+                            "maxCacheSize" | "max_cache_size" => Ok(GeneratedField::MaxCacheSize),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -1124,6 +848,7 @@ impl<'de> serde::Deserialize<'de> for OpenTelemetryConfig {
                 let mut service_name__ = None;
                 let mut resource_detectors__ = None;
                 let mut sampler__ = None;
+                let mut max_cache_size__ = None;
                 while let Some(k) = map_.next_key()? {
                     match k {
                         GeneratedField::GrpcService => {
@@ -1156,6 +881,12 @@ impl<'de> serde::Deserialize<'de> for OpenTelemetryConfig {
                             }
                             sampler__ = map_.next_value()?;
                         }
+                        GeneratedField::MaxCacheSize => {
+                            if max_cache_size__.is_some() {
+                                return Err(serde::de::Error::duplicate_field("maxCacheSize"));
+                            }
+                            max_cache_size__ = map_.next_value()?;
+                        }
                     }
                 }
                 Ok(OpenTelemetryConfig {
@@ -1164,6 +895,7 @@ impl<'de> serde::Deserialize<'de> for OpenTelemetryConfig {
                     service_name: service_name__.unwrap_or_default(),
                     resource_detectors: resource_detectors__.unwrap_or_default(),
                     sampler: sampler__,
+                    max_cache_size: max_cache_size__,
                 })
             }
         }
