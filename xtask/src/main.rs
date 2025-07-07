@@ -6,11 +6,24 @@ use std::{
 };
 
 use anyhow::Context;
+use clap::{Parser, ValueEnum};
 use prost::Message;
 use prost_build::Module;
 use prost_types::FileDescriptorSet;
 use serde::Deserialize;
-use xshell::{cmd, Shell};
+use xshell::{Shell, cmd};
+
+#[derive(Debug, Parser)]
+struct Args {
+    #[arg(value_enum)]
+    commands: Vec<Commands>,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum, PartialEq, Eq)]
+enum Commands {
+    Generate,
+    CheckDirty,
+}
 
 /// Generate sources and check that the generated changes have been committed.
 ///
@@ -20,14 +33,14 @@ use xshell::{cmd, Shell};
 ///
 /// These flags are opt-out instead of opt-in so the checks run in CI and fail
 /// on pushes that get protos and generated sources out-of-sync.
-#[test]
-fn generate_sources() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<()> {
+    let args = Args::parse();
     let sh = Shell::new().unwrap();
-    if env::var("XDS_API_SKIP_GEN_SRC").is_err() {
+
+    if args.commands.is_empty() || args.commands.contains(&Commands::Generate) {
         generate_xds_api(&sh)?;
     }
-
-    if env::var("XDS_API_SKIP_GEN_SRC_DIRTY_CHECK").is_err() {
+    if args.commands.is_empty() || args.commands.contains(&Commands::CheckDirty) {
         check_dirty_repo(&sh)?;
     }
 
@@ -36,6 +49,9 @@ fn generate_sources() -> anyhow::Result<()> {
 
 fn project_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .canonicalize()
+        .unwrap()
 }
 
 /// Generate the xds-api definitions by downloading protobuf dependencies and running
