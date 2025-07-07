@@ -1,12 +1,12 @@
 name: Regression Build and Test
 
-on: 
+on:
   push:
-    branches: [ "main" ]
-    
+    branches: ["main"]
+
   pull_request:
-    branches: [ "main" ]
-  
+    branches: ["main"]
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -15,15 +15,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v3
-      with:
-        version: "27.3"
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          version: "29.5"
 
-    - name: Build
-      run: cargo build --verbose
-      
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Regenerate sources and check for uncommitted changes
+        run: cargo xtask generate check-dirty
+
+      - name: Run tests
+        run: cargo test --verbose
